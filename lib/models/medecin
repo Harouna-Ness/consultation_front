@@ -1,0 +1,60 @@
+class Medecin extends Utilisateur {
+  final String specialite;
+  final List<String> joursIntervention;
+
+  Medecin({
+    required int id,
+    required String nom,
+    required String prenom,
+    required Role role,
+    required String adresse,
+    required String email,
+    required String telephone,
+    required String motDePasse,
+    required String sexe,
+    required this.specialite,
+    required this.joursIntervention,
+  }) : super(
+            id: id,
+            nom: nom,
+            prenom: prenom,
+            role: role,
+            adresse: adresse,
+            email: email,
+            telephone: telephone,
+            motDePasse: motDePasse,
+            sexe: sexe);
+
+  factory Medecin.fromMap(Map<String, dynamic> map) {
+    return Medecin(
+      id: map['id'],
+      nom: map['nom'],
+      prenom: map['prenom'],
+      role: Role.fromMap(map['role']),
+      adresse: map['adresse'],
+      email: map['email'],
+      telephone: map['telephone'],
+      motDePasse: map['motDePasse'],
+      sexe: map['sexe'],
+      specialite: map['specialite'],
+      joursIntervention: List<String>.from(map['joursIntervention']),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nom': nom,
+      'prenom': prenom,
+      'role': role.toMap(),
+      'adresse': adresse,
+      'email': email,
+      'telephone': telephone,
+      'motDePasse': motDePasse,
+      'sexe': sexe,
+      'specialite': specialite,
+      'joursIntervention': joursIntervention,
+    };
+  }
+}

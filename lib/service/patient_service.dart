@@ -18,7 +18,7 @@ class PatientService {
     _cachedPatientCount = prefs.getInt('patient_count');
 
     if (_cachedPatientCount != null) {
-      //print("dans le cache:::::: $_cachedPatientCount");
+      
       return _cachedPatientCount!;
     }
 
@@ -26,7 +26,7 @@ class PatientService {
     try {
       Response response = await apiService.getData('admin/voirNombrePatient');
       _cachedPatientCount = response.data;
-      print("hors cache:::::: $_cachedPatientCount");
+
       // Sauvegarder le nombre d'utilisateurs dans Shared Preferences
       await prefs.setInt('patient_count', _cachedPatientCount!);
       return _cachedPatientCount!;

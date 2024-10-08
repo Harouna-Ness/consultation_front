@@ -24,12 +24,6 @@ class _PatientsState extends State<Patients> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    double? changeSize() {
-      if (size.width < 880) {
-        return 20;
-      } else {}
-      return null;
-    }
 
     List<PieChartSectionData> pieChartSectionData = [
       PieChartSectionData(
