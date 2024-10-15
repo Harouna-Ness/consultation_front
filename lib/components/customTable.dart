@@ -1,133 +1,330 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:medstory/components/edit_patient_model.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/controllers/controller.dart';
+import 'package:medstory/models/my_data.dart';
+import 'package:medstory/models/patient.dart';
+import 'package:medstory/service/patient_service.dart';
+import 'package:medstory/utils/lodder.dart';
+import 'package:provider/provider.dart';
 
-class Customtable extends StatelessWidget {
+class Customtable extends StatefulWidget {
   const Customtable({super.key});
 
+  @override
+  State<Customtable> createState() => _CustomtableState();
+}
+
+class _CustomtableState extends State<Customtable> {
+  String searchText = '';
+  String? selectedFilter;
+  List<String> filters = [
+    "Aucun Filtre",
+    "Direction",
+    "Site de Travail",
+    "Profession"
+  ];
+  TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return Container(
-      child: size.width > 1000
-          ? SizedBox(
-              width: double.infinity,
-              child: DataTable(
-                headingTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-                horizontalMargin: 0,
-                columnSpacing: defaultPadding,
-                columns: const [
-                  DataColumn(label: Text("Prénom")),
-                  DataColumn(label: Text("Nom")),
-                  DataColumn(label: Text("Age")),
-                  DataColumn(label: Text("Matricule")),
-                  DataColumn(label: Text("Proffession")),
-                  DataColumn(label: Text("Direction")),
-                  DataColumn(label: Text("Site de Travail")),
-                  DataColumn(label: Text("Actions")),
-                ],
-                rows: List.generate(
-                  10,
-                  (index) => customDataRow(),
-                ),
-              ),
-            )
-          : SizedBox(
-              width: double.infinity,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Column(
-                        children: [
-                          customtableHeader(),
-                          const Divider(
-                            height: 1,
-                            thickness: 5,
-                            indent: 2,
-                            endIndent: 0,
-                            color: Colors.black,
+    //
+    List<Patient> filteredPatients =
+        context.watch<MyData>().patients.where((patient) {
+      bool matchesSearch = patient.prenom
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase()) ||
+              patient.nom.toLowerCase().contains(searchText.toLowerCase()) ||
+              patient.proffession!
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase()) ||
+              patient.sitedetravail!.nom
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase()) ??
+          false;
+      bool matchesFilter = true;
+      if (selectedFilter != null) {
+        switch (selectedFilter) {
+          case "Direction":
+            matchesFilter = patient.direction?.nom != null &&
+                patient.direction!.nom.toLowerCase().contains(searchText);
+            break;
+          case "Site de Travail":
+            matchesFilter = patient.sitedetravail?.nom != null &&
+                patient.sitedetravail!.nom.toLowerCase().contains(searchText);
+            break;
+          case "profession":
+            matchesFilter = patient.proffession != null &&
+                patient.proffession!.toLowerCase().contains(searchText);
+            break;
+        }
+      }
+      return matchesSearch && matchesFilter;
+    }).toList();
+
+    //
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              "Liste des patients",
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Colors.black87,
+                    fontSize: 18,
+                  ),
+            ),
+            const Spacer(),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  width: 200,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Center(
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          searchText = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        icon: SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: SvgPicture.asset(
+                            "assets/icons/search_icon.svg", // Icône SVG pour le bouton
                           ),
-                          Column(
-                            children: List.generate(
-                              10,
-                              (index) => customDataRow1(),
-                            ),
-                          ),
-                        ],
+                        ),
+                        hintText: "Prénom, nom, profession...",
+                        contentPadding: const EdgeInsets.only(
+                          bottom: 10,
+                        ),
+                        border: InputBorder.none,
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 100,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 40,
-                          child: const Text(
-                            "Actions",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Column(
-                          children: List.generate(
-                            10,
-                            (index) => Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Container(
-                                  height: 56,
-                                  child: SvgPicture.asset(
-                                    "assets/icons/Report.svg",
-                                    height: 25,
-                                    width: 25,
-                                  ),
-                                ),
-                                Container(
-                                  height: 56,
-                                  child: SvgPicture.asset(
-                                    "assets/icons/Report.svg",
-                                    height: 25,
-                                    width: 25,
-                                  ),
-                                ),
-                                Container(
-                                  height: 56,
-                                  child: SvgPicture.asset(
-                                    "assets/icons/Report.svg",
-                                    height: 25,
-                                    width: 25,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Container(
+                  height: 35,
+                  width: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 0.5,
                     ),
                   ),
-                ],
-              ),
+                  child: Center(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedFilter,
+                        icon: SvgPicture.asset(
+                          "assets/icons/filter_alt.svg", // Icône SVG pour le bouton
+                          height: 25,
+                          width: 25,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedFilter = newValue!;
+                          });
+                        },
+                        selectedItemBuilder: (BuildContext context) {
+                          return filters.map<Widget>((String value) {
+                            return Container(); // On cache complètement le texte
+                          }).toList();
+                        },
+                        menuWidth: 200,
+                        items: filters
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(
+              width: 50,
+            ),
+          ],
+        ),
+        Container(
+          child: size.width > 1000
+              ? SizedBox(
+                  width: double.infinity,
+                  child: DataTable(
+                    headingTextStyle:
+                        const TextStyle(fontWeight: FontWeight.bold),
+                    horizontalMargin: 0,
+                    columnSpacing: defaultPadding,
+                    columns: const [
+                      DataColumn(label: Text("Prénom")),
+                      DataColumn(label: Text("Nom")),
+                      DataColumn(label: Text("Age")),
+                      DataColumn(label: Text("Matricule")),
+                      DataColumn(label: Text("Proffession")),
+                      DataColumn(label: Text("Direction")),
+                      DataColumn(label: Text("Site de Travail")),
+                      DataColumn(label: Text("Actions")),
+                    ],
+                    rows: List.generate(
+                      filteredPatients.length,
+                      (index) =>
+                          customDataRow(context, filteredPatients[index]),
+                      // context.watch<MyData>().patients.length,
+                      // (index) => customDataRow(
+                      //     context, context.watch<MyData>().patients[index]),
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                            children: [
+                              customtableHeader(),
+                              const Divider(
+                                height: 1,
+                                thickness: 5,
+                                indent: 2,
+                                endIndent: 0,
+                                color: Colors.black,
+                              ),
+                              Column(
+                                children: List.generate(
+                                  10,
+                                  (index) => customDataRow1(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 40,
+                              child: const Text(
+                                "Actions",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Column(
+                              children: List.generate(
+                                10,
+                                (index) => Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Container(
+                                      height: 56,
+                                      child: SvgPicture.asset(
+                                        "assets/icons/Report.svg",
+                                        height: 25,
+                                        width: 25,
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 56,
+                                      child: SvgPicture.asset(
+                                        "assets/icons/Report.svg",
+                                        height: 25,
+                                        width: 25,
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 56,
+                                      child: SvgPicture.asset(
+                                        "assets/icons/Report.svg",
+                                        height: 25,
+                                        width: 25,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      ],
     );
   }
 }
 
+void showEditPatientModal(BuildContext context, Patient patient) {
+  final patientService = PatientService();
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return ChangeNotifierProvider.value(
+        value: Provider.of<MyData>(context),
+        child: EditPatientModal(
+          patient: patient,
+          onSubmit: (onSubmit) async {
+            context.showLoader();
+            await patientService.updatePatient(onSubmit).then((onValue) {
+              context.hideLoader();
+            }).catchError((onError) {
+              context.showError(onError.toString());
+            }).whenComplete(() {
+              context.showSuccess("Le patient a été modifié avec succès.");
+              context.read<MyMenuController>().changePage(1);
+            });
+          },
+          contexte: context,
+        ),
+      );
+    },
+  );
+}
+
 DataRow customDataRow(
-    // parametre ou donnée à passer
-    ) {
+  // parametre ou donnée à passer
+  BuildContext contexte,
+  Patient patient,
+) {
   return DataRow(
     cells: [
       DataCell(
         Container(
           width: 150,
           child: Text(
-            "Nessy Nessy Nessy Nessy Nessy Nessy Nessy Nessy",
+            patient.prenom,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -136,37 +333,67 @@ DataRow customDataRow(
       DataCell(
         Container(
           width: 150,
-          child: Text("Nessy"),
+          child: Text(patient.nom),
         ),
       ),
-      DataCell(Text("Nessy")),
-      DataCell(Text("Nessy")),
-      DataCell(Text("Nessy Nessy")),
-      DataCell(Text("Nessy Nessy")),
-      DataCell(Text("Nessy Nessy Nessy")),
+      DataCell(Text(patient.dateDeNaissance!.day.toString())),
+      DataCell(Text(patient.telephone)),
+      DataCell(patient.proffession != null
+          ? Text(patient.proffession!)
+          : const Text("Néant")),
+      DataCell(patient.direction != null
+          ? Text(patient.direction!.nom)
+          : const Text("Néant")),
+      DataCell(patient.sitedetravail != null
+          ? Text(patient.sitedetravail!.nom)
+          : const Text("Néant")),
       DataCell(
         Row(
           children: [
-            SvgPicture.asset(
-              "assets/icons/Report.svg",
-              height: 25,
-              width: 25,
+            InkWell(
+              onTap: () {
+                showEditPatientModal(contexte, patient);
+              },
+              child: SvgPicture.asset(
+                "assets/icons/edit.svg",
+                height: 25,
+                width: 25,
+              ),
             ),
             const SizedBox(
               width: 5,
             ),
-            SvgPicture.asset(
-              "assets/icons/Report.svg",
-              height: 25,
-              width: 25,
+            InkWell(
+              onTap: () {},
+              child: SvgPicture.asset(
+                "assets/icons/folderView.svg",
+                height: 25,
+                width: 25,
+              ),
             ),
             const SizedBox(
               width: 5,
             ),
-            SvgPicture.asset(
-              "assets/icons/Report.svg",
-              height: 25,
-              width: 25,
+            InkWell(
+              onTap: () async {
+                contexte.showLoader();
+                final patientService = PatientService();
+                await patientService.deletePatient(patient.id!).then((value) {
+                  contexte.read<MyData>().getNombrePatient();
+                  contexte.hideLoader();
+                }).catchError((onError) {
+                  contexte.showError(onError.toString());
+                }).whenComplete(() {
+                  contexte
+                      .showSuccess("Le patient a été supprimé avec succès.");
+                  contexte.read<MyMenuController>().changePage(1);
+                });
+              },
+              child: SvgPicture.asset(
+                "assets/icons/supp.svg",
+                height: 25,
+                width: 25,
+              ),
             ),
           ],
         ),

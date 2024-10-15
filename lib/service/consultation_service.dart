@@ -6,6 +6,16 @@ class ConsultationService {
   final apiService = ApiService(DioClient.dio);
   int? _cachedconsultationCount;
 
+  Future<void> creerConsultation(Map<String, dynamic> data, String emailPatient) async {
+    try {
+      await apiService.postData("medicin/creerConsultation/$emailPatient", data);
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET consultation_count : $e");
+    }
+  }
+
+  
+
   Future<int> getConsultationCount() async {
     // Vérifier si le nombre d'utilisateurs est déjà mis en cache
     if (_cachedconsultationCount != null) {

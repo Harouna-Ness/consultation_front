@@ -1,11 +1,11 @@
 import 'package:medstory/models/role.dart';
 
 class Utilisateur {
-  final int id;
+  final int? id;
   final String nom;
   final String prenom;
   final Role role;
-  final String adresse;
+  final String? adresse;
   final String email;
   final String telephone;
   final String motDePasse;

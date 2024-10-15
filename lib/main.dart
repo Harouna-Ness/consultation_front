@@ -5,7 +5,19 @@ import 'package:medstory/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => MyMenuController(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => MyData(),
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    );
 }
 
 class MyApp extends StatelessWidget {
@@ -20,17 +32,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
         useMaterial3: true,
       ),
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => MyMenuController(),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => MyData(),
-          ),
-        ],
-        child: const MainScreen(),
-      ),
+      home: const MainScreen(),
     );
   }
 }

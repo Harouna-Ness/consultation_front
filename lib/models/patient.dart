@@ -5,11 +5,11 @@ import 'package:medstory/models/statut_patient.dart';
 import 'package:medstory/models/utilisateur.dart';
 
 class Patient extends Utilisateur {
-  final DateTime dateDeNaissance;
-  final String profession;
-  final Sitedetravail sitedetravail;
-  final Direction direction;
-  final StatutPatient statut;
+  final DateTime? dateDeNaissance;
+  final String? proffession;
+  final Sitedetravail? sitedetravail;
+  final Direction? direction;
+  final StatutPatient? statut;
 
   Patient({
     required super.id,
@@ -22,7 +22,7 @@ class Patient extends Utilisateur {
     required super.motDePasse,
     required super.sexe,
     required this.dateDeNaissance,
-    required this.profession,
+    required this.proffession,
     required this.sitedetravail,
     required this.direction,
     required this.statut,
@@ -33,15 +33,15 @@ class Patient extends Utilisateur {
       id: map['id'],
       nom: map['nom'],
       prenom: map['prenom'],
-      role: Role.fromMap(map['role']),
+      role:  Role.fromMap(map['role']),
       adresse: map['adresse'],
       email: map['email'],
       telephone: map['telephone'],
       motDePasse: map['motDePasse'],
       sexe: map['sexe'],
       dateDeNaissance: DateTime.parse(map['dateDeNaissance']),
-      profession: map['profession'],
-      sitedetravail: Sitedetravail.fromMap(map['Sitedetravail']),
+      proffession: map['proffession'],
+      sitedetravail: map['siteDeTravail'] != null ? Sitedetravail.fromMap(map['siteDeTravail']): null,
       direction: Direction.fromMap(map['direction']),
       statut: StatutPatient.fromMap(map['statut']),
     );
@@ -59,11 +59,11 @@ class Patient extends Utilisateur {
       'telephone': telephone,
       'motDePasse': motDePasse,
       'sexe': sexe,
-      'dateDeNaissance': dateDeNaissance.toIso8601String(),
-      'profession': profession,
-      'Sitedetravail': sitedetravail.toMap(),
-      'direction': direction.toMap(),
-      'statut': statut.toMap(),
+      'dateDeNaissance': dateDeNaissance!.toIso8601String(),
+      'proffession': proffession,
+      'Sitedetravail': sitedetravail?.toMap(),
+      'direction': direction?.toMap(),
+      'statut': statut?.toMap(),
     };
   }
 }

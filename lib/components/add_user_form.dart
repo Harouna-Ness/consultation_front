@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:medstory/models/direction.dart';
+import 'package:medstory/models/my_data.dart';
+import 'package:medstory/models/site_de_tavail.dart';
+import 'package:provider/provider.dart';
 
 class AddUserForm extends StatefulWidget {
-  final Function(Map<String, dynamic>) onSubmit; // Callback pour renvoyer les données du formulaire
+  final Function(Map<String, dynamic>) onSubmit;
+  final BuildContext contexte;
 
-  AddUserForm({required this.onSubmit});
+  const AddUserForm({
+    super.key,
+    required this.onSubmit,
+    required this.contexte,
+  });
 
   @override
   _AddUserFormState createState() => _AddUserFormState();
@@ -11,6 +20,12 @@ class AddUserForm extends StatefulWidget {
 
 class _AddUserFormState extends State<AddUserForm> {
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    // widget.contexte.read<MyData>().fetchDirections();
+  }
 
   // Controllers pour récupérer les valeurs des champs
   TextEditingController nameController = TextEditingController();
@@ -29,11 +44,16 @@ class _AddUserFormState extends State<AddUserForm> {
   String? selectedStatut;
 
   // Listes des suggestions pour les champs d'auto-complétion
-  List<String> directions = ['Direction 1', 'Direction 2', 'Direction 3'];
-  List<String> sitesDeTravail = ['Site 1', 'Site 2', 'Site 3'];
+  List<Direction> directions = [];
+  List<Sitedetravail> sitesDeTravails = [];
+  Direction? selectedDirection;
+  Sitedetravail? selectedsitedetravail;
 
   @override
   Widget build(BuildContext context) {
+    directions = widget.contexte.watch<MyData>().directions;
+    sitesDeTravails = widget.contexte.watch<MyData>().siteDetravails;
+    print("${directions.length} liste des d");
     return Form(
       key: _formKey,
       child: ListView(
@@ -47,27 +67,38 @@ class _AddUserFormState extends State<AddUserForm> {
             ],
           ),
           const SizedBox(height: 16),
-          buildSelectField('Sexe', ['Masculin', 'Féminin'], selectedSexe, (value) {
-            setState(() {
-              selectedSexe = value;
-            });
-          }),
+          buildSelectField(
+            'Sexe',
+            ['Masculin', 'Féminin'],
+            selectedSexe,
+            (value) {
+              setState(() {
+                selectedSexe = value;
+              });
+            },
+          ),
           const SizedBox(height: 16),
-          buildTextField('Date de Naissance', dobController, keyboardType: TextInputType.datetime),
-         const SizedBox(height: 16),
-          buildTextField('Téléphone', phoneController, keyboardType: TextInputType.phone),
-         const SizedBox(height: 16),
-          buildTextField('Email', emailController, keyboardType: TextInputType.emailAddress),
-         const SizedBox(height: 16),
+          buildTextField('Date de Naissance', dobController,
+              keyboardType: TextInputType.datetime),
+          const SizedBox(height: 16),
+          buildTextField('Téléphone', phoneController,
+              keyboardType: TextInputType.phone),
+          const SizedBox(height: 16),
+          buildTextField('Email', emailController,
+              keyboardType: TextInputType.emailAddress),
+          const SizedBox(height: 16),
           buildTextField('Adresse', addressController),
-         const SizedBox(height: 16),
-          buildAutocompleteField('Direction', directionController, directions),
           const SizedBox(height: 16),
-          buildAutocompleteField('Site de Travail', siteController, sitesDeTravail),
-         const  SizedBox(height: 16),
+          buildAutocompleteDirectinField(
+              'Direction', directionController, directions),
+          const SizedBox(height: 16),
+          buildAutocompletesitedetravailField(
+              'Site de Travail', siteController, sitesDeTravails),
+          const SizedBox(height: 16),
           buildTextField('Profession', professionController),
           const SizedBox(height: 16),
-          buildSelectField('Statut', ['Actif', 'Inactif'], selectedStatut, (value) {
+          buildSelectField('Statut', ['Actif', 'Inactif'], selectedStatut,
+              (value) {
             setState(() {
               selectedStatut = value;
             });
@@ -87,15 +118,18 @@ class _AddUserFormState extends State<AddUserForm> {
                   'telephone': phoneController.text,
                   'email': emailController.text,
                   'adresse': addressController.text,
-                  'direction': {"id":1},
-                  'siteDeTravail': {"id":1},
-                  // 'direction': directionController.text,
-                  // 'siteDeTravail': siteController.text,
-                  'profession': professionController.text,
-                  'statut': {"id":1},
-                  // 'statut': selectedStatut,
+                  'siteDeTravail': selectedsitedetravail != null
+                      ? {"id": selectedsitedetravail!.id}
+                      : null,
+                  'direction': selectedDirection != null
+                      ? {'id': selectedDirection!.id}
+                      : null,
+                  'proffession': professionController.text,
+                  'statut': {"id": 1, "libelle": "Nouveau"},
                   'motDePasse': passwordController.text,
                 });
+
+                Navigator.of(context).pop();
               }
             },
             child: const Text('Ajouter'),
@@ -106,12 +140,13 @@ class _AddUserFormState extends State<AddUserForm> {
   }
 
   // Méthodes auxiliaires (identiques à la version précédente)
-  Widget buildTextField(String label, TextEditingController controller, {TextInputType keyboardType = TextInputType.text}) {
+  Widget buildTextField(String label, TextEditingController controller,
+      {TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
+        // border: const OutlineInputBorder(),
       ),
       keyboardType: keyboardType,
       validator: (value) {
@@ -129,7 +164,7 @@ class _AddUserFormState extends State<AddUserForm> {
       obscureText: true,
       decoration: const InputDecoration(
         labelText: 'Mot de passe',
-        border: OutlineInputBorder(),
+        // border: OutlineInputBorder(),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -143,11 +178,12 @@ class _AddUserFormState extends State<AddUserForm> {
     );
   }
 
-  Widget buildSelectField(String label, List<String> options, String? selectedValue, Function(String?) onChanged) {
+  Widget buildSelectField(String label, List<String> options,
+      String? selectedValue, Function(String?) onChanged) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
+        // border: const OutlineInputBorder(),
       ),
       value: selectedValue,
       onChanged: onChanged,
@@ -166,26 +202,103 @@ class _AddUserFormState extends State<AddUserForm> {
     );
   }
 
-  Widget buildAutocompleteField(String label, TextEditingController controller, List<String> options) {
+  Widget buildAutocompleteField(
+      String label, TextEditingController controller, List<String> options) {
     return Autocomplete<String>(
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text.isEmpty) {
           return const Iterable<String>.empty();
         }
         return options.where((String option) {
-          return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+          return option
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase());
         });
       },
       onSelected: (String selection) {
         controller.text = selection;
       },
-      fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+      fieldViewBuilder:
+          (context, textEditingController, focusNode, onFieldSubmitted) {
         return TextFormField(
           controller: textEditingController,
           focusNode: focusNode,
           decoration: InputDecoration(
             labelText: label,
-            border: const OutlineInputBorder(),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Veuillez entrer ou sélectionner $label';
+            }
+            return null;
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildAutocompleteDirectinField(String label,
+      TextEditingController controller, List<Direction> directions) {
+    return Autocomplete<Direction>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<Direction>.empty();
+        }
+        return directions.where((Direction direction) {
+          return direction.nom
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      displayStringForOption: (Direction direction) => direction.nom,
+      onSelected: (Direction selection) {
+        controller.text = selection.nom;
+        selectedDirection = selection; // Enregistrer la direction sélectionnée
+      },
+      fieldViewBuilder:
+          (context, textEditingController, focusNode, onFieldSubmitted) {
+        return TextFormField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            labelText: label,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Veuillez entrer ou sélectionner $label';
+            }
+            return null;
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildAutocompletesitedetravailField(String label,
+      TextEditingController controller, List<Sitedetravail> sitedetravails) {
+    return Autocomplete<Sitedetravail>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<Sitedetravail>.empty();
+        }
+        return sitedetravails.where((Sitedetravail site) {
+          return site.nom
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      displayStringForOption: (Sitedetravail site) => site.nom,
+      onSelected: (Sitedetravail selection) {
+        controller.text = selection.nom;
+        selectedsitedetravail = selection;
+      },
+      fieldViewBuilder:
+          (context, textEditingController, focusNode, onFieldSubmitted) {
+        return TextFormField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            labelText: label,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {

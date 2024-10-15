@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:medstory/components/add_user_formdialog%20.dart';
 import 'package:medstory/components/header.dart';
 import 'package:medstory/components/side_menu.dart';
 import 'package:medstory/constantes.dart';
@@ -32,6 +31,9 @@ class _MainScreenState extends State<MainScreen> {
     final Size size = MediaQuery.of(context).size;
     context.read<MyData>().getNombrePatient();
     context.read<MyData>().getNombreConsultation();
+    context.read<MyData>().fetchPatients();
+    context.read<MyData>().fetchDirections();
+    context.read<MyData>().fetchSiteDeTraivails();
     currentPages = context.watch<MyMenuController>().index;
     
     return (size.width <= 272)

@@ -5,11 +5,13 @@ import 'package:medstory/components/add_user_form.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/components/customTable.dart';
-import 'package:medstory/components/header.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
+import 'package:medstory/models/patient.dart';
 import 'package:medstory/service/patient_service.dart';
+import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
 
 class Patients extends StatefulWidget {
@@ -70,31 +72,27 @@ class _PatientsState extends State<Patients> {
                   widthFactor:
                       0.8, // Ajuster la largeur pour que le dialog soit responsive
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0*2),
+                    padding: const EdgeInsets.all(16.0 * 2),
                     child: AddUserForm(
                       onSubmit: (formData) async {
+                        context.showLoader();
                         // Afficher les données soumises
                         await patientService.addPatient(formData).then((value) {
                           parentContext.read<MyData>().getNombrePatient();
+                          context.hideLoader();
+                        }).catchError((onError) {
+                          context.showError(onError.toString());
+                        }).whenComplete(() {
+                          context.showSuccess(
+                              "Le patient a été ajouté avec succès.");
+                              parentContext.read<MyMenuController>().changePage(1);
                         });
-                        showDialog(
-                          context: parentContext,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Données soumises'),
-                              content: Text(formData.toString()),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+
+                        
+                        
+
                       },
+                      contexte: parentContext,
                     ),
                   ),
                 ),

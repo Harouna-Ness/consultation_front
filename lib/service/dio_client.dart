@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DioClient {
   // URL de base pour toutes les requêtes
@@ -72,6 +73,18 @@ class ApiService {
     } catch (e) {
       throw Exception("Erreur lors de la requête DELETE : $e");
     }
+  }
+
+  // Enregistrer les données hors ligne
+  Future<void> saveDataOffline(String key, String jsonString) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, jsonString);
+  }
+
+  // Charger les données hors ligne
+  Future<String?> loadDataOffline(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key);
   }
 
 }

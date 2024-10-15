@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:medstory/models/patient.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,6 +36,20 @@ class PatientService {
     }
   }
 
+  Future<List<Patient>> getAllPatients() async {
+    try {
+      Response response = await apiService.getData('admin/voirPatients');
+      if (response.statusCode == 200) {
+        List data = response.data;
+        return data.map((e) => Patient.fromMap(e)).toList();
+      } else {
+        throw Exception('Erreur lors de la récupération des patients');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET patient_list: $e");
+    }
+  }
+
   Future<void> addPatient(Map<String, dynamic> patientData) async {
     try {
       await apiService.postData('admin/creerPatient', patientData);
@@ -54,9 +69,22 @@ class PatientService {
     }
   }
 
+  // Méthode pour modifier un patient
+  Future<void> updatePatient(Map<String, dynamic> patientData) async {
+    try {
+      // Appel API pour modifier les informations du patient
+      await apiService.putData('admin/modifierPatient', patientData);
+
+      // Si nécessaire, actualiser le cache local
+      _cachedPatientCount ??= await getPatientCount();
+    } catch (e) {
+      throw Exception("Erreur lors de la modification du patient : $e");
+    }
+  }
+
   Future<void> deletePatient(int patientId) async {
     try {
-      await apiService.deleteData('Patients/$patientId');
+      await apiService.deleteData('admin/supprimerPatient/$patientId');
 
       // Décrémenter le compteur et mettre à jour le cache
       if (_cachedPatientCount != null) {
