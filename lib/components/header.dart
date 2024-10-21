@@ -46,7 +46,10 @@ String pageTitle(int currentPages) {
     return "RendezVous";
   } else if (currentPages == 4) {
     return "Pathologie";
-  } else {
+  } else if (currentPages == 5) {
+    return "Settings";
+  }
+   else {
     return "";
   }
 }

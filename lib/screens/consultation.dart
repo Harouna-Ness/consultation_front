@@ -5,27 +5,431 @@ import 'package:medstory/components/box.dart';
 import 'package:medstory/components/champs_texte.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
+import 'package:medstory/models/analyse.dart';
+import 'package:medstory/models/bilan.dart';
+import 'package:medstory/models/consultation.dart';
 import 'package:medstory/models/direction.dart';
+import 'package:medstory/models/motif_de_consultation.dart';
 import 'package:medstory/models/my_data.dart';
+import 'package:medstory/models/patient.dart';
 import 'package:medstory/models/site_de_tavail.dart';
+import 'package:medstory/models/statut_patient.dart';
+import 'package:medstory/models/type_de_consultation.dart';
 import 'package:medstory/service/consultation_service.dart';
 import 'package:medstory/service/patient_service.dart';
 import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
 
-class Consultation extends StatefulWidget {
-  const Consultation({super.key});
+class ConsultationScreen extends StatefulWidget {
+  const ConsultationScreen({super.key});
 
   @override
-  State<Consultation> createState() => _ConsultationState();
+  State<ConsultationScreen> createState() => _ConsultationState();
 }
 
-class _ConsultationState extends State<Consultation> {
+class _ConsultationState extends State<ConsultationScreen> {
+  Patient? _selectedPatient;
+  bool showForm = false;
   @override
   Widget build(BuildContext context) {
-    return Box(
-      child: ConsultationForm(
-        contexte: context,
+    List<Consultation> consultations = context.watch<MyData>().consultations;
+    List<Patient> patients = context.watch<MyData>().patients;
+
+    return !showForm
+        ? SafeArea(
+            child: Box(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          selectionModal(context, patients);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: primaryColor,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: .1,
+                                spreadRadius: .1,
+                                offset: Offset(0, 1),
+                                blurStyle: BlurStyle.outer,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                          child: const Text(
+                            "Nouvelle consultation",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Expanded(
+                      child: consultationListSection(context, consultations)),
+                ],
+              ),
+            ),
+          )
+        : Box(child: FormConsultation(patient: _selectedPatient!));
+  }
+
+  Future<dynamic> selectionModal(
+      BuildContext contexte, List<Patient> patients) {
+    return showDialog(
+      context: contexte,
+      builder: (contexte) {
+        return Dialog(
+          child: FractionallySizedBox(
+            widthFactor:
+                0.8, // Ajuster la largeur pour que le dialog soit responsive
+            child: Padding(
+              padding: const EdgeInsets.all(16.0 * 2),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Sélection de patient",
+                      style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: DataTable(
+                      headingTextStyle:
+                          const TextStyle(fontWeight: FontWeight.bold),
+                      columns: const [
+                        DataColumn(label: Text("Prénom")),
+                        DataColumn(label: Text("Nom")),
+                        DataColumn(label: Text("Matricule")),
+                        DataColumn(label: Text("Proffession")),
+                        DataColumn(label: Text("Site de Travail")),
+                        DataColumn(label: Text("Actions")),
+                      ],
+                      rows: List.generate(
+                        patients.length,
+                        (index) => DataRow(
+                          cells: [
+                            DataCell(Text(patients[index].prenom)),
+                            DataCell(Text(patients[index].nom)),
+                            DataCell(Text(patients[index].telephone)),
+                            DataCell(patients[index].proffession != null
+                                ? Text(patients[index].proffession!)
+                                : const Text("Néant")),
+                            DataCell(patients[index].sitedetravail != null
+                                ? Text(patients[index].sitedetravail!.nom)
+                                : const Text("Néant")),
+                            DataCell(
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Remplir les champs du formulaire avec les infos du patient sélectionné
+                                  setState(() {
+                                    _selectedPatient = patients[index];
+                                    print("::::: le patient: ${_selectedPatient!.email}.");
+                                  });
+                                  Navigator.of(context).pop();
+                                  if (_selectedPatient != null) {
+                                    showForm = true;
+                                  }
+                                },
+                                child: const Text('Sélectionner'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+Widget consultationListSection(
+    BuildContext context, List<Consultation> consultations) {
+  return ListView.separated(
+    itemCount: consultations.length,
+    itemBuilder: (context, index) {
+      final consultation = consultations[index];
+      return ExpansionTile(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide.none,
+        ),
+        title: Text(
+            'Consultation du ${consultations[index].creationDate!.day}-${consultations[index].creationDate!.month}-${consultations[index].creationDate!.year}'),
+        children: [
+          ListTile(
+            title: const Text('Patient'),
+            subtitle: Text(
+                '${consultation.patientFullName}'),
+          ),
+          ListTile(
+            title: const Text('Diagnostic'),
+            subtitle: Text('${consultation.diagnostic}'),
+          ),
+        ],
+      );
+    },
+    separatorBuilder: (BuildContext context, int index) {
+      return const Divider(color: Colors.grey);
+    },
+  );
+}
+
+class FormConsultation extends StatefulWidget {
+  final Patient patient;
+  const FormConsultation({super.key, required this.patient});
+
+  @override
+  State<FormConsultation> createState() => _FormConsultationState();
+}
+
+class _FormConsultationState extends State<FormConsultation> {
+  final _formKey = GlobalKey<FormState>();
+  // Controllers pour récupérer les valeurs des champs de la consultation
+  TextEditingController motifController = TextEditingController();
+  TextEditingController typeConsultationController = TextEditingController();
+  TextEditingController symptomeController = TextEditingController();
+  TextEditingController diagnosticController = TextEditingController();
+  TextEditingController prescriptionController = TextEditingController();
+  List<TextEditingController> prescriptionControllers = [TextEditingController()];
+
+  // Valeurs pour les selects
+  MotifDeConsultation? _selectedMotifDeConsultation;
+  TypeDeConsultation? _selectedTypeDeConsultation;
+  List<Analyse?> selectedAnalyses = [null];
+
+  @override
+  void dispose() {
+    for (var controller in prescriptionControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final consultationService = ConsultationService();
+    List<MotifDeConsultation> motifDeConsultations =
+        context.watch<MyData>().motifDeConsultations;
+    List<Analyse> analyses = context.watch<MyData>().analyses;
+    List<TypeDeConsultation> typeDeConsultations =
+        context.watch<MyData>().typeDeConsultations;
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(defaultPadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Champ Type
+              DropdownButtonFormField<TypeDeConsultation>(
+                decoration:
+                    const InputDecoration(labelText: "Type de consultation"),
+                value: _selectedTypeDeConsultation,
+                onChanged: (value) =>
+                    setState(() => _selectedTypeDeConsultation = value),
+                items: typeDeConsultations
+                    .map((type) => DropdownMenuItem(
+                          value: type,
+                          child: Text(type.libelle),
+                        ))
+                    .toList(),
+                validator: (value) => value == null ? 'Champ requis' : null,
+              ),
+              // Champ Motif
+              DropdownButtonFormField<MotifDeConsultation>(
+                decoration: const InputDecoration(
+                    labelText: "Motif de la consultation"),
+                value: _selectedMotifDeConsultation,
+                onChanged: (value) =>
+                    setState(() => _selectedMotifDeConsultation = value),
+                items: motifDeConsultations
+                    .map((motif) => DropdownMenuItem(
+                          value: motif,
+                          child: Text(motif.motif!),
+                        ))
+                    .toList(),
+                validator: (value) => value == null ? 'Champ requis' : null,
+              ),
+              // Champ Symptôme
+              ChampsTexte.buildTextField("Symptômes", symptomeController),
+              // Champ Diagnostic
+              ChampsTexte.buildTextField("Diagnostic", diagnosticController),
+              // Champ Analyse
+              for (int i = 0; i < selectedAnalyses.length; i++)
+                DropdownButtonFormField<Analyse>(
+                  decoration: InputDecoration(labelText: "Analyse ${i + 1}"),
+                  value: selectedAnalyses[i],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedAnalyses[i] = value;
+                    });
+                  },
+                  items: analyses
+                      .map((analyse) => DropdownMenuItem(
+                            value: analyse,
+                            child: Text(analyse.libelle!),
+                          ))
+                      .toList(),
+                  validator: (value) => value == null ? 'Champ requis' : null,
+                ),
+
+              const SizedBox(height: 10),
+
+              // Bouton pour ajouter un nouveau champ
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          selectedAnalyses
+                              .add(null); // Ajouter un nouveau champ
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color.fromARGB(255, 125, 123, 129),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        "Ajouter une autre analyse",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              for (int i = 0; i < prescriptionControllers.length; i++) ChampsTexte.buildTextField("Prescription ${i+1}", prescriptionControllers[i]),
+              const SizedBox(height: 10,),
+              // Bouton pour ajouter un nouveau champ
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          prescriptionControllers.add(TextEditingController()); // Ajouter un nouveau champ
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color.fromARGB(255, 125, 123, 129),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        "Ajouter une prescription",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: defaultPadding,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    context.showLoader();
+
+                    List<Analyse> nonNullAnalyses = selectedAnalyses
+                        .where((analyse) => analyse != null)
+                        .cast<Analyse>()
+                        .toList();
+
+                    // Créer un bilan avec les analyses non nulles
+                    Bilan bilan = Bilan(analyses: nonNullAnalyses);
+
+                    // Données consultation.
+                    Map<String, dynamic> consultation = {
+                      "id": 0,
+                      "diagnostic": diagnosticController.text,
+                      "symptome": "sylto",
+                      "medecin": {"id": 1},
+                      "typeDeConsultation": _selectedTypeDeConsultation != null
+                          ? {"id": _selectedTypeDeConsultation!.id}
+                          : null,
+                      "motifDeConsultation":
+                          _selectedMotifDeConsultation != null
+                              ? {"id": _selectedMotifDeConsultation!.id}
+                              : null,
+                      "bilan": bilan.toMap(),
+                      "prescriptions": prescriptionControllers.map((controller) => controller.text).toList(),
+                      // }
+                    };
+
+                    print("object::::::::: ${widget.patient.email} le email");
+                    print("object::::::::: ${consultation.toString()} le email");
+
+                    //TODO Logique pour sauvegarder la consultation
+
+                    await consultationService
+                        .creerConsultation(
+                      consultation,
+                      widget.patient.email,
+                    )
+                        .then((onValue) {
+                      context.read<MyData>().getNombreConsultation();
+                      context.hideLoader();
+                      context.showSuccess("Ajoutée avec succès.");
+                    }).catchError((onError) {
+                      context.hideLoader();
+                      context.showError(onError.toString());
+                    }).whenComplete(() {
+                      context.read<MyMenuController>().changePage(2);
+                    });
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                child: const Text(
+                  "Enregistrer",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -44,7 +448,6 @@ class _ConsultationFormState extends State<ConsultationForm> {
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
 
-  // Champs du formulaire
   // Controllers pour récupérer les valeurs des champs
   TextEditingController nameController = TextEditingController();
   TextEditingController surnameController = TextEditingController();
@@ -67,6 +470,13 @@ class _ConsultationFormState extends State<ConsultationForm> {
   DateTime? _selectedDate;
   Direction? _selectedDirection;
   Sitedetravail? _selectedSite;
+  MotifDeConsultation? _selectedMotifDeConsultation;
+  StatutPatient? _selectedStatutPatient;
+  TypeDeConsultation? _selectedTypeDeConsultation;
+
+  List<Analyse?> selectedAnalyses = [null];
+
+  Patient? _selectedPatient;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +485,14 @@ class _ConsultationFormState extends State<ConsultationForm> {
     List<Direction> directions = widget.contexte.watch<MyData>().directions;
     List<Sitedetravail> sitesDeTravails =
         widget.contexte.watch<MyData>().siteDetravails;
+    List<MotifDeConsultation> motifDeConsultations =
+        widget.contexte.watch<MyData>().motifDeConsultations;
+    List<StatutPatient> statutPatients =
+        widget.contexte.watch<MyData>().statutPatients;
+    List<Analyse> analyses = widget.contexte.watch<MyData>().analyses;
+    List<TypeDeConsultation> typeDeConsultations =
+        widget.contexte.watch<MyData>().typeDeConsultations;
+    List<Patient> patients = widget.contexte.watch<MyData>().patients;
 
     return Form(
       key: _formKey,
@@ -90,13 +508,21 @@ class _ConsultationFormState extends State<ConsultationForm> {
 
               context.showLoader();
 
+              List<Analyse> nonNullAnalyses = selectedAnalyses
+                  .where((analyse) => analyse != null)
+                  .cast<Analyse>()
+                  .toList();
+
+              // Créer un bilan avec les analyses non nulles
+              Bilan bilan = Bilan(analyses: nonNullAnalyses);
+
               // Données patient.
               Map<String, dynamic> patientData = {
                 'nom': nameController.text,
                 'prenom': surnameController.text,
                 'sexe': selectedSexe,
                 'dateDeNaissance':
-                    "${_selectedDate!.year}-${_selectedDate!.month}-${_selectedDate!.day}",
+                    "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}",
                 'telephone': phoneController.text,
                 'email': emailController.text,
                 'adresse': addressController.text,
@@ -106,7 +532,9 @@ class _ConsultationFormState extends State<ConsultationForm> {
                     ? {'id': _selectedDirection!.id}
                     : null,
                 'proffession': professionController.text,
-                'statut': {"id": 1, "libelle": "Nouveau"},
+                'statut': _selectedStatutPatient != null
+                    ? {"id": _selectedStatutPatient!.id}
+                    : null,
                 'motDePasse': passwordController.text,
               };
 
@@ -116,15 +544,14 @@ class _ConsultationFormState extends State<ConsultationForm> {
                 "diagnostic": motifController.text,
                 "symptome": "sylto",
                 "medecin": {"id": 1},
-                "typeDeConsultation": {"id": 1},
-                "motifDeConsultation": {"id": 1},
-                "bilan": {
-                  "id": 0,
-                  "analyses": [
-                    {"id": 2, "libelle": "analyse A"},
-                    {"id": 1, "libelle": "analyse b"}
-                  ]
-                }
+                "typeDeConsultation": _selectedTypeDeConsultation != null
+                    ? {"id": _selectedTypeDeConsultation!.id}
+                    : null,
+                "motifDeConsultation": _selectedMotifDeConsultation != null
+                    ? {"id": _selectedMotifDeConsultation!.id}
+                    : null,
+                "bilan": bilan.toMap(),
+                // }
               };
 
               // Soumission données patient.
@@ -136,7 +563,7 @@ class _ConsultationFormState extends State<ConsultationForm> {
                 context.showError(onError.toString());
               });
 
-              // Logique pour sauvegarder la consultation
+              //TODO Logique pour sauvegarder la consultation
               if (callConsultationApi) {
                 await consultationService
                     .creerConsultation(consultation, emailController.text)
@@ -220,7 +647,9 @@ class _ConsultationFormState extends State<ConsultationForm> {
                 Row(
                   children: [
                     Expanded(
-                      child: ChampsTexte.buildTextField("Nom", nameController),
+                      child: _selectedPatient != null
+                          ? Text("Nom : ${_selectedPatient!.nom}")
+                          : ChampsTexte.buildTextField("Nom", nameController),
                     ),
                     const SizedBox(
                       width: 10,
@@ -228,6 +657,8 @@ class _ConsultationFormState extends State<ConsultationForm> {
                     ElevatedButton(
                       onPressed: () {
                         // TODO: logique de selection d'un patient afin de preremplir le formulaire.
+                        // selectionModal(context);
+                        selectionModal(context, patients);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
@@ -282,14 +713,21 @@ class _ConsultationFormState extends State<ConsultationForm> {
 
                 // Champ Adresse
                 ChampsTexte.buildTextField('Adresse', addressController),
+
                 // Champ Statut
-                ChampsTexte.buildSelectField(
-                    'Statut', ['Celibataire', 'Marié'], selectedStatut,
-                    (value) {
-                  setState(() {
-                    selectedStatut = value;
-                  });
-                }),
+                DropdownButtonFormField<StatutPatient>(
+                  decoration: const InputDecoration(labelText: "Statut"),
+                  value: _selectedStatutPatient,
+                  onChanged: (value) =>
+                      setState(() => _selectedStatutPatient = value),
+                  items: statutPatients
+                      .map((statut) => DropdownMenuItem(
+                            value: statut,
+                            child: Text(statut.libelle),
+                          ))
+                      .toList(),
+                  validator: (value) => value == null ? 'Champ requis' : null,
+                ),
                 // Champs Téléphone
                 ChampsTexte.buildTextField('Téléphone', phoneController,
                     keyboardType: TextInputType.phone),
@@ -344,10 +782,94 @@ class _ConsultationFormState extends State<ConsultationForm> {
             title: const Text("Consultation"),
             content: Column(
               children: [
+                // Champ Type
+                DropdownButtonFormField<TypeDeConsultation>(
+                  decoration:
+                      const InputDecoration(labelText: "Type de consultation"),
+                  value: _selectedTypeDeConsultation,
+                  onChanged: (value) =>
+                      setState(() => _selectedTypeDeConsultation = value),
+                  items: typeDeConsultations
+                      .map((type) => DropdownMenuItem(
+                            value: type,
+                            child: Text(type.libelle),
+                          ))
+                      .toList(),
+                  validator: (value) => value == null ? 'Champ requis' : null,
+                ),
                 // Champ Motif
-                ChampsTexte.buildTextField(
-                    "Motif de la consultation", motifController),
-                // TODO: le reste ici.
+                DropdownButtonFormField<MotifDeConsultation>(
+                  decoration: const InputDecoration(
+                      labelText: "Motif de la consultation"),
+                  value: _selectedMotifDeConsultation,
+                  onChanged: (value) =>
+                      setState(() => _selectedMotifDeConsultation = value),
+                  items: motifDeConsultations
+                      .map((motif) => DropdownMenuItem(
+                            value: motif,
+                            child: Text(motif.motif!),
+                          ))
+                      .toList(),
+                  validator: (value) => value == null ? 'Champ requis' : null,
+                ),
+                // Champ Symptôme
+                ChampsTexte.buildTextField("Symptômes", symptomeController),
+                // Champ Diagnostic
+                ChampsTexte.buildTextField("Diagnostic", diagnosticController),
+                // Champ Analyse
+                for (int i = 0; i < selectedAnalyses.length; i++)
+                  DropdownButtonFormField<Analyse>(
+                    decoration: InputDecoration(labelText: "Analyse ${i + 1}"),
+                    value: selectedAnalyses[i],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedAnalyses[i] = value;
+                      });
+                    },
+                    items: analyses
+                        .map((analyse) => DropdownMenuItem(
+                              value: analyse,
+                              child: Text(analyse.libelle!),
+                            ))
+                        .toList(),
+                    validator: (value) => value == null ? 'Champ requis' : null,
+                  ),
+
+                const SizedBox(height: 10),
+
+                // Bouton pour ajouter un nouveau champ
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            selectedAnalyses
+                                .add(null); // Ajouter un nouveau champ
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 125, 123, 129),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter une autre analyse",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -355,6 +877,110 @@ class _ConsultationFormState extends State<ConsultationForm> {
       ),
     );
   }
+
+  Future<dynamic> selectionModal(
+      BuildContext contexte, List<Patient> patients) {
+    return showDialog(
+      context: contexte,
+      builder: (contexte) {
+        return Dialog(
+          child: FractionallySizedBox(
+            widthFactor:
+                0.8, // Ajuster la largeur pour que le dialog soit responsive
+            child: Padding(
+              padding: const EdgeInsets.all(16.0 * 2),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Sélection de patient",
+                      style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: DataTable(
+                      headingTextStyle:
+                          const TextStyle(fontWeight: FontWeight.bold),
+                      columns: const [
+                        DataColumn(label: Text("Prénom")),
+                        DataColumn(label: Text("Nom")),
+                        DataColumn(label: Text("Matricule")),
+                        DataColumn(label: Text("Proffession")),
+                        DataColumn(label: Text("Site de Travail")),
+                        DataColumn(label: Text("Actions")),
+                      ],
+                      rows: List.generate(
+                        patients.length,
+                        (index) => DataRow(
+                          cells: [
+                            DataCell(Text(patients[index].prenom)),
+                            DataCell(Text(patients[index].nom)),
+                            DataCell(Text(patients[index].telephone)),
+                            DataCell(patients[index].proffession != null
+                                ? Text(patients[index].proffession!)
+                                : const Text("Néant")),
+                            DataCell(patients[index].sitedetravail != null
+                                ? Text(patients[index].sitedetravail!.nom)
+                                : const Text("Néant")),
+                            DataCell(
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Remplir les champs du formulaire avec les infos du patient sélectionné
+                                  setState(() {
+                                    nameController.text = patients[index].nom;
+                                    surnameController.text =
+                                        patients[index].prenom;
+                                    phoneController.text =
+                                        patients[index].telephone;
+                                    selectedSexe = patients[index].sexe;
+                                    _selectedDate =
+                                        patients[index].dateDeNaissance;
+                                    _selectedSite =
+                                        patients[index].sitedetravail;
+                                    _selectedDirection =
+                                        patients[index].direction;
+                                    professionController.text =
+                                        patients[index].proffession ?? '';
+                                    _selectedStatutPatient =
+                                        patients[index].statut;
+                                  });
+                                  Navigator.of(context)
+                                      .pop(); // Fermer le modal
+                                },
+                                child: const Text('Sélectionner'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Future<dynamic> selectionModal(BuildContext context) {
+  //   return showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return const Dialog(
+  //         child: FractionallySizedBox(
+  //           widthFactor:
+  //               0.8, // Ajuster la largeur pour que le dialog soit responsive
+  //           child: Padding(
+  //             padding: EdgeInsets.all(16.0 * 2),
+  //             child: Center(
+  //               child: Text("Selection de patient"),
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }
 
 // le formulaire complet de la partie consultation......................................................

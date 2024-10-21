@@ -1,29 +1,23 @@
+import 'package:medstory/models/role.dart';
+import 'package:medstory/models/utilisateur.dart';
+
 class Medecin extends Utilisateur {
   final String specialite;
   final List<String> joursIntervention;
 
   Medecin({
-    required int id,
-    required String nom,
-    required String prenom,
-    required Role role,
-    required String adresse,
-    required String email,
-    required String telephone,
-    required String motDePasse,
-    required String sexe,
+    required int super.id,
+    required super.nom,
+    required super.prenom,
+    required super.role,
+    required String super.adresse,
+    required super.email,
+    required super.telephone,
+    required super.motDePasse,
+    required super.sexe,
     required this.specialite,
     required this.joursIntervention,
-  }) : super(
-            id: id,
-            nom: nom,
-            prenom: prenom,
-            role: role,
-            adresse: adresse,
-            email: email,
-            telephone: telephone,
-            motDePasse: motDePasse,
-            sexe: sexe);
+  });
 
   factory Medecin.fromMap(Map<String, dynamic> map) {
     return Medecin(

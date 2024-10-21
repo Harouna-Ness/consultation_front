@@ -96,6 +96,25 @@ void showSuccessSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+void showErrorSnackBar(BuildContext context, String message) {
+  final snackBar = SnackBar(
+    content: Text(
+      message,
+      style: const TextStyle(color: Colors.white),
+    ),
+    backgroundColor: Colors.red,
+    duration: const Duration(seconds: 3),
+    action: SnackBarAction(
+      label: 'Fermer',
+      textColor: Colors.white,
+      onPressed: () {
+        // Si l'utilisateur veut fermer manuellement
+      },
+    ),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
 // Extension pour simplifier l'appel
 extension LoadingDialogExtension on BuildContext {
   void showLoader() => showLoadingDialog(this); // Affiche le loader
@@ -104,5 +123,8 @@ extension LoadingDialogExtension on BuildContext {
         this,
         errorMessage,
       ); // Affiche un dialog d'erreur
-      void showSuccess(String message) => showSuccessSnackBar(this, message); // Affiche un message de succès
+  void showSuccess(String message) =>
+      showSuccessSnackBar(this, message); // Affiche un message de succès
+  void showSnackError(String message) =>
+      showErrorSnackBar(this, message); // Affiche un message de succès
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/components/edit_patient_model.dart';
@@ -136,7 +138,7 @@ class _CustomtableState extends State<Customtable> {
                       child: DropdownButton<String>(
                         value: selectedFilter,
                         icon: SvgPicture.asset(
-                          "assets/icons/filter_alt.svg", // Icône SVG pour le bouton
+                          "assets/icons/filter_alt.svg",
                           height: 25,
                           width: 25,
                         ),
@@ -192,9 +194,6 @@ class _CustomtableState extends State<Customtable> {
                       filteredPatients.length,
                       (index) =>
                           customDataRow(context, filteredPatients[index]),
-                      // context.watch<MyData>().patients.length,
-                      // (index) => customDataRow(
-                      //     context, context.watch<MyData>().patients[index]),
                     ),
                   ),
                 )

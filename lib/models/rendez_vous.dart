@@ -1,4 +1,4 @@
-import 'package:medstory/models/medecin';
+import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/patient.dart';
 import 'package:medstory/models/statut.dart';
 

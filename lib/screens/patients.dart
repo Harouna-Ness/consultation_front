@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -87,10 +89,6 @@ class _PatientsState extends State<Patients> {
                               "Le patient a été ajouté avec succès.");
                               parentContext.read<MyMenuController>().changePage(1);
                         });
-
-                        
-                        
-
                       },
                       contexte: parentContext,
                     ),

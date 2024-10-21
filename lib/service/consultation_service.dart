@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:medstory/models/consultation.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,13 +9,25 @@ class ConsultationService {
 
   Future<void> creerConsultation(Map<String, dynamic> data, String emailPatient) async {
     try {
-      await apiService.postData("medicin/creerConsultation/$emailPatient", data);
+      await apiService.postData("medecin/creerConsultation/$emailPatient", data);
     } catch (e) {
       throw Exception("Erreur lors de la requête GET consultation_count : $e");
     }
   }
 
-  
+  Future<List<Consultation>> getAllConsultation() async {
+    try {
+      Response response = await apiService.getData('medecin/all');
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((e) => Consultation.fromMap(e)).toList();
+      } else {
+        throw Exception("Erreur lors de la récupération des consultations");
+      } 
+    } catch (e) {
+      throw Exception("Erreur : $e");
+    }
+  }
 
   Future<int> getConsultationCount() async {
     // Vérifier si le nombre d'utilisateurs est déjà mis en cache

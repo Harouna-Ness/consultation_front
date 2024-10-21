@@ -18,4 +18,30 @@ class SiteDeTravailService {
       throw Exception("Erreur : $e");
     }
   }
+
+  Future<void> createSitedetravail(Sitedetravail sitedetravail) async {
+    try {
+      Map<String, dynamic> data = sitedetravail.toMap();
+      await apiService.postData('admin/creerSiteDeTravail', data);
+    } catch (e) {
+      throw Exception("Erreur : $e");
+    }
+  }
+
+  Future<void> updateSitedetravail(Sitedetravail sitedetravail) async {
+    try {
+      Map<String, dynamic> data = sitedetravail.toMap();
+      await apiService.putData('admin/modifierSiteDeTravail', data);
+    } catch (e) {
+      throw Exception("Erreur : $e");
+    }
+  }
+
+  Future<void> deleteSitedetravail(int sitedetravailId) async {
+    try {
+      await apiService.deleteData('admin/supprimeSiteDeTravail/$sitedetravailId');
+    } catch (e) {
+      throw Exception("Erreur : $e");
+    }
+  }
 }

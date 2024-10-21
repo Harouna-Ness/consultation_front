@@ -1,6 +1,7 @@
 import 'package:medstory/models/bilan.dart';
-import 'package:medstory/models/medecin';
+import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/motif_de_consultation.dart';
+import 'package:medstory/models/patient.dart';
 import 'package:medstory/models/type_de_consultation.dart';
 
 class Consultation {
@@ -12,6 +13,8 @@ class Consultation {
   TypeDeConsultation? typeDeConsultation;
   MotifDeConsultation? motifDeConsultation;
   Bilan? bilan;
+  List<String>? prescriptions;
+  String? patientFullName;
 
   Consultation({
     this.id,
@@ -22,6 +25,8 @@ class Consultation {
     this.typeDeConsultation,
     this.motifDeConsultation,
     this.bilan,
+    this.prescriptions,
+    this.patientFullName,
   });
 
   factory Consultation.fromMap(Map<String, dynamic> map) {
@@ -38,6 +43,9 @@ class Consultation {
           ? MotifDeConsultation.fromMap(map['motifDeConsultation'])
           : null,
       bilan: map['bilan'] != null ? Bilan.fromMap(map['bilan']) : null,
+      prescriptions:
+          map['prescriptions'] != null ? List.from(map['prescriptions']) : [],
+      patientFullName: map['patientFullName'],
     );
   }
 
@@ -51,6 +59,8 @@ class Consultation {
       'typeDeConsultation': typeDeConsultation?.toMap(),
       'motifDeConsultation': motifDeConsultation?.toMap(),
       'bilan': bilan?.toMap(),
+      'prescriptions': prescriptions?.map((item) => item).toList(),
+      'patientFullName':patientFullName,
     };
   }
 }

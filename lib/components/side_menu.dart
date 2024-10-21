@@ -65,6 +65,7 @@ class _SideMenuState extends State<SideMenu> {
             title: "Settings",
             svgSrc: "assets/icons/menu_setting.svg",
             press: () => {
+              context.read<MyMenuController>().changePage(5),
               context.read<MyMenuController>().closeDrawer(),
             },
           ),

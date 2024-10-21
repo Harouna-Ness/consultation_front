@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medstory/components/box.dart';
 import 'package:medstory/components/header.dart';
 import 'package:medstory/components/side_menu.dart';
 import 'package:medstory/constantes.dart';
@@ -10,6 +11,7 @@ import 'package:medstory/screens/dashboard.dart';
 import 'package:medstory/screens/pathologie.dart';
 import 'package:medstory/screens/patients.dart';
 import 'package:medstory/screens/rendez_vous.dart';
+import 'package:medstory/screens/setting_screen.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -20,12 +22,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  
   int currentPages = 0;
   @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -34,8 +36,13 @@ class _MainScreenState extends State<MainScreen> {
     context.read<MyData>().fetchPatients();
     context.read<MyData>().fetchDirections();
     context.read<MyData>().fetchSiteDeTraivails();
+    context.read<MyData>().fetchAnalyse();
+    context.read<MyData>().fetchMotifDeConsultion();
+    context.read<MyData>().fetchTypeDeConsultation();
+    context.read<MyData>().fetchStatutPatient();
+    context.read<MyData>().fetchConsultation();
     currentPages = context.watch<MyMenuController>().index;
-    
+
     return (size.width <= 272)
         ? const ErreurTaille()
         : Scaffold(
@@ -71,13 +78,13 @@ class _MainScreenState extends State<MainScreen> {
                               child: Dashboard(),
                             ),
                           if (currentPages == 1)
-                             Expanded(
+                            const Expanded(
                               // child: AddUserFormDialog(),
                               child: Patients(),
                             ),
                           if (currentPages == 2)
                             const Expanded(
-                              child: Consultation(),
+                              child: ConsultationScreen(),
                             ),
                           if (currentPages == 3)
                             const Expanded(
@@ -86,6 +93,10 @@ class _MainScreenState extends State<MainScreen> {
                           if (currentPages == 4)
                             const Expanded(
                               child: Pathologie(),
+                            ),
+                          if (currentPages == 5)
+                            const Expanded(
+                              child: SettingScreen(),
                             ),
                         ],
                       ),
