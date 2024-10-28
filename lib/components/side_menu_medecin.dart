@@ -82,7 +82,9 @@ class _SideMenuState extends State<SideMenuMedecin> {
               ),
               // deconnxion button
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
                 child: Container(
                   height: 50,
                   width: 40,

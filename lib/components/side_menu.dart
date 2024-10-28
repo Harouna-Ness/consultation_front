@@ -48,20 +48,12 @@ class _SideMenuState extends State<SideMenu> {
           ),
           DrawerListTile(
             title: "Docteurs",
-            svgSrc: "assets/icons/patients.svg",
+            svgSrc: "assets/icons/docIcone.svg",
             press: () => {
               setState(() {
                 context.read<MyMenuController>().changePage(6);
                 context.read<MyMenuController>().closeDrawer();
               })
-            },
-          ),
-          DrawerListTile(
-            title: "Consultation",
-            svgSrc: "assets/icons/consultation.svg",
-            press: () => {
-              context.read<MyMenuController>().changePage(2),
-              context.read<MyMenuController>().closeDrawer(),
             },
           ),
           DrawerListTile(
@@ -112,7 +104,9 @@ class _SideMenuState extends State<SideMenu> {
               ),
               // deconnxion button
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
                 child: Container(
                   height: 50,
                   width: 40,

@@ -18,7 +18,7 @@ class MedecinPortail extends StatefulWidget {
 }
 
 class _MedecinPortailState extends State<MedecinPortail> {
-  int currentPages = 0;
+  int currentPages = 8;
   @override
   void initState() {
     super.initState();
