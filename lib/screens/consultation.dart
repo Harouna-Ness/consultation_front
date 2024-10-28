@@ -41,8 +41,16 @@ class _ConsultationState extends State<ConsultationScreen> {
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      const Text(
+                        "Mes consultation",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       InkWell(
                         onTap: () {
                           selectionModal(context, patients);
@@ -81,7 +89,15 @@ class _ConsultationState extends State<ConsultationScreen> {
               ),
             ),
           )
-        : Box(child: FormConsultation(patient: _selectedPatient!));
+        : Box(
+            child: FormConsultation(
+            patient: _selectedPatient!,
+            changeView: () {
+              setState(() {
+                showForm = false;
+              });
+            },
+          ));
   }
 
   Future<dynamic> selectionModal(
@@ -93,8 +109,7 @@ class _ConsultationState extends State<ConsultationScreen> {
           child: FractionallySizedBox(
             widthFactor:
                 0.8, // Ajuster la largeur pour que le dialog soit responsive
-            child: Padding(
-              padding: const EdgeInsets.all(16.0 * 2),
+            child: Box(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -132,7 +147,8 @@ class _ConsultationState extends State<ConsultationScreen> {
                                   // Remplir les champs du formulaire avec les infos du patient sélectionné
                                   setState(() {
                                     _selectedPatient = patients[index];
-                                    print("::::: le patient: ${_selectedPatient!.email}.");
+                                    print(
+                                        "::::: le patient: ${_selectedPatient!.email}.");
                                   });
                                   Navigator.of(context).pop();
                                   if (_selectedPatient != null) {
@@ -173,8 +189,7 @@ Widget consultationListSection(
         children: [
           ListTile(
             title: const Text('Patient'),
-            subtitle: Text(
-                '${consultation.patientFullName}'),
+            subtitle: Text('${consultation.patientFullName}'),
           ),
           ListTile(
             title: const Text('Diagnostic'),
@@ -190,8 +205,10 @@ Widget consultationListSection(
 }
 
 class FormConsultation extends StatefulWidget {
+  final void Function() changeView;
   final Patient patient;
-  const FormConsultation({super.key, required this.patient});
+  const FormConsultation(
+      {super.key, required this.patient, required this.changeView});
 
   @override
   State<FormConsultation> createState() => _FormConsultationState();
@@ -205,7 +222,9 @@ class _FormConsultationState extends State<FormConsultation> {
   TextEditingController symptomeController = TextEditingController();
   TextEditingController diagnosticController = TextEditingController();
   TextEditingController prescriptionController = TextEditingController();
-  List<TextEditingController> prescriptionControllers = [TextEditingController()];
+  List<TextEditingController> prescriptionControllers = [
+    TextEditingController()
+  ];
 
   // Valeurs pour les selects
   MotifDeConsultation? _selectedMotifDeConsultation;
@@ -236,6 +255,11 @@ class _FormConsultationState extends State<FormConsultation> {
           key: _formKey,
           child: Column(
             children: [
+              const Text(
+                'Nouvelle consultation',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
               // Champ Type
               DropdownButtonFormField<TypeDeConsultation>(
                 decoration:
@@ -294,65 +318,63 @@ class _FormConsultationState extends State<FormConsultation> {
               // Bouton pour ajouter un nouveau champ
               Row(
                 children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          selectedAnalyses
-                              .add(null); // Ajouter un nouveau champ
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color.fromARGB(255, 125, 123, 129),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        selectedAnalyses.add(null); // Ajouter un nouveau champ
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      icon: const Icon(
-                        Icons.add,
+                    ),
+                    icon: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Ajouter une autre analyse",
+                      style: TextStyle(
                         color: Colors.white,
-                      ),
-                      label: const Text(
-                        "Ajouter une autre analyse",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ],
               ),
-              for (int i = 0; i < prescriptionControllers.length; i++) ChampsTexte.buildTextField("Prescription ${i+1}", prescriptionControllers[i]),
-              const SizedBox(height: 10,),
+              for (int i = 0; i < prescriptionControllers.length; i++)
+                ChampsTexte.buildTextField(
+                    "Prescription ${i + 1}", prescriptionControllers[i]),
+              const SizedBox(
+                height: 10,
+              ),
               // Bouton pour ajouter un nouveau champ
               Row(
                 children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          prescriptionControllers.add(TextEditingController()); // Ajouter un nouveau champ
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color.fromARGB(255, 125, 123, 129),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        prescriptionControllers.add(
+                            TextEditingController()); // Ajouter un nouveau champ
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: tertiaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      icon: const Icon(
-                        Icons.add,
+                    ),
+                    icon: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Ajouter une prescription",
+                      style: TextStyle(
                         color: Colors.white,
-                      ),
-                      label: const Text(
-                        "Ajouter une prescription",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -361,71 +383,99 @@ class _FormConsultationState extends State<FormConsultation> {
               const SizedBox(
                 height: defaultPadding,
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    context.showLoader();
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        context.showLoader();
 
-                    List<Analyse> nonNullAnalyses = selectedAnalyses
-                        .where((analyse) => analyse != null)
-                        .cast<Analyse>()
-                        .toList();
+                        List<Analyse> nonNullAnalyses = selectedAnalyses
+                            .where((analyse) => analyse != null)
+                            .cast<Analyse>()
+                            .toList();
 
-                    // Créer un bilan avec les analyses non nulles
-                    Bilan bilan = Bilan(analyses: nonNullAnalyses);
+                        // Créer un bilan avec les analyses non nulles
+                        Bilan bilan = Bilan(analyses: nonNullAnalyses);
 
-                    // Données consultation.
-                    Map<String, dynamic> consultation = {
-                      "id": 0,
-                      "diagnostic": diagnosticController.text,
-                      "symptome": "sylto",
-                      "medecin": {"id": 1},
-                      "typeDeConsultation": _selectedTypeDeConsultation != null
-                          ? {"id": _selectedTypeDeConsultation!.id}
-                          : null,
-                      "motifDeConsultation":
-                          _selectedMotifDeConsultation != null
-                              ? {"id": _selectedMotifDeConsultation!.id}
-                              : null,
-                      "bilan": bilan.toMap(),
-                      "prescriptions": prescriptionControllers.map((controller) => controller.text).toList(),
-                      // }
-                    };
+                        // Données consultation.
+                        Map<String, dynamic> consultation = {
+                          "id": 0,
+                          "diagnostic": diagnosticController.text,
+                          "symptome": "sylto",
+                          "medecin": {"id": 1},
+                          "typeDeConsultation":
+                              _selectedTypeDeConsultation != null
+                                  ? {"id": _selectedTypeDeConsultation!.id}
+                                  : null,
+                          "motifDeConsultation":
+                              _selectedMotifDeConsultation != null
+                                  ? {"id": _selectedMotifDeConsultation!.id}
+                                  : null,
+                          "bilan": bilan.toMap(),
+                          "prescriptions": prescriptionControllers
+                              .map((controller) => controller.text)
+                              .toList(),
+                        };
 
-                    print("object::::::::: ${widget.patient.email} le email");
-                    print("object::::::::: ${consultation.toString()} le email");
+                        //Logique pour sauvegarder la consultation
 
-                    //TODO Logique pour sauvegarder la consultation
-
-                    await consultationService
-                        .creerConsultation(
-                      consultation,
-                      widget.patient.email,
-                    )
-                        .then((onValue) {
-                      context.read<MyData>().getNombreConsultation();
-                      context.hideLoader();
-                      context.showSuccess("Ajoutée avec succès.");
-                    }).catchError((onError) {
-                      context.hideLoader();
-                      context.showError(onError.toString());
-                    }).whenComplete(() {
-                      context.read<MyMenuController>().changePage(2);
-                    });
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
+                        await consultationService
+                            .creerConsultation(
+                          consultation,
+                          widget.patient.email,
+                        )
+                            .then((onValue) {
+                          context.read<MyData>().getNombreConsultation();
+                          context.hideLoader();
+                          context.showSuccess("Ajoutée avec succès.");
+                        }).catchError((onError) {
+                          context.hideLoader();
+                          context.showError(onError.toString());
+                        }).whenComplete(() {
+                          setState(() {
+                            // context.read<MyMenuController>().changePage(2);
+                            widget.changeView();
+                          });
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    child: const Text(
+                      "Enregistrer",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  "Enregistrer",
-                  style: TextStyle(
-                    color: Colors.white,
+                  const SizedBox(
+                    width: 10,
                   ),
-                ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        widget.changeView();
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    child: const Text(
+                      "Annuler",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -961,26 +1011,6 @@ class _ConsultationFormState extends State<ConsultationForm> {
       },
     );
   }
-
-  // Future<dynamic> selectionModal(BuildContext context) {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return const Dialog(
-  //         child: FractionallySizedBox(
-  //           widthFactor:
-  //               0.8, // Ajuster la largeur pour que le dialog soit responsive
-  //           child: Padding(
-  //             padding: EdgeInsets.all(16.0 * 2),
-  //             child: Center(
-  //               child: Text("Selection de patient"),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }
 
 // le formulaire complet de la partie consultation......................................................

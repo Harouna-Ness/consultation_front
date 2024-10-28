@@ -4,16 +4,16 @@ import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:provider/provider.dart';
 
-class SideMenu extends StatefulWidget {
-  const SideMenu({
+class SideMenuMedecin extends StatefulWidget {
+  const SideMenuMedecin({
     super.key,
   });
 
   @override
-  State<SideMenu> createState() => _SideMenuState();
+  State<SideMenuMedecin> createState() => _SideMenuState();
 }
 
-class _SideMenuState extends State<SideMenu> {
+class _SideMenuState extends State<SideMenuMedecin> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -25,38 +25,6 @@ class _SideMenuState extends State<SideMenu> {
             child: SvgPicture.asset("assets/icons/logo.svg"),
           ),
           DrawerListTile(
-            title: "Dashboard",
-            svgSrc: "assets/icons/dashbordd.svg",
-            press: () => {
-              setState(
-                () {
-                  context.read<MyMenuController>().changePage(0);
-                  context.read<MyMenuController>().closeDrawer();
-                },
-              )
-            },
-          ),
-          DrawerListTile(
-            title: "Patients",
-            svgSrc: "assets/icons/patients.svg",
-            press: () => {
-              setState(() {
-                context.read<MyMenuController>().changePage(1);
-                context.read<MyMenuController>().closeDrawer();
-              })
-            },
-          ),
-          DrawerListTile(
-            title: "Docteurs",
-            svgSrc: "assets/icons/patients.svg",
-            press: () => {
-              setState(() {
-                context.read<MyMenuController>().changePage(6);
-                context.read<MyMenuController>().closeDrawer();
-              })
-            },
-          ),
-          DrawerListTile(
             title: "Consultation",
             svgSrc: "assets/icons/consultation.svg",
             press: () => {
@@ -65,18 +33,20 @@ class _SideMenuState extends State<SideMenu> {
             },
           ),
           DrawerListTile(
-            title: "Rendez-vous",
-            svgSrc: "assets/icons/rendezvous.svg",
+            title: "Patients",
+            svgSrc: "assets/icons/patients.svg",
             press: () => {
-              context.read<MyMenuController>().changePage(3),
-              context.read<MyMenuController>().closeDrawer(),
+              setState(() {
+                context.read<MyMenuController>().changePage(7);
+                context.read<MyMenuController>().closeDrawer();
+              })
             },
           ),
           DrawerListTile(
-            title: "Settings",
-            svgSrc: "assets/icons/menu_setting.svg",
+            title: "Rendez-vous",
+            svgSrc: "assets/icons/rendezvous.svg",
             press: () => {
-              context.read<MyMenuController>().changePage(5),
+              context.read<MyMenuController>().changePage(8),
               context.read<MyMenuController>().closeDrawer(),
             },
           ),
@@ -103,7 +73,7 @@ class _SideMenuState extends State<SideMenu> {
                       fontSize: 14,
                     ),
                   ),
-                  subtitle: const Text("  Admin", style: TextStyle(
+                  subtitle: const Text("  Médecin", style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
                       fontSize: 12,

@@ -7,7 +7,7 @@ class StatutService {
 
   Future<List<Statut>> getAllStatuts() async {
     try {
-      Response response = await apiService.getData('admin/voirStatuts');
+      Response response = await apiService.getData('statut/all');
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         return data.map((e) => Statut.fromMap(e)).toList();
@@ -22,7 +22,7 @@ class StatutService {
   Future<void> createStatut(Statut statut) async {
     try {
       Map<String, dynamic> data = statut.toMap();
-      await apiService.postData('admin/creerStatut', data);
+      await apiService.postData('statut', data);
     } catch (e) {
       throw Exception("Erreur : $e");
     }
@@ -31,7 +31,7 @@ class StatutService {
   Future<void> updateStatut(Statut statut) async {
     try {
       Map<String, dynamic> data = statut.toMap();
-      await apiService.putData('admin/modifierStatut', data);
+      await apiService.putData('statut/${statut.id}', data);
     } catch (e) {
       throw Exception("Erreur : $e");
     }
@@ -39,7 +39,7 @@ class StatutService {
 
   Future<void> deleteStatut(int statutId) async {
     try {
-      await apiService.deleteData('admin/supprimerStatut/$statutId');
+      await apiService.deleteData('statut/$statutId');
     } catch (e) {
       throw Exception("Erreur : $e");
     }

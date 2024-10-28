@@ -31,7 +31,7 @@ class TypeConsultationService {
   Future<void> updateTypeDeConsultation(TypeDeConsultation typeDeConsultation) async {
     try {
       Map<String, dynamic> data = typeDeConsultation.toMap();
-      await apiService.putData('admin/modifierTypeDeConsultation', data);
+      await apiService.putData('admin/modifier-type-consultation', data);
     } catch (e) {
       throw Exception("Erreur : $e");
     }
@@ -39,7 +39,7 @@ class TypeConsultationService {
 
   Future<void> deleteTypeDeConsultation(int typeDeConsultationId) async {
     try {
-      await apiService.deleteData('admin/supprimerTypeDeConsultation/$typeDeConsultationId');
+      await apiService.deleteData('admin/supprimer-type-de-consultation/$typeDeConsultationId');
     } catch (e) {
       throw Exception("Erreur : $e");
     }

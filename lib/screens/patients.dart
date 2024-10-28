@@ -12,6 +12,7 @@ import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/patient.dart';
+import 'package:medstory/screens/dossier_patient.dart';
 import 'package:medstory/service/patient_service.dart';
 import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,9 @@ class Patients extends StatefulWidget {
 }
 
 class _PatientsState extends State<Patients> {
+  Patient? selectedPatient;
   final patientService = PatientService();
+  bool showDossier = false;
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -87,7 +90,7 @@ class _PatientsState extends State<Patients> {
                         }).whenComplete(() {
                           context.showSuccess(
                               "Le patient a été ajouté avec succès.");
-                              parentContext.read<MyMenuController>().changePage(1);
+                          parentContext.read<MyMenuController>().changePage(1);
                         });
                       },
                       contexte: parentContext,
@@ -226,253 +229,283 @@ class _PatientsState extends State<Patients> {
         ),
       ),
     ];
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(defaultPadding),
-        child: Column(
-          children: [
-            Responsive(
-              mobile: CustomGridView(
-                crossAxisCount: size.width < 650 ? 2 : 4,
-                childAspectRatio: size.width < 320 ? 1.1 : 1.8,
-                // childAspectRatio: size.width < 320 ? 1.1 : 1.8,
-                screens: screens,
-              ),
-              tablet: CustomGridView(
-                childAspectRatio: size.width < 920 ? 2.3 : 2.9,
-                screens: screens,
-              ),
-              desktop: CustomGridView(
-                childAspectRatio: size.width < 1200 ? 2.8 : 2.9,
-                // childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
-                screens: screens,
-              ),
-            ),
-            const SizedBox(
-              height: defaultPadding,
-            ),
-            Responsive(
-              mobile: CustomGridView(
-                crossAxisCount: 1,
-                childAspectRatio: size.width < 650 ? 1.7 : 2.1,
-                screens: [
-                  Container(
-                    color: Colors.grey,
+    return !showDossier
+        ? SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(defaultPadding),
+              child: Column(
+                children: [
+                  Responsive(
+                    mobile: CustomGridView(
+                      crossAxisCount: size.width < 650 ? 2 : 4,
+                      childAspectRatio: size.width < 320 ? 1.1 : 1.8,
+                      // childAspectRatio: size.width < 320 ? 1.1 : 1.8,
+                      screens: screens,
+                    ),
+                    tablet: CustomGridView(
+                      childAspectRatio: size.width < 920 ? 2.3 : 2.9,
+                      screens: screens,
+                    ),
+                    desktop: CustomGridView(
+                      childAspectRatio: size.width < 1200 ? 2.8 : 2.9,
+                      // childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
+                      screens: screens,
+                    ),
                   ),
-                  Container(
-                    color: Colors.grey,
+                  const SizedBox(
+                    height: defaultPadding,
                   ),
-                ],
-              ),
-              tablet: CustomGridView(
-                crossAxisCount: 2,
-                childAspectRatio: 2.1,
-                screens: [
-                  Container(
-                    color: Colors.grey,
-                  ),
-                  Container(
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
-              desktop: CustomGridView(
-                crossAxisCount: 2,
-                childAspectRatio: 2.1,
-                screens: [
-                  Box(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Patients par direction",
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                  Responsive(
+                    mobile: CustomGridView(
+                      crossAxisCount: 1,
+                      childAspectRatio: size.width < 650 ? 1.7 : 2.1,
+                      screens: [
+                        Container(
+                          color: Colors.grey,
                         ),
-                        const SizedBox(
-                          height: defaultPadding,
-                        ),
-                        Expanded(
-                          child: BarChart(
-                            BarChartData(
-                              maxY: 100,
-                              barGroups: [
-                                BarChartGroupData(
-                                  x: 1,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: 80,
-                                      width: 30,
-                                      color: tertiaryColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    // BarChartRodData(toY: 40, color: secondaryColor),
-                                  ],
-                                ),
-                                BarChartGroupData(
-                                  x: 2,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: 70,
-                                      width: 30,
-                                      color: secondaryColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ],
-                                ),
-                                BarChartGroupData(
-                                  x: 3,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: 70,
-                                      width: 30,
-                                      color: tertiaryColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ],
-                                ),
-                                BarChartGroupData(
-                                  x: 4,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: 70,
-                                      width: 30,
-                                      color: secondaryColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ],
-                                ),
-                                BarChartGroupData(
-                                  x: 5,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: 70,
-                                      width: 30,
-                                      color: tertiaryColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ],
-                                ),
-                                BarChartGroupData(
-                                  x: 6,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: 70,
-                                      width: 30,
-                                      color: secondaryColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              borderData: FlBorderData(show: false),
-                              titlesData: FlTitlesData(
-                                rightTitles: const AxisTitles(),
-                                topTitles: const AxisTitles(),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    reservedSize: 30,
-                                    showTitles: true,
-                                    getTitlesWidget: (value, meta) => Text(
-                                      value.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    reservedSize: 23,
-                                    showTitles: true,
-                                    getTitlesWidget: getBottomTile,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                        Container(
+                          color: Colors.grey,
                         ),
                       ],
                     ),
-                  ),
-                  Box(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Patients par site de travail",
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                    tablet: CustomGridView(
+                      crossAxisCount: 2,
+                      childAspectRatio: 2.1,
+                      screens: [
+                        Container(
+                          color: Colors.grey,
                         ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        Container(
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                    desktop: CustomGridView(
+                      crossAxisCount: 2,
+                      childAspectRatio: 2.1,
+                      screens: [
+                        Box(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // const SizedBox(height: defaultPadding),
-                              SizedBox(
-                                height: 100,
-                                width: 100,
-                                child: PieChart(
-                                  PieChartData(
-                                    sectionsSpace: 0,
-                                    centerSpaceRadius: 30,
-                                    startDegreeOffset: -90,
-                                    sections: pieChartSectionData,
+                              Text(
+                                "Patients par direction",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              const SizedBox(
+                                height: defaultPadding,
+                              ),
+                              Expanded(
+                                child: BarChart(
+                                  BarChartData(
+                                    maxY: 100,
+                                    barGroups: [
+                                      BarChartGroupData(
+                                        x: 1,
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: 80,
+                                            width: 30,
+                                            color: tertiaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          // BarChartRodData(toY: 40, color: secondaryColor),
+                                        ],
+                                      ),
+                                      BarChartGroupData(
+                                        x: 2,
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: 70,
+                                            width: 30,
+                                            color: secondaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                        ],
+                                      ),
+                                      BarChartGroupData(
+                                        x: 3,
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: 70,
+                                            width: 30,
+                                            color: tertiaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                        ],
+                                      ),
+                                      BarChartGroupData(
+                                        x: 4,
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: 70,
+                                            width: 30,
+                                            color: secondaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                        ],
+                                      ),
+                                      BarChartGroupData(
+                                        x: 5,
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: 70,
+                                            width: 30,
+                                            color: tertiaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                        ],
+                                      ),
+                                      BarChartGroupData(
+                                        x: 6,
+                                        barRods: [
+                                          BarChartRodData(
+                                            toY: 70,
+                                            width: 30,
+                                            color: secondaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                    borderData: FlBorderData(show: false),
+                                    titlesData: FlTitlesData(
+                                      rightTitles: const AxisTitles(),
+                                      topTitles: const AxisTitles(),
+                                      leftTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          reservedSize: 30,
+                                          showTitles: true,
+                                          getTitlesWidget: (value, meta) =>
+                                              Text(
+                                            value.toString(),
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      bottomTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          reservedSize: 23,
+                                          showTitles: true,
+                                          getTitlesWidget: getBottomTile,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                              // const SizedBox(height: defaultPadding),
-                              Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 3,
-                                        backgroundColor: primaryColor,
+                            ],
+                          ),
+                        ),
+                        Box(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Patients par site de travail",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              const SizedBox(height: 16),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    // const SizedBox(height: defaultPadding),
+                                    SizedBox(
+                                      height: 100,
+                                      width: 100,
+                                      child: PieChart(
+                                        PieChartData(
+                                          sectionsSpace: 0,
+                                          centerSpaceRadius: 30,
+                                          startDegreeOffset: -90,
+                                          sections: pieChartSectionData,
+                                        ),
                                       ),
-                                      const SizedBox(
-                                        width: 7,
-                                      ),
-                                      Text(
-                                        "Bamako",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(
-                                              color: Colors.black,
+                                    ),
+                                    // const SizedBox(height: defaultPadding),
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const CircleAvatar(
+                                              radius: 3,
+                                              backgroundColor: primaryColor,
                                             ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              )
+                                            const SizedBox(
+                                              width: 7,
+                                            ),
+                                            Text(
+                                              "Bamako",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .copyWith(
+                                                    color: Colors.black,
+                                                  ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(
+                    height: defaultPadding,
+                  ),
+                  Box(
+                    padding: 10,
+                    child: Customtable(
+                      changeView: (Patient patient) {
+                        setState(() {
+                          selectedPatient = patient;
+                        });
+                        if (selectedPatient != null) {
+                          showDossier = true;
+                        }
+                      },
+                    ),
+                  )
                 ],
               ),
             ),
-            const SizedBox(
-              height: defaultPadding,
-            ),
-            Box(
-              padding: 10,
-              child: const Customtable(),
-            )
-          ],
-        ),
-      ),
-    );
+          )
+        : DossierPatient(
+            patient: selectedPatient!,
+            changeView: () {
+              setState(() {
+                showDossier = false;
+              });
+            },
+          );
   }
 
   Widget getBottomTile(double value, TitleMeta meta) {

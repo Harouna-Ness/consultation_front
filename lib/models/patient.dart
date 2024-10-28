@@ -1,4 +1,5 @@
 import 'package:medstory/models/direction.dart';
+import 'package:medstory/models/dossier_medical.dart';
 import 'package:medstory/models/role.dart';
 import 'package:medstory/models/site_de_tavail.dart';
 import 'package:medstory/models/statut_patient.dart';
@@ -10,6 +11,7 @@ class Patient extends Utilisateur {
   final Sitedetravail? sitedetravail;
   final Direction? direction;
   final StatutPatient? statut;
+  final DossierMedical? dossierMedical;
 
   Patient({
     required super.id,
@@ -25,6 +27,7 @@ class Patient extends Utilisateur {
     required this.proffession,
     required this.sitedetravail,
     required this.direction,
+    required this.dossierMedical,
     required this.statut,
   });
 
@@ -43,7 +46,8 @@ class Patient extends Utilisateur {
       proffession: map['proffession'],
       sitedetravail: map['siteDeTravail'] != null ? Sitedetravail.fromMap(map['siteDeTravail']): null,
       direction: Direction.fromMap(map['direction']),
-      statut: StatutPatient.fromMap(map['statut']),
+      statut: StatutPatient.fromMap(map['statut']), 
+      dossierMedical: map['dossierMedical'] != null ? DossierMedical.fromMap(map['dossierMedical']) : null,
     );
   }
 

@@ -43,13 +43,20 @@ String pageTitle(int currentPages) {
   } else if (currentPages == 2) {
     return "Consultation";
   } else if (currentPages == 3) {
-    return "RendezVous";
+    return "Rendez-vous";
   } else if (currentPages == 4) {
     return "Pathologie";
   } else if (currentPages == 5) {
     return "Settings";
+  } else if (currentPages == 6) {
+    return "Docteurs";
+  } else if (currentPages == 7) {
+    return "Dossier Patient";
+  } else if (currentPages == 8) {
+    return "Rendez-vous";
   }
-   else {
+  
+  else {
     return "";
   }
 }

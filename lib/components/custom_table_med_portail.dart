@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/components/edit_patient_model.dart';
@@ -11,15 +9,15 @@ import 'package:medstory/service/patient_service.dart';
 import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
 
-class Customtable extends StatefulWidget {
+class CustomTableMedPortail extends StatefulWidget {
   final void Function(Patient patient) changeView;
-  const Customtable({super.key, required this.changeView});
+  const CustomTableMedPortail({super.key, required this.changeView});
 
   @override
-  State<Customtable> createState() => _CustomtableState();
+  State<CustomTableMedPortail> createState() => _CustomTableMedPortailState();
 }
 
-class _CustomtableState extends State<Customtable> {
+class _CustomTableMedPortailState extends State<CustomTableMedPortail> {
   String searchText = '';
   String? selectedFilter;
   List<String> filters = [
@@ -356,19 +354,7 @@ DataRow customDataRow(
       DataCell(
         Row(
           children: [
-            InkWell(
-              onTap: () {
-                showEditPatientModal(contexte, patient);
-              },
-              child: SvgPicture.asset(
-                "assets/icons/edit.svg",
-                height: 25,
-                width: 25,
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
+            
             InkWell(
               // Logique pour voir le dossier patient
               onTap: voirDossierLogique,
@@ -378,30 +364,7 @@ DataRow customDataRow(
                 width: 25,
               ),
             ),
-            const SizedBox(
-              width: 5,
-            ),
-            InkWell(
-              onTap: () async {
-                contexte.showLoader();
-                final patientService = PatientService();
-                await patientService.deletePatient(patient.id!).then((value) {
-                  contexte.read<MyData>().getNombrePatient();
-                  contexte.hideLoader();
-                }).catchError((onError) {
-                  contexte.showError(onError.toString());
-                }).whenComplete(() {
-                  contexte
-                      .showSuccess("Le patient a été supprimé avec succès.");
-                  contexte.read<MyMenuController>().changePage(1);
-                });
-              },
-              child: SvgPicture.asset(
-                "assets/icons/supp.svg",
-                height: 25,
-                width: 25,
-              ),
-            ),
+            
           ],
         ),
       ),

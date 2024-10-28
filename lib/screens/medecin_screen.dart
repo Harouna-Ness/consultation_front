@@ -1,92 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/components/box.dart';
+import 'package:medstory/components/doctor_forme.dart';
+import 'package:medstory/components/doctor_table.dart';
 import 'package:medstory/components/empty_content.dart';
-import 'package:medstory/components/rendez_vous_form.dart';
-import 'package:medstory/components/rendez_vous_table.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/my_data.dart';
-import 'package:medstory/models/rendez_vous.dart';
 import 'package:provider/provider.dart';
 
-class RendezVousScreen extends StatefulWidget {
-  const RendezVousScreen({super.key});
+class MedecinScreen extends StatefulWidget {
+  const MedecinScreen({super.key});
 
   @override
-  State<RendezVousScreen> createState() => _RendezVousScreenState();
+  State<MedecinScreen> createState() => _MedecinScreenState();
 }
 
-class _RendezVousScreenState extends State<RendezVousScreen> {
+class _MedecinScreenState extends State<MedecinScreen> {
   bool showForm = false;
   String searchText = '';
   String? selectedFilter;
-  List<String> filters = [
-    "Aucun Filtre",
-    "Motif",
-    "Statut",
-    "Date",
-    "Médecin",
-    "Patient"
-  ];
+  List<String> filters = ["Aucun Filtre", "Spécialité", "Matricule"];
   TextEditingController searchController = TextEditingController();
-  List<RendezVous> _rendezVous = [];
+  List<Medecin> _medecins = [];
   @override
   Widget build(BuildContext context) {
-    _rendezVous = context.watch<MyData>().rendezVous;
+    _medecins = context.watch<MyData>().medecins;
+    List<Medecin> filteredMedecins = _medecins;
 
-    List<RendezVous> filteredRendezVous = _rendezVous.where((rendezVous) {
-      bool matchesSearch =
-          rendezVous.motif.toLowerCase().contains(searchText.toLowerCase()) ||
-              rendezVous.statut.libelle
+    filteredMedecins = context.watch<MyData>().medecins.where((medecin) {
+      bool matchesSearch = medecin.prenom
                   .toLowerCase()
                   .contains(searchText.toLowerCase()) ||
-              rendezVous.date.toString().contains(searchText) ||
-              rendezVous.medecin.nom
+              medecin.nom.toLowerCase().contains(searchText.toLowerCase()) ||
+              medecin.specialite
                   .toLowerCase()
                   .contains(searchText.toLowerCase()) ||
-              rendezVous.medecin.prenom
+              medecin.matricule!
                   .toLowerCase()
-                  .contains(searchText.toLowerCase()) ||
-              rendezVous.patient.nom
-                  .toLowerCase()
-                  .contains(searchText.toLowerCase()) ||
-              rendezVous.patient.prenom
-                  .toLowerCase()
-                  .contains(searchText.toLowerCase());
+                  .contains(searchText.toLowerCase()) ??
+          false;
 
       bool matchesFilter = true;
       if (selectedFilter != null) {
         switch (selectedFilter) {
-          case "Motif":
-            matchesFilter = rendezVous.motif.toLowerCase().contains(searchText);
-            break;
-          case "Statut":
+          case "Spécialité":
             matchesFilter =
-                rendezVous.statut.libelle.toLowerCase().contains(searchText);
+                medecin.specialite.toLowerCase().contains(searchText);
             break;
-          case "Date":
-            matchesFilter = rendezVous.date.toString().contains(searchText);
-            break;
-          case "Médecin":
-            matchesFilter = rendezVous.medecin.nom
-                    .toLowerCase()
-                    .contains(searchText) ||
-                rendezVous.medecin.prenom.toLowerCase().contains(searchText);
-            break;
-          case "Patient":
-            matchesFilter = rendezVous.patient.nom
-                    .toLowerCase()
-                    .contains(searchText) ||
-                rendezVous.patient.prenom.toLowerCase().contains(searchText);
+          case "Matricule":
+            matchesFilter = medecin.matricule != null &&
+                medecin.matricule.toLowerCase().contains(searchText);
             break;
         }
       }
       return matchesSearch && matchesFilter;
     }).toList();
 
-    return SafeArea(
-      child: !showForm
-          ? SingleChildScrollView(
+    return showForm
+        ? Box(child: DoctorForm(
+            changeView: () {
+              setState(() {
+                showForm = false;
+              });
+            },
+          ))
+        : SafeArea(
+            child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 50,
@@ -98,7 +78,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                       Row(
                         children: [
                           Text(
-                            "Liste des Rendez-vous",
+                            "Liste des Médecins",
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
                                       color: Colors.black87,
@@ -111,58 +91,6 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                               setState(() {
                                 showForm = true;
                               });
-                              //TODO: logique de création de rendez-vous.
-                              //   context.showLoader();
-                              //   final rendezVousService = RendezVousService();
-                              //   RendezVous rdv = RendezVous(
-                              //       id: 0,
-                              //       motif: "motif",
-                              //       date: DateTime(2024, 11, 23),
-                              //       heure: "18:10",
-                              //       statut: Statut(id: 1, libelle: "libelle"),
-                              //       medecin: Medecin(
-                              //         id: 1,
-                              //         nom: "nom",
-                              //         prenom: "prenom",
-                              //         role: Role(id: 0, libelle: "libelle"),
-                              //         adresse: "adresse",
-                              //         email: "email",
-                              //         telephone: "telephone",
-                              //         motDePasse: "motDePasse",
-                              //         sexe: "sexe",
-                              //         specialite: "specialite",
-                              //         joursIntervention: [],
-                              //         matricule: '',
-                              //       ),
-                              //       patient: Patient(
-                              //           id: 2,
-                              //           nom: "nom",
-                              //           prenom: "prenom",
-                              //           role: Role(id: 0, libelle: "libelle"),
-                              //           adresse: "adresse",
-                              //           email: "email",
-                              //           telephone: "telephone",
-                              //           motDePasse: "motDePasse",
-                              //           sexe: "sexe",
-                              //           dateDeNaissance: DateTime.now(),
-                              //           proffession: "proffession",
-                              //           sitedetravail: Sitedetravail(id: 0, nom: "nom"),
-                              //           direction: Direction(id: 0, nom: "nom"),
-                              //           statut:
-                              //               StatutPatient(id: 0, libelle: "libelle")));
-                              //   await rendezVousService
-                              //       .createRendezVous(rdv)
-                              //       .then((value) {
-                              //   context.read<MyData>().fetchRendezVous();
-                              //   context.hideLoader();
-                              //   context.showSuccess(
-                              //       "Le rendez-vous a été ajouté avec succès.");
-                              // }).catchError((onError) {
-                              //   context.hideLoader();
-                              //   context.showError(onError.toString());
-                              // });
-
-                              ////
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,
@@ -171,7 +99,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                               ),
                             ),
                             child: const Text(
-                              "Planifier un rendez-vous",
+                              "Ajouter un docteur",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -213,7 +141,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                                           "assets/icons/search_icon.svg", // Icône SVG pour le bouton
                                         ),
                                       ),
-                                      hintText: "Motif, statut, date...",
+                                      hintText: "Prénom, nom, spécialité...",
                                       contentPadding: const EdgeInsets.only(
                                         bottom: 10,
                                       ),
@@ -276,27 +204,19 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                       const SizedBox(
                         height: 10,
                       ),
-                      (_rendezVous.isEmpty)
+                      (_medecins.isEmpty)
                           ? const EmptyContent()
                           : SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: RendezVousTable(
-                                rendezVousList: filteredRendezVous,
+                              child: DoctorTable(
+                                medecinList: filteredMedecins,
                               ),
                             ),
                     ],
                   ),
                 ),
               ),
-            )
-          : RendezVousForm(
-              changeView: () {
-                setState(() {
-                  showForm = false;
-                });
-              },
             ),
-      // ): const AddRendezVousForm(),
-    );
+          );
   }
 }

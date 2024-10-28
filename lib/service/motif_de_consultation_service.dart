@@ -22,7 +22,7 @@ class MotifDeConsultationService {
   Future<void> createMotifDeConsultation(MotifDeConsultation motifDeConsultation) async {
     try {
       Map<String, dynamic> data = motifDeConsultation.toMap();
-      await apiService.postData('admin/creer-motif-consultation', data);
+      await apiService.postData('motif-de-consultation', data);
     } catch (e) {
       throw Exception("Erreur : $e");
     }
@@ -31,7 +31,7 @@ class MotifDeConsultationService {
   Future<void> updateMotifDeConsultation(MotifDeConsultation motifDeConsultation) async {
     try {
       Map<String, dynamic> data = motifDeConsultation.toMap();
-      await apiService.putData('admin/modifierMotifDeConsultation', data);
+      await apiService.putData('motif-de-consultation/${motifDeConsultation.id}', data);
     } catch (e) {
       throw Exception("Erreur : $e");
     }
@@ -39,7 +39,7 @@ class MotifDeConsultationService {
 
   Future<void> deleteMotifDeConsultation(int motifDeConsultationId) async {
     try {
-      await apiService.deleteData('admin/supprimerMotifDeConsultation/$motifDeConsultationId');
+      await apiService.deleteData('motif-de-consultation/$motifDeConsultationId');
     } catch (e) {
       throw Exception("Erreur : $e");
     }

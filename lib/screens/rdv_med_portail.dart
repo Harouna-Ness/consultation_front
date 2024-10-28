@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/empty_content.dart';
-import 'package:medstory/components/rendez_vous_form.dart';
-import 'package:medstory/components/rendez_vous_table.dart';
+import 'package:medstory/components/rdv_form_med_portail.dart';
+import 'package:medstory/components/rdv_tab_med_portail.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/rendez_vous.dart';
 import 'package:provider/provider.dart';
 
-class RendezVousScreen extends StatefulWidget {
-  const RendezVousScreen({super.key});
+class RdvMedPortail extends StatefulWidget {
+  const RdvMedPortail({super.key});
 
   @override
-  State<RendezVousScreen> createState() => _RendezVousScreenState();
+  State<RdvMedPortail> createState() => _RdvMedPortailState();
 }
 
-class _RendezVousScreenState extends State<RendezVousScreen> {
+class _RdvMedPortailState extends State<RdvMedPortail> {
   bool showForm = false;
   String searchText = '';
   String? selectedFilter;
@@ -98,7 +98,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                       Row(
                         children: [
                           Text(
-                            "Liste des Rendez-vous",
+                            "Mes Rendez-vous",
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
                                       color: Colors.black87,
@@ -112,57 +112,6 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                                 showForm = true;
                               });
                               //TODO: logique de création de rendez-vous.
-                              //   context.showLoader();
-                              //   final rendezVousService = RendezVousService();
-                              //   RendezVous rdv = RendezVous(
-                              //       id: 0,
-                              //       motif: "motif",
-                              //       date: DateTime(2024, 11, 23),
-                              //       heure: "18:10",
-                              //       statut: Statut(id: 1, libelle: "libelle"),
-                              //       medecin: Medecin(
-                              //         id: 1,
-                              //         nom: "nom",
-                              //         prenom: "prenom",
-                              //         role: Role(id: 0, libelle: "libelle"),
-                              //         adresse: "adresse",
-                              //         email: "email",
-                              //         telephone: "telephone",
-                              //         motDePasse: "motDePasse",
-                              //         sexe: "sexe",
-                              //         specialite: "specialite",
-                              //         joursIntervention: [],
-                              //         matricule: '',
-                              //       ),
-                              //       patient: Patient(
-                              //           id: 2,
-                              //           nom: "nom",
-                              //           prenom: "prenom",
-                              //           role: Role(id: 0, libelle: "libelle"),
-                              //           adresse: "adresse",
-                              //           email: "email",
-                              //           telephone: "telephone",
-                              //           motDePasse: "motDePasse",
-                              //           sexe: "sexe",
-                              //           dateDeNaissance: DateTime.now(),
-                              //           proffession: "proffession",
-                              //           sitedetravail: Sitedetravail(id: 0, nom: "nom"),
-                              //           direction: Direction(id: 0, nom: "nom"),
-                              //           statut:
-                              //               StatutPatient(id: 0, libelle: "libelle")));
-                              //   await rendezVousService
-                              //       .createRendezVous(rdv)
-                              //       .then((value) {
-                              //   context.read<MyData>().fetchRendezVous();
-                              //   context.hideLoader();
-                              //   context.showSuccess(
-                              //       "Le rendez-vous a été ajouté avec succès.");
-                              // }).catchError((onError) {
-                              //   context.hideLoader();
-                              //   context.showError(onError.toString());
-                              // });
-
-                              ////
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,
@@ -280,7 +229,7 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                           ? const EmptyContent()
                           : SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: RendezVousTable(
+                              child: RdvTabMedPortail(
                                 rendezVousList: filteredRendezVous,
                               ),
                             ),
@@ -289,14 +238,13 @@ class _RendezVousScreenState extends State<RendezVousScreen> {
                 ),
               ),
             )
-          : RendezVousForm(
+          : RdvFormMedPortail(
               changeView: () {
                 setState(() {
                   showForm = false;
                 });
               },
             ),
-      // ): const AddRendezVousForm(),
     );
   }
 }

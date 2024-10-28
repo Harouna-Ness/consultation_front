@@ -3,7 +3,8 @@ import 'package:medstory/models/utilisateur.dart';
 
 class Medecin extends Utilisateur {
   final String specialite;
-  final List<String> joursIntervention;
+  final String matricule;
+  final List<Map<String, dynamic>> joursIntervention;
 
   Medecin({
     required int super.id,
@@ -16,22 +17,24 @@ class Medecin extends Utilisateur {
     required super.motDePasse,
     required super.sexe,
     required this.specialite,
+    required this.matricule,
     required this.joursIntervention,
   });
 
   factory Medecin.fromMap(Map<String, dynamic> map) {
     return Medecin(
-      id: map['id'],
-      nom: map['nom'],
-      prenom: map['prenom'],
+      id: map['id'] ?? 0, // exemple de valeur par défaut
+      nom: map['nom'] ?? 'Nom Inconnu',
+      prenom: map['prenom'] ?? 'Prénom Inconnu',
       role: Role.fromMap(map['role']),
-      adresse: map['adresse'],
-      email: map['email'],
-      telephone: map['telephone'],
-      motDePasse: map['motDePasse'],
-      sexe: map['sexe'],
-      specialite: map['specialite'],
-      joursIntervention: List<String>.from(map['joursIntervention']),
+      adresse: map['adresse'] ?? '',
+      email: map['email'] ?? 'email@example.com',
+      telephone: map['telephone'] ?? '0000000000',
+      motDePasse: map['motDePasse'] ?? '',
+      sexe: map['sexe'] ?? '',
+      specialite: map['specialite'] ?? 'Spécialité Inconnue',
+      matricule: map['matricule'] ?? '0000000000',
+      joursIntervention: List<Map<String, dynamic>>.from(map['joursIntervention'] ?? []),
     );
   }
 
@@ -48,6 +51,7 @@ class Medecin extends Utilisateur {
       'motDePasse': motDePasse,
       'sexe': sexe,
       'specialite': specialite,
+      'matricule': matricule,
       'joursIntervention': joursIntervention,
     };
   }
