@@ -31,6 +31,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     context.read<MyData>().getNombrePatient();
+    context.read<MyData>().getMoyenneAge();
     context.read<MyData>().getNombreConsultation();
     context.read<MyData>().fetchPatients();
     context.read<MyData>().fetchDirections();
@@ -39,7 +40,6 @@ class _MainScreenState extends State<MainScreen> {
     context.read<MyData>().fetchMotifDeConsultion();
     context.read<MyData>().fetchTypeDeConsultation();
     context.read<MyData>().fetchStatutPatient();
-    context.read<MyData>().fetchConsultation();
     context.read<MyData>().fetchStatut();
     context.read<MyData>().fetchRendezVous();
     context.read<MyData>().fetchMedecins();

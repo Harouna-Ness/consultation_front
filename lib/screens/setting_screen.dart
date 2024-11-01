@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/components/box.dart';
-import 'package:medstory/components/customTable.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/models/analyse.dart';
 import 'package:medstory/models/direction.dart';
@@ -217,7 +216,7 @@ class _StatutRdvTileState extends State<StatutRdvTile> {
                                               .then((onValue) {
                                             context
                                                 .read<MyData>()
-                                                .updateStatut(statut, index);
+                                                .fetchStatut();
                                             context.hideLoader();
                                             Navigator.of(context).pop();
                                             context.showSuccess(
@@ -259,7 +258,7 @@ class _StatutRdvTileState extends State<StatutRdvTile> {
                       await statutService
                           .deleteStatut(widget.statuts[index].id)
                           .then((onValue) {
-                        context.read<MyData>().deleteStatut(index);
+                        context.read<MyData>().fetchStatut();
                         context.hideLoader();
                         context.showSuccess("Statut supprimé");
                       }).catchError((e) {
@@ -334,7 +333,7 @@ class _StatutRdvTileState extends State<StatutRdvTile> {
                           await statutService
                               .createStatut(statut)
                               .then((onValue) {
-                            context.read<MyData>().addStatut(statut);
+                            context.read<MyData>().fetchStatut();
                             statutController.clear();
                             context.hideLoader();
                             context.showSuccess("Enregistrer !");
@@ -479,8 +478,7 @@ class _TypeSectionTileState extends State<TypeSectionTile> {
                                               .then((onValue) {
                                             context
                                                 .read<MyData>()
-                                                .updateTypeDeConsultation(
-                                                    type, index);
+                                                .fetchTypeDeConsultation();
                                             context.hideLoader();
                                             Navigator.of(context).pop();
                                             context.showSuccess(
@@ -523,7 +521,7 @@ class _TypeSectionTileState extends State<TypeSectionTile> {
                           .deleteTypeDeConsultation(
                               widget.typesDeConsultations[index].id)
                           .then((onValue) {
-                        context.read<MyData>().deleteTypeDeConsultationt(index);
+                        context.read<MyData>().fetchTypeDeConsultation();
                         context.hideLoader();
                         context.showSuccess("Type supprimé");
                       }).catchError((e) {
@@ -578,7 +576,7 @@ class _TypeSectionTileState extends State<TypeSectionTile> {
                   ),
                   Expanded(
                     child: TextField(
-                      decoration: const InputDecoration(label: Text("Motif")),
+                      decoration: const InputDecoration(label: Text("Type")),
                       controller: typeController,
                     ),
                   ),
@@ -597,7 +595,7 @@ class _TypeSectionTileState extends State<TypeSectionTile> {
                           await typeService
                               .createTypeDeConsultation(type)
                               .then((onValue) {
-                            context.read<MyData>().addTypeDeConsultation(type);
+                            context.read<MyData>().fetchTypeDeConsultation();
                             typeController.clear();
                             context.hideLoader();
                             context.showSuccess("Enregistrer !");
@@ -743,8 +741,7 @@ class _MotifSectionTileState extends State<MotifSectionTile> {
                                               .then((onValue) {
                                             context
                                                 .read<MyData>()
-                                                .updateMotifDeConsultion(
-                                                    motifDeConsultation, index);
+                                                .fetchMotifDeConsultion();
                                             context.hideLoader();
                                             Navigator.of(context).pop();
                                             context.showSuccess(
@@ -787,7 +784,7 @@ class _MotifSectionTileState extends State<MotifSectionTile> {
                           .deleteMotifDeConsultation(
                               widget.motifDeConsultations[index].id!)
                           .then((onValue) {
-                        context.read<MyData>().deleteMotifDeConsultion(index);
+                        context.read<MyData>().fetchMotifDeConsultion();
                         context.hideLoader();
                         context.showSuccess("Motif supprimé");
                       }).catchError((e) {
@@ -861,7 +858,7 @@ class _MotifSectionTileState extends State<MotifSectionTile> {
                           await motifService
                               .createMotifDeConsultation(motif)
                               .then((onValue) {
-                            context.read<MyData>().addMotifDeConsultion(motif);
+                            context.read<MyData>().fetchMotifDeConsultion();
                             motifController.clear();
                             context.hideLoader();
                             context.showSuccess("Enregistrer !");
@@ -1003,7 +1000,7 @@ class _AnalyseSectionTileState extends State<AnalyseSectionTile> {
                                               .then((onValue) {
                                             context
                                                 .read<MyData>()
-                                                .updateAnalyse(analyse, index);
+                                                .fetchAnalyse();
                                             context.hideLoader();
                                             Navigator.of(context).pop();
                                             context.showSuccess(
@@ -1045,7 +1042,7 @@ class _AnalyseSectionTileState extends State<AnalyseSectionTile> {
                       await analyseService
                           .deleteAnalyse(widget.analyses[index].id!)
                           .then((onValue) {
-                        context.read<MyData>().deleteAnalyse(index);
+                        context.read<MyData>().fetchAnalyse();
                         context.hideLoader();
                         context.showSuccess("Analyse supprimée");
                       }).catchError((e) {
@@ -1120,7 +1117,7 @@ class _AnalyseSectionTileState extends State<AnalyseSectionTile> {
                           await analyseService
                               .createAnalyse(analyse)
                               .then((onValue) {
-                            context.read<MyData>().addAnalyse(analyse);
+                            context.read<MyData>().fetchAnalyse();
                             analyseController.clear();
                             context.hideLoader();
                             context.showSuccess("Enregistrer !");
@@ -1263,8 +1260,7 @@ class _SiteSectionTileState extends State<SiteSectionTile> {
                                               .then((onValue) {
                                             context
                                                 .read<MyData>()
-                                                .updateSiteDeTraivails(
-                                                    site, index);
+                                                .fetchSiteDeTraivails();
                                             context.hideLoader();
                                             Navigator.of(context).pop();
                                             context
@@ -1306,7 +1302,7 @@ class _SiteSectionTileState extends State<SiteSectionTile> {
                       await sitedeTravailService
                           .deleteSitedetravail(widget.sitesDeTravails[index].id)
                           .then((onValue) {
-                        context.read<MyData>().deleteSiteDeTraivailst(index);
+                        context.read<MyData>().fetchSiteDeTraivails();
                         context.hideLoader();
                         context.showSuccess("Site supprimé");
                       }).catchError((e) {
@@ -1381,7 +1377,7 @@ class _SiteSectionTileState extends State<SiteSectionTile> {
                           await sitedeTravailService
                               .createSitedetravail(site)
                               .then((onValue) {
-                            context.read<MyData>().addSiteDeTraivails(site);
+                            context.read<MyData>().fetchSiteDeTraivails();
                             siteController.clear();
                             context.hideLoader();
                             context.showSuccess("Enregistrer !");
@@ -1523,8 +1519,7 @@ class _DirectionSectionTileState extends State<DirectionSectionTile> {
                                               .then((onValue) {
                                             context
                                                 .read<MyData>()
-                                                .updateDirections(
-                                                    direction, index);
+                                                .fetchDirections();
                                             context.hideLoader();
                                             Navigator.of(context).pop();
                                             context.showSuccess(
@@ -1566,7 +1561,7 @@ class _DirectionSectionTileState extends State<DirectionSectionTile> {
                       await directionService
                           .deleteDirection(widget.directions[index].id)
                           .then((onValue) {
-                        context.read<MyData>().deleteDirectionst(index);
+                        context.read<MyData>().fetchDirections();
                         context.hideLoader();
                         context.showSuccess("Direction supprimée");
                       }).catchError((e) {
@@ -1641,7 +1636,7 @@ class _DirectionSectionTileState extends State<DirectionSectionTile> {
                           await directionService
                               .createDirection(direction)
                               .then((onValue) {
-                            context.read<MyData>().addDirections(direction);
+                            context.read<MyData>().fetchDirections();
                             directionController.clear();
                             context.hideLoader();
                             context.showSuccess("Enregistrer !");
@@ -1784,10 +1779,10 @@ class _StatutSectionTileState extends State<StatutSectionTile> {
                                               .updateStatutPatient(
                                                   statutPatient)
                                               .then((onValue) {
+                                            statutController.clear();
                                             context
                                                 .read<MyData>()
-                                                .updateStatutPatient(
-                                                    statutPatient, index);
+                                                .fetchStatutPatient();
                                             context.hideLoader();
                                             Navigator.of(context).pop();
                                             context.showSuccess(
@@ -1803,6 +1798,7 @@ class _StatutSectionTileState extends State<StatutSectionTile> {
                                         }
                                       },
                                       onCancel: () {
+                                        statutController.clear();
                                         Navigator.of(context).pop();
                                       },
                                     ),
@@ -1829,9 +1825,7 @@ class _StatutSectionTileState extends State<StatutSectionTile> {
                       await statutPatientService
                           .deleteStatutPatient(widget.statutPatients[index].id)
                           .then((onValue) {
-                        context.read<MyData>().deleteStatutPatient(
-                              index,
-                            );
+                        context.read<MyData>().fetchStatutPatient();
                         context.hideLoader();
                         context.showSuccess("Statut supprimé");
                       }).catchError((e) {
@@ -1895,8 +1889,9 @@ class _StatutSectionTileState extends State<StatutSectionTile> {
                       await statutPatientService
                           .createStatutPatient(statutPatient)
                           .then((onValue) {
-                        context.read<MyData>().addStatutPatient(statutPatient);
+                        context.read<MyData>().fetchStatutPatient();
                         context.hideLoader();
+                        statutController.clear();
                         context.showSuccess("Enregistrer");
                       });
                     } catch (e) {

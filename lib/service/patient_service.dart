@@ -49,6 +49,20 @@ class PatientService {
       throw Exception("Erreur lors de la requête GET patient_list: $e");
     }
   }
+  
+  Future<double> getAllmoyenneAge() async {
+    try {
+      Response response = await apiService.getData('statistics/patients-age-moyenne');
+      if (response.statusCode == 200) {
+        double data = response.data;
+        return data;
+      } else {
+        throw Exception('Erreur lors de la récupération de patients-age-moyenne');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET patients-age-moyenne: $e");
+    }
+  }
 
   Future<void> addPatient(Map<String, dynamic> patientData) async {
     try {

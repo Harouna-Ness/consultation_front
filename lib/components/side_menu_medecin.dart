@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
+import 'package:medstory/main.dart';
+import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SideMenuMedecin extends StatefulWidget {
   const SideMenuMedecin({
@@ -82,8 +85,18 @@ class _SideMenuState extends State<SideMenuMedecin> {
               ),
               // deconnxion button
               InkWell(
-                onTap: () {
-                  Navigator.of(context).pop();
+                onTap: () async {
+                  if (navigatorKey.currentContext != null) {
+                    navigatorKey.currentContext!.showLoader();
+                  }
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
+
+                  Navigator.pushReplacementNamed(context, '/login').then((_) {
+                    if (navigatorKey.currentContext != null) {
+                      navigatorKey.currentContext!.hideLoader();
+                    }
+                  });
                 },
                 child: Container(
                   height: 50,

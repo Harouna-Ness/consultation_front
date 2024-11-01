@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:medstory/components/customTable.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
+import 'package:medstory/main.dart';
+import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({
@@ -95,17 +99,30 @@ class _SideMenuState extends State<SideMenu> {
                       fontSize: 14,
                     ),
                   ),
-                  subtitle: const Text("  Admin", style: TextStyle(
+                  subtitle: const Text(
+                    "  Admin",
+                    style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
                       fontSize: 12,
-                    ),),
+                    ),
+                  ),
                 ),
               ),
               // deconnxion button
               InkWell(
-                onTap: () {
-                  Navigator.of(context).pop();
+                onTap: () async {
+                  if (navigatorKey.currentContext != null) {
+                    navigatorKey.currentContext!.showLoader();
+                  }
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
+
+                  Navigator.pushReplacementNamed(context, '/login').then((_) {
+                    if (navigatorKey.currentContext != null) {
+                      navigatorKey.currentContext!.hideLoader();
+                    }
+                  });
                 },
                 child: Container(
                   height: 50,
@@ -124,7 +141,9 @@ class _SideMenuState extends State<SideMenu> {
               ),
             ],
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(
+            height: 10,
+          ),
         ],
       ),
     );

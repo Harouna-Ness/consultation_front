@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/screens/mobile/component/medecin_liste.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _HomeState extends State<Home> {
+class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
 
@@ -55,14 +56,12 @@ class _HomeState extends State<Home> {
             _selectedIndex = index;
           });
         },
-        children: [
-          MedecinListPage(),
-          const Center(
-              child: Text('Page Dossier', style: TextStyle(fontSize: 24))),
-          const Center(
+        children: const [
+          Home(),
+          Center(child: Text('Page Dossier', style: TextStyle(fontSize: 24))),
+          Center(
               child: Text('Page Rendez-vous', style: TextStyle(fontSize: 24))),
-          const Center(
-              child: Text('Page Profif', style: TextStyle(fontSize: 24))),
+          Center(child: Text('Page Profif', style: TextStyle(fontSize: 24))),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -117,6 +116,87 @@ class _HomeState extends State<Home> {
   }
 }
 
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  final List<Medecinn> medecins = [
+    Medecinn(
+      nom: "Kanté",
+      prenom: "Noumouden",
+      specialite: "Cardiologie",
+      imageAssetPath: "assets/images/medecinA.png",
+    ),
+    Medecinn(
+      nom: "Diallo",
+      prenom: "Hamidou",
+      specialite: "Dermatologie",
+      imageAssetPath: "assets/images/medecinB.png",
+    ),
+    Medecinn(
+      nom: "Diallo",
+      prenom: "Hamidou",
+      specialite: "Dermatologie",
+      imageAssetPath: "assets/images/medecinC.png",
+    ),
+    Medecinn(
+      nom: "Kanté",
+      prenom: "Noumouden",
+      specialite: "Cardiologie",
+      imageAssetPath: "assets/images/medecinA.png",
+    ),
+    Medecinn(
+      nom: "Diallo",
+      prenom: "Hamidou",
+      specialite: "Dermatologie",
+      imageAssetPath: "assets/images/medecinB.png",
+    ),
+    Medecinn(
+      nom: "Diallo",
+      prenom: "Hamidou",
+      specialite: "Dermatologie",
+      imageAssetPath: "assets/images/medecinC.png",
+    ),
+    // Ajoutez plus de médecins ici...
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Nos Médecins"),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => MedecinListPage()));
+                },
+                child: const Text(
+                  "Voir tout",
+                  style: TextStyle(
+                    color: tertiaryColor,
+                  ),
+                ),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          MedecinListe(medecins: medecins, count: 3),
+        ],
+      ),
+    );
+  }
+}
+
 class Medecinn {
   final String nom;
   final String prenom;
@@ -151,6 +231,24 @@ class MedecinListPage extends StatelessWidget {
       specialite: "Dermatologie",
       imageAssetPath: "assets/images/medecinC.png",
     ),
+    Medecinn(
+      nom: "Kanté",
+      prenom: "Noumouden",
+      specialite: "Cardiologie",
+      imageAssetPath: "assets/images/medecinA.png",
+    ),
+    Medecinn(
+      nom: "Diallo",
+      prenom: "Hamidou",
+      specialite: "Dermatologie",
+      imageAssetPath: "assets/images/medecinB.png",
+    ),
+    Medecinn(
+      nom: "Diallo",
+      prenom: "Hamidou",
+      specialite: "Dermatologie",
+      imageAssetPath: "assets/images/medecinC.png",
+    ),
     // Ajoutez plus de médecins ici...
   ];
 
@@ -158,49 +256,30 @@ class MedecinListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: medecins.length,
-      separatorBuilder: (context, index) => Divider(
-        color: Colors.grey[300],
-        thickness: 1, // Épaisseur du divider
-        indent: 40, // Décalage depuis la gauche
-        endIndent: 40, // Décalage depuis la droite
-      ),
-      itemBuilder: (context, index) {
-        final medecin = medecins[index];
-        return Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(5), // Arrondi de 5px
-                child: Container(
-                  width: 55,
-                  height: 69,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Image.asset(
-                    medecin.imageAssetPath,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: SvgPicture.asset("assets/icons/MedStory.svg"),
+        actions: [
+          InkWell(
+            child: CircleAvatar(
+              backgroundColor: Colors.grey[200],
+              child: SvgPicture.asset(
+                "assets/icons/Notification.svg",
               ),
-              Expanded(
-                child: ListTile(
-                  title: Text("${medecin.nom} ${medecin.prenom}"),
-                  subtitle: Text(medecin.specialite),
-                  trailing: SvgPicture.asset(
-                    "assets/icons/hournav_.svg",
-                    width: 24,
-                    height: 24,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        );
-      },
+          const SizedBox(
+            width: 10,
+          ),
+        ],
+      ),
+      body: MedecinListe(
+        medecins: medecins,
+        count: medecins.length,
+      ),
     );
   }
 }

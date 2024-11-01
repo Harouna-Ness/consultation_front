@@ -17,7 +17,7 @@ class DoctorForm extends StatefulWidget {
 }
 
 class DoctorStateForm extends State<DoctorForm> {
-  int _currentStep = 0;
+  int _currentStep = 0; 
   final _formKey = GlobalKey<FormState>();
   final medecinService = MedecinService();
 

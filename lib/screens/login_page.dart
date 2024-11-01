@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:medstory/components/customTable.dart';
 import 'package:medstory/controllers/controller.dart';
-import 'package:medstory/screens/main_screen.dart';
-import 'package:medstory/screens/medecin_portail.dart';
+import 'package:medstory/main.dart';
+import 'package:medstory/models/utilisateur.dart';
+import 'package:medstory/service/dio_client.dart';
+import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,68 +20,61 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Simulated lists for demonstration
-  final List<Map<String, dynamic>> medecins = [
-    {
-      'email': 'medecin@example.com',
-      'motDePasse': 'pass1234',
-      'role': 'medecin'
-    },
-  ];
-  final List<Map<String, dynamic>> admins = [
-    {'email': 'admin@example.com', 'motDePasse': 'pass1234', 'role': 'admin'},
-  ];
+  final ApiService apiService = ApiService(DioClient.dio);
 
-  // Function to handle login
-  void _login() {
-    String email = _emailController.text.trim();
-    String motDePasse = _passwordController.text.trim();
+  Future<void> login(String username, String password) async {
+    if (navigatorKey.currentContext != null) {
+      navigatorKey.currentContext!.showLoader();
+    }
+    try {
+      final response = await apiService.postData("auth/login", {
+        'email': username,
+        'password': password,
+      });
 
-    // Check in the list of medecins
-    final medecin = medecins.firstWhere(
-      (user) => user['email'] == email && user['motDePasse'] == motDePasse,
-      orElse: () => <String, dynamic>{}, // retourne un Map vide si non trouvé
-    );
+      if (response.statusCode == 200) {
+        final token = response.data['token'];
+        // S'assurer de n'avoir l'intercepteur qu'une seule fois
+        DioClient.dio.interceptors.clear();
+        DioClient.dio.interceptors.add(DioClient.authInterceptor(token));
 
-    // Check in the list of patients if not found in medecins
-    final admin = medecin.isEmpty
-        ? admins.firstWhere(
-            (user) =>
-                user['email'] == email && user['motDePasse'] == motDePasse,
-            orElse: () =>
-                <String, dynamic>{}, // retourne un Map vide si non trouvé
-          )
-        : <String, dynamic>{};
+        final userResponse = await apiService.getData('/users/me');
 
-    if (medecin.isNotEmpty || admin.isNotEmpty) {
-      final user = medecin.isNotEmpty ? medecin : admin;
-      final role = user['role'];
+        if (userResponse.statusCode == 200) {
+          final userData = userResponse.data;
+          final utilisateur = Utilisateur.fromMap(userData);
 
-      // Navigate based on the user role
-      if (role == 'medecin') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              context.read<MyMenuController>().changePage(8);
-              return const MedecinPortail();
-            },
-          ),
-        );
-      } else if (role == 'admin') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
+          // Redirection en fonction du rôle
+          if (utilisateur.role.libelle == 'admin') {
+            Navigator.pushReplacementNamed(context, '/admin').then((_) {
               context.read<MyMenuController>().changePage(0);
-              return const MainScreen();}
-          ),
-        );
+            });
+          } else if (utilisateur.role.libelle == 'medecin') {
+            Navigator.pushReplacementNamed(context, '/medecin').then((_) {
+              context.read<MyMenuController>().changePage(2);
+            });
+          } else if (utilisateur.role.libelle == 'patient') {
+            Navigator.pushReplacementNamed(context, '/patient');
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Rôle utilisateur non reconnu')),
+            );
+          }
+        } else {
+          throw Exception(
+              "Impossible de récupérer les informations utilisateur");
+        }
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
       }
-    } else {
-      // Show error message
+    } catch (e) {
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+      // Gérer l'erreur de connexion
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
+        SnackBar(content: Text(e.toString())),
       );
     }
   }
@@ -118,7 +115,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _login,
+                onPressed: () {
+                  login(_emailController.text.trim(),
+                      _passwordController.text.trim());
+                },
                 child: const Text('Se connecter'),
               ),
             ],

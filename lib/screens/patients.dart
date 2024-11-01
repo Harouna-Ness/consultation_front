@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,6 +15,7 @@ import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/patient.dart';
 import 'package:medstory/screens/dossier_patient.dart';
+import 'package:medstory/service/dio_client.dart';
 import 'package:medstory/service/patient_service.dart';
 import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
@@ -28,42 +31,142 @@ class _PatientsState extends State<Patients> {
   Patient? selectedPatient;
   final patientService = PatientService();
   bool showDossier = false;
+  Map<String, int> patientStatistics = {};
+  Map<String, Map<String, int>> patientPieStatistics = {};
+  final List<Color> colors = [
+    primaryColor,
+    tertiaryColor,
+    Colors.red,
+    Colors.blue,
+    Colors.purple,
+    Colors.cyan
+  ];
+  final apiService = ApiService(DioClient.dio);
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPatientStatistics();
+    fetchPatientPieStatistics();
+  }
+
+  Future<void> fetchPatientStatistics() async {
+    final response =
+        await DioClient.dio.get("statistics/patients-by-direction");
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = response.data as Map<String, dynamic>;
+      print("object::::::: ${response.data}");
+      print("object:::::: $data");
+      // Map<String, dynamic> data = json.decode(response.data);
+      setState(() {
+        patientStatistics = data.map((key, value) => MapEntry(
+            key,
+            value
+                as int)); // data.map((key, value) => MapEntry(key, (value as num).toInt()));
+      });
+      print(patientStatistics);
+    } else {
+      throw Exception('Failed to load statistics');
+    }
+  }
+
+  Future<void> fetchPatientPieStatistics() async {
+    final response =
+        await DioClient.dio.get("statistics/patients-by-site-and-profession");
+
+    if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+      Map<String, Map<String, int>> parsedData =
+          (response.data as Map<String, dynamic>).map((key, value) {
+        Map<String, int> professionData = (value as Map<String, dynamic>)
+            .map((k, v) => MapEntry(k, v as int));
+        return MapEntry(key, professionData);
+      });
+
+      setState(() {
+        patientPieStatistics = parsedData;
+      });
+    } else {
+      throw Exception('Invalid data format');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    List<PieChartSectionData> pieChartSectionData = [
-      PieChartSectionData(
-        value: 25,
-        color: primaryColor,
-        showTitle: false,
-        radius: 25,
-      ),
-      PieChartSectionData(
-        value: 20,
-        color: Color(0xFF26E5FF),
-        showTitle: false,
-        radius: 22,
-      ),
-      PieChartSectionData(
-        value: 10,
-        color: Color(0xFFFFCF26),
-        showTitle: false,
-        radius: 19,
-      ),
-      PieChartSectionData(
-        value: 15,
-        color: Color(0xFFEE2727),
-        showTitle: false,
-        radius: 16,
-      ),
-      PieChartSectionData(
-        value: 25,
-        color: primaryColor.withOpacity(0.1),
-        showTitle: false,
-        radius: 13,
-      ),
-    ];
+    List<PieChartSectionData> buildPieChartSections() {
+      List<PieChartSectionData> sections = [];
+      int index = 0;
+
+      patientPieStatistics.forEach((site, professionData) {
+        int totalPatients = professionData.values.reduce((a, b) => a + b);
+        double percentage = (totalPatients /
+                patientPieStatistics.values
+                    .map((e) => e.values.reduce((a, b) => a + b))
+                    .reduce((a, b) => a + b)) *
+            100;
+        Color color = colors[index % colors.length];
+
+        sections.add(
+          PieChartSectionData(
+            value: percentage,
+            color: color,
+            showTitle: false,
+            radius: 25 + (index * 3).toDouble(),
+          ),
+        );
+        index++;
+      });
+
+      return sections;
+    }
+
+    Widget buildLegend() {
+      int index = 0;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: patientPieStatistics.entries.map((entry) {
+          String site = entry.key;
+          Color color = colors[index % colors.length];
+          index++;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CircleAvatar(radius: 5, backgroundColor: color),
+                const SizedBox(width: 8),
+                Text(
+                  site,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: entry.value.entries.map((professionEntry) {
+                    String profession = professionEntry.key;
+                    int count = professionEntry.value;
+
+                    return Text(
+                      "$profession: $count",
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      );
+    }
 
     var screens = [
       InkWell(
@@ -84,6 +187,9 @@ class _PatientsState extends State<Patients> {
                         // Afficher les données soumises
                         await patientService.addPatient(formData).then((value) {
                           parentContext.read<MyData>().getNombrePatient();
+                          context.read<MyData>().getMoyenneAge();
+                          fetchPatientStatistics();
+                          fetchPatientPieStatistics();
                           context.hideLoader();
                         }).catchError((onError) {
                           context.showError(onError.toString());
@@ -162,7 +268,9 @@ class _PatientsState extends State<Patients> {
                   ),
             ),
             Text(
-              "27,2",
+              context.watch<MyData>().moyenneAge == -1
+                  ? "-"
+                  : "${context.watch<MyData>().moyenneAge}",
               style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -177,30 +285,19 @@ class _PatientsState extends State<Patients> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Moyenne d'age",
+              "Direction",
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     color: Colors.black87,
                     fontSize: 14,
                   ),
             ),
-            Row(
-              children: [
-                Text(
-                  "34",
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                ),
-                Text(
-                  "/ce mois",
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
-                ),
-              ],
+            Text(
+              "34",
+              style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
             ),
           ],
         ),
@@ -211,7 +308,7 @@ class _PatientsState extends State<Patients> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Moyenne d'age",
+              "Site de travail",
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     color: Colors.black87,
                     fontSize: 14,
@@ -301,113 +398,47 @@ class _PatientsState extends State<Patients> {
                                 height: defaultPadding,
                               ),
                               Expanded(
-                                child: BarChart(
-                                  BarChartData(
-                                    maxY: 100,
-                                    barGroups: [
-                                      BarChartGroupData(
-                                        x: 1,
-                                        barRods: [
-                                          BarChartRodData(
-                                            toY: 80,
-                                            width: 30,
-                                            color: tertiaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                          // BarChartRodData(toY: 40, color: secondaryColor),
-                                        ],
-                                      ),
-                                      BarChartGroupData(
-                                        x: 2,
-                                        barRods: [
-                                          BarChartRodData(
-                                            toY: 70,
-                                            width: 30,
-                                            color: secondaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                        ],
-                                      ),
-                                      BarChartGroupData(
-                                        x: 3,
-                                        barRods: [
-                                          BarChartRodData(
-                                            toY: 70,
-                                            width: 30,
-                                            color: tertiaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                        ],
-                                      ),
-                                      BarChartGroupData(
-                                        x: 4,
-                                        barRods: [
-                                          BarChartRodData(
-                                            toY: 70,
-                                            width: 30,
-                                            color: secondaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                        ],
-                                      ),
-                                      BarChartGroupData(
-                                        x: 5,
-                                        barRods: [
-                                          BarChartRodData(
-                                            toY: 70,
-                                            width: 30,
-                                            color: tertiaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                        ],
-                                      ),
-                                      BarChartGroupData(
-                                        x: 6,
-                                        barRods: [
-                                          BarChartRodData(
-                                            toY: 70,
-                                            width: 30,
-                                            color: secondaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                    borderData: FlBorderData(show: false),
-                                    titlesData: FlTitlesData(
-                                      rightTitles: const AxisTitles(),
-                                      topTitles: const AxisTitles(),
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          reservedSize: 30,
-                                          showTitles: true,
-                                          getTitlesWidget: (value, meta) =>
-                                              Text(
-                                            value.toString(),
-                                            style: const TextStyle(
-                                              color: Colors.grey,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
+                                child: patientStatistics.isEmpty
+                                    ? const Center(
+                                        child: CircularProgressIndicator())
+                                    : BarChart(
+                                        BarChartData(
+                                          maxY: patientStatistics.values
+                                                  .reduce(
+                                                      (a, b) => a > b ? a : b)
+                                                  .toDouble() +
+                                              10,
+                                          barGroups: buildBarGroups(),
+                                          borderData: FlBorderData(show: false),
+                                          titlesData: FlTitlesData(
+                                            rightTitles: const AxisTitles(),
+                                            topTitles: const AxisTitles(),
+                                            leftTitles: AxisTitles(
+                                              sideTitles: SideTitles(
+                                                reservedSize: 30,
+                                                showTitles: true,
+                                                getTitlesWidget:
+                                                    (value, meta) => Text(
+                                                  value.toString(),
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            bottomTitles: AxisTitles(
+                                              sideTitles: SideTitles(
+                                                reservedSize: 23,
+                                                showTitles: true,
+                                                getTitlesWidget:
+                                                    getBottomTitles,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          reservedSize: 23,
-                                          showTitles: true,
-                                          getTitlesWidget: getBottomTile,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
                               ),
                             ],
                           ),
@@ -427,51 +458,81 @@ class _PatientsState extends State<Patients> {
                               ),
                               const SizedBox(height: 16),
                               Expanded(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    // const SizedBox(height: defaultPadding),
-                                    SizedBox(
-                                      height: 100,
-                                      width: 100,
-                                      child: PieChart(
-                                        PieChartData(
-                                          sectionsSpace: 0,
-                                          centerSpaceRadius: 30,
-                                          startDegreeOffset: -90,
-                                          sections: pieChartSectionData,
+                                child: patientStatistics.isEmpty
+                                    ? const Center(
+                                        child: CircularProgressIndicator())
+                                    : Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            // PieChart Section
+                                            SizedBox(
+                                              height: 200,
+                                              width: 200,
+                                              child: PieChart(
+                                                PieChartData(
+                                                  sectionsSpace: 0,
+                                                  centerSpaceRadius: 30,
+                                                  startDegreeOffset: -90,
+                                                  sections:
+                                                      buildPieChartSections(),
+                                                ),
+                                              ),
+                                            ),
+                                            // Legend Section
+                                            buildLegend(),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                    // const SizedBox(height: defaultPadding),
-                                    Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const CircleAvatar(
-                                              radius: 3,
-                                              backgroundColor: primaryColor,
-                                            ),
-                                            const SizedBox(
-                                              width: 7,
-                                            ),
-                                            Text(
-                                              "Bamako",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .copyWith(
-                                                    color: Colors.black,
-                                                  ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                ),
                               ),
+                              // Expanded(
+                              //   child: Row(
+                              //     mainAxisAlignment:
+                              //         MainAxisAlignment.spaceAround,
+                              //     children: [
+                              //       // const SizedBox(height: defaultPadding),
+                              //       SizedBox(
+                              //         height: 100,
+                              //         width: 100,
+                              //         child: PieChart(
+                              //           PieChartData(
+                              //             sectionsSpace: 0,
+                              //             centerSpaceRadius: 30,
+                              //             startDegreeOffset: -90,
+                              //             sections: pieChartSectionData,
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       // const SizedBox(height: defaultPadding),
+                              //       Column(
+                              //         children: [
+                              //           Row(
+                              //             children: [
+                              //               const CircleAvatar(
+                              //                 radius: 3,
+                              //                 backgroundColor: primaryColor,
+                              //               ),
+                              //               const SizedBox(
+                              //                 width: 7,
+                              //               ),
+                              //               Text(
+                              //                 "Bamako",
+                              //                 style: Theme.of(context)
+                              //                     .textTheme
+                              //                     .bodySmall!
+                              //                     .copyWith(
+                              //                       color: Colors.black,
+                              //                     ),
+                              //               ),
+                              //             ],
+                              //           )
+                              //         ],
+                              //       )
+                              //     ],
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -506,6 +567,42 @@ class _PatientsState extends State<Patients> {
               });
             },
           );
+  }
+
+  List<BarChartGroupData> buildBarGroups() {
+    int index = 0;
+    return patientStatistics.entries.map((entry) {
+      double count = entry.value.toDouble();
+      Color color = colors[index % colors.length];
+      index++;
+
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: count,
+            width: 30,
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ],
+      );
+    }).toList();
+  }
+
+  Widget getBottomTitles(double value, TitleMeta meta) {
+    int index = value.toInt();
+    if (index >= 1 && index <= patientStatistics.length) {
+      return Text(
+        patientStatistics.keys.elementAt(index - 1),
+        style: const TextStyle(
+          color: Colors.grey,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      );
+    }
+    return const Text('');
   }
 
   Widget getBottomTile(double value, TitleMeta meta) {

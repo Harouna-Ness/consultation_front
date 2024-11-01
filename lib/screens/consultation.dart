@@ -427,6 +427,7 @@ class _FormConsultationState extends State<FormConsultation> {
                         )
                             .then((onValue) {
                           context.read<MyData>().getNombreConsultation();
+                          context.read<MyData>().fetchConsultation();
                           context.hideLoader();
                           context.showSuccess("Ajoutée avec succès.");
                         }).catchError((onError) {

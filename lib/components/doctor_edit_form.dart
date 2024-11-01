@@ -25,8 +25,8 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
   // Controllers pour récupérer les valeurs des champs
   TextEditingController nameController = TextEditingController();
   TextEditingController surnameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController passwordConfirmeController = TextEditingController();
+  // TextEditingController passwordController = TextEditingController();
+  // TextEditingController passwordConfirmeController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -51,8 +51,8 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
     super.initState();
     nameController.text = widget.medecin.nom;
     surnameController.text = widget.medecin.prenom;
-    passwordController.text = widget.medecin.motDePasse;
-    passwordConfirmeController.text = widget.medecin.motDePasse;
+    // passwordController.text = widget.medecin.motDePasse;
+    // passwordConfirmeController.text = widget.medecin.motDePasse;
     phoneController.text = widget.medecin.telephone;
     emailController.text = widget.medecin.email;
     addressController.text = widget.medecin.adresse!;
@@ -88,8 +88,7 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
   @override
   Widget build(BuildContext context) {
     Future<void> Soumettre() async {
-      if (passwordController.text.trim() ==
-          passwordConfirmeController.text.trim()) {
+      
         context.showLoader();
 
         // Traduire les jours en anglais et retirer les maps vides ou null de la liste des jours d'intervention
@@ -121,7 +120,7 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
           specialite: specialiteController.text,
           joursIntervention: joursInterventionFiltres,
           role: widget.medecin.role,
-          motDePasse: passwordController.text.trim(),
+          motDePasse: widget.medecin.motDePasse,
         );
 
         // Soumission données medecin.
@@ -134,13 +133,11 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
           context.hideLoader();
           context.showError(onError.toString());
         });
-      } else {
-        context.showSnackError("Les mots de passe ne correspondent pas");
-      }
+      
     }
 
     void nextStep() {
-      if (_currentStep < 2) {
+      if (_currentStep < 1) {
         setState(() => _currentStep += 1);
       } else {
         if (_formKey.currentState!.validate()) {
@@ -356,28 +353,28 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
                 ],
               ),
             ),
-            Step(
-              stepStyle: _currentStep >= 2
-                  ? const StepStyle(
-                      color: primaryColor,
-                    )
-                  : const StepStyle(
-                      color: Colors.black,
-                    ),
-              isActive: _currentStep >= 1,
-              title: const Text("Identifiants du compte"),
-              content: Column(
-                children: [
-                  // Champ Email
-                  ChampsTexte.buildTextField('Email', emailController,
-                      keyboardType: TextInputType.emailAddress),
-                  // Champ mot de passe
-                  ChampsTexte.buildPasswordField(passwordController),
-                  // Champ confirmation mdp
-                  ChampsTexte.buildPasswordField(passwordConfirmeController),
-                ],
-              ),
-            ),
+            // Step(
+            //   stepStyle: _currentStep >= 2
+            //       ? const StepStyle(
+            //           color: primaryColor,
+            //         )
+            //       : const StepStyle(
+            //           color: Colors.black,
+            //         ),
+            //   isActive: _currentStep >= 1,
+            //   title: const Text("Identifiants du compte"),
+            //   content: Column(
+            //     children: [
+            //       // Champ Email
+            //       ChampsTexte.buildTextField('Email', emailController,
+            //           keyboardType: TextInputType.emailAddress),
+            //       // Champ mot de passe
+            //       ChampsTexte.buildPasswordField(passwordController),
+            //       // Champ confirmation mdp
+            //       ChampsTexte.buildPasswordField(passwordConfirmeController),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),

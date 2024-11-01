@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medstory/models/direction.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/site_de_tavail.dart';
+import 'package:medstory/models/statut_patient.dart';
 import 'package:provider/provider.dart';
 
 class AddUserForm extends StatefulWidget {
@@ -38,6 +39,7 @@ class _AddUserFormState extends State<AddUserForm> {
   TextEditingController dobController = TextEditingController();
   TextEditingController directionController = TextEditingController();
   TextEditingController siteController = TextEditingController();
+  TextEditingController statutController = TextEditingController();
 
   // Valeurs pour les selects
   String? selectedSexe;
@@ -46,13 +48,16 @@ class _AddUserFormState extends State<AddUserForm> {
   // Listes des suggestions pour les champs d'auto-complétion
   List<Direction> directions = [];
   List<Sitedetravail> sitesDeTravails = [];
+  List<StatutPatient> statusPatient = [];
   Direction? selectedDirection;
   Sitedetravail? selectedsitedetravail;
+  StatutPatient? statutSelected;
 
   @override
   Widget build(BuildContext context) {
     directions = widget.contexte.watch<MyData>().directions;
     sitesDeTravails = widget.contexte.watch<MyData>().siteDetravails;
+    statusPatient = widget.contexte.watch<MyData>().statutPatients;
     print("${directions.length} liste des d");
     return Form(
       key: _formKey,
@@ -89,6 +94,9 @@ class _AddUserFormState extends State<AddUserForm> {
           const SizedBox(height: 16),
           buildTextField('Adresse', addressController),
           const SizedBox(height: 16),
+          buildAutocompleteStatutField(
+              'Statut', statutController, statusPatient),
+          const SizedBox(height: 16),
           buildAutocompleteDirectinField(
               'Direction', directionController, directions),
           const SizedBox(height: 16),
@@ -124,8 +132,10 @@ class _AddUserFormState extends State<AddUserForm> {
                   'direction': selectedDirection != null
                       ? {'id': selectedDirection!.id}
                       : null,
+                  'statut': statutSelected != null
+                      ? {'id': statutSelected!.id}
+                      : null,
                   'proffession': professionController.text,
-                  'statut': {"id": 1, "libelle": "Nouveau"},
                   'motDePasse': passwordController.text,
                 });
 
@@ -254,6 +264,43 @@ class _AddUserFormState extends State<AddUserForm> {
       onSelected: (Direction selection) {
         controller.text = selection.nom;
         selectedDirection = selection; // Enregistrer la direction sélectionnée
+      },
+      fieldViewBuilder:
+          (context, textEditingController, focusNode, onFieldSubmitted) {
+        return TextFormField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            labelText: label,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Veuillez entrer ou sélectionner $label';
+            }
+            return null;
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildAutocompleteStatutField(String label,
+      TextEditingController controller, List<StatutPatient> statut) {
+    return Autocomplete<StatutPatient>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<StatutPatient>.empty();
+        }
+        return statut.where((StatutPatient statu) {
+          return statu.libelle
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      displayStringForOption: (StatutPatient statut) => statut.libelle,
+      onSelected: (StatutPatient selection) {
+        controller.text = selection.libelle;
+        statutSelected = selection; // Enregistrer la direction sélectionnée
       },
       fieldViewBuilder:
           (context, textEditingController, focusNode, onFieldSubmitted) {

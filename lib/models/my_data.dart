@@ -10,6 +10,7 @@ import 'package:medstory/models/site_de_tavail.dart';
 import 'package:medstory/models/statut.dart';
 import 'package:medstory/models/statut_patient.dart';
 import 'package:medstory/models/type_de_consultation.dart';
+import 'package:medstory/models/utilisateur.dart';
 import 'package:medstory/service/analyse_service.dart';
 import 'package:medstory/service/consultation_service.dart';
 import 'package:medstory/service/direction_service.dart';
@@ -21,6 +22,7 @@ import 'package:medstory/service/site_de_travail_service.dart';
 import 'package:medstory/service/statut_patient_service.dart';
 import 'package:medstory/service/statut_service.dart';
 import 'package:medstory/service/type_consultation_service.dart.dart';
+import 'package:medstory/service/user_service.dart';
 
 class MyData extends ChangeNotifier {
   final patientService = PatientService();
@@ -34,9 +36,16 @@ class MyData extends ChangeNotifier {
   final typeDeConsultationService = TypeConsultationService();
   final rendezVousService = RendezVousService();
   final medecinsService = MedecinService();
+  final userService = UserService();
+
+  Utilisateur? _currentUser;
+  Utilisateur? get currentUser => _currentUser;
 
   int _nombrePatient = -1;
   int get nombrePatient => _nombrePatient;
+  
+  double _moyenneAge = -1;
+  double get moyenneAge => _moyenneAge;
 
   int _nombreConsultation = -1;
   int get nombreConsultation => _nombreConsultation;
@@ -74,6 +83,11 @@ class MyData extends ChangeNotifier {
   List<Medecin> _medecins = [];
   List<Medecin> get medecins => _medecins;
 
+  Future<void> getCurrentUser() async {
+    _currentUser = await userService.getCurrentUser();
+    notifyListeners();
+  }
+
   Future<void> getNombreConsultation() async {
     _nombreConsultation = await consultationService.getConsultationCount();
     notifyListeners();
@@ -82,6 +96,11 @@ class MyData extends ChangeNotifier {
   // Crud patient
   Future<void> getNombrePatient() async {
     _nombrePatient = await patientService.getPatientCount();
+    notifyListeners();
+  }
+  
+  Future<void> getMoyenneAge() async {
+    _moyenneAge = await patientService.getAllmoyenneAge();
     notifyListeners();
   }
 

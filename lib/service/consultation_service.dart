@@ -17,7 +17,7 @@ class ConsultationService {
 
   Future<List<Consultation>> getAllConsultation() async {
     try {
-      Response response = await apiService.getData('medecin/all');
+      Response response = await apiService.getData('medecin/consultation');
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         return data.map((e) => Consultation.fromMap(e)).toList();
