@@ -88,52 +88,51 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
   @override
   Widget build(BuildContext context) {
     Future<void> Soumettre() async {
-      
-        context.showLoader();
+      context.showLoader();
 
-        // Traduire les jours en anglais et retirer les maps vides ou null de la liste des jours d'intervention
-        final List<Map<String, String>> joursInterventionFiltres =
-            joursIntervention
-                .where((jour) =>
-                    jour.isNotEmpty &&
-                    jour.values.any((v) => v != null && v.isNotEmpty))
-                .map((jour) {
-          final jourTraduit =
-              jour['jour'] != null ? joursFrancaisAnglais[jour['jour']] : null;
-          return {
-            'jour': jourTraduit!.toUpperCase() ?? '',
-            'heureDebut': jour['heureDebut'] ?? '',
-            'heureFin': jour['heureFin'] ?? '',
-          };
-        }).toList();
+      // Traduire les jours en anglais et retirer les maps vides ou null de la liste des jours d'intervention
+      final List<Map<String, String>> joursInterventionFiltres =
+          joursIntervention
+              .where((jour) =>
+                  jour.isNotEmpty &&
+                  jour.values.any((v) => v != null && v.isNotEmpty))
+              .map((jour) {
+        final jourTraduit =
+            jour['jour'] != null ? joursFrancaisAnglais[jour['jour']] : null;
+        return {
+          'jour': jourTraduit!.toUpperCase() ?? '',
+          'heureDebut': jour['heureDebut'] ?? '',
+          'heureFin': jour['heureFin'] ?? '',
+        };
+      }).toList();
 
-        // Créer l'objet Medecin avec les données renseignées
-        final medecin = Medecin(
-          id: widget.medecin.id!,
-          nom: nameController.text,
-          prenom: surnameController.text,
-          sexe: selectedSexe ?? '',
-          adresse: addressController.text,
-          telephone: phoneController.text,
-          email: emailController.text,
-          matricule: matriculeController.text,
-          specialite: specialiteController.text,
-          joursIntervention: joursInterventionFiltres,
-          role: widget.medecin.role,
-          motDePasse: widget.medecin.motDePasse,
-        );
+      // Créer l'objet Medecin avec les données renseignées
+      final medecin = Medecin(
+        id: widget.medecin.id!,
+        nom: nameController.text,
+        prenom: surnameController.text,
+        sexe: selectedSexe ?? '',
+        adresse: addressController.text,
+        telephone: phoneController.text,
+        email: emailController.text,
+        matricule: matriculeController.text,
+        specialite: specialiteController.text,
+        joursIntervention: joursInterventionFiltres,
+        role: widget.medecin.role,
+        motDePasse: widget.medecin.motDePasse,
+        profileImage: null,
+      );
 
-        // Soumission données medecin.
-        await medecinService.updateMedecin(medecin).then((value) {
-          context.read<MyData>().fetchMedecins();
-          context.hideLoader();
-          Navigator.of(context).pop();
-          context.showSuccess("Modifier avec succès.");
-        }).catchError((onError) {
-          context.hideLoader();
-          context.showError(onError.toString());
-        });
-      
+      // Soumission données medecin.
+      await medecinService.updateMedecin(medecin).then((value) {
+        context.read<MyData>().fetchMedecins();
+        context.hideLoader();
+        Navigator.of(context).pop();
+        context.showSuccess("Modifier avec succès.");
+      }).catchError((onError) {
+        context.hideLoader();
+        context.showError(onError.toString());
+      });
     }
 
     void nextStep() {
@@ -234,7 +233,7 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
                       selectedSexe = value;
                     });
                   }),
-      
+
                   // Champs Téléphone
                   ChampsTexte.buildTextField('Téléphone', phoneController,
                       keyboardType: TextInputType.phone),
@@ -243,7 +242,8 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
                   // Champ Adresse
                   ChampsTexte.buildTextField('Adresse', addressController),
                   // Champ Spécialité
-                  ChampsTexte.buildTextField("Spécialité", specialiteController),
+                  ChampsTexte.buildTextField(
+                      "Spécialité", specialiteController),
                 ],
               ),
             ),
@@ -313,8 +313,8 @@ class _DoctorEditFormState extends State<DoctorEditForm> {
                           ),
                         ),
                         IconButton(
-                          icon:
-                              const Icon(Icons.remove_circle, color: Colors.red),
+                          icon: const Icon(Icons.remove_circle,
+                              color: Colors.red),
                           onPressed: () {
                             setState(() {
                               joursIntervention.removeAt(i);

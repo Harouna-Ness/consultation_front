@@ -6,6 +6,7 @@ class Utilisateur {
   final String prenom;
   final Role role;
   final String? adresse;
+  final String? profileImage;
   final String email;
   final String telephone;
   final String motDePasse;
@@ -21,6 +22,7 @@ class Utilisateur {
     required this.telephone,
     required this.motDePasse,
     required this.sexe,
+    required this.profileImage,
   });
 
   factory Utilisateur.fromMap(Map<String, dynamic> map) {
@@ -34,6 +36,7 @@ class Utilisateur {
       telephone: map['telephone'],
       motDePasse: map['motDePasse'],
       sexe: map['sexe'],
+      profileImage: map['profileImage'],
     );
   }
 
@@ -48,6 +51,7 @@ class Utilisateur {
       'telephone': telephone,
       'motDePasse': motDePasse,
       'sexe': sexe,
+      'profileImage': profileImage,
     };
   }
 }

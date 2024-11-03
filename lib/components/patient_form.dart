@@ -66,7 +66,7 @@ class _PatientFormState extends State<PatientForm> {
           sitedetravail: null,
           direction: null,
           dossierMedical: null,
-          statut: null,
+          statut: null, profileImage: null,
         );
 
         // Soumission données patient.

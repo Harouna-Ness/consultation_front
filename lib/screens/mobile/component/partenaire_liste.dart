@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/constantes.dart';
-import 'package:medstory/screens/mobile/screen/main_page.dart';
+import 'package:medstory/models/partenaire.dart';
 
 class PartenaireListe extends StatefulWidget {
   final List<Partenaire> partenaires;
@@ -38,54 +38,54 @@ class PartenaireItemBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        partenaire.nom != null?
-        ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: Container(
-            color: tertiaryColor,
-            height: 100,
-            width: double.infinity,
-            child: Image.asset(
-              partenaire.imageAssetPath,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ): ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: Container(
-            color: Colors.grey[200],
-            height: 100,
-            width: double.infinity,
-            child: Center(
-              child: Text(
-                        "Partenaire",
-                        style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        partenaire.image != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: Container(
+                  color: tertiaryColor,
+                  height: 100,
+                  width: double.infinity,
+                  child: Image.asset(
+                    partenaire.image!,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                      ),
-            ),
-          ),
-        ),
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: Container(
+                  color: Colors.grey[200],
+                  height: 100,
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      "Partenaire",
+                      style:
+                          Theme.of(context).textTheme.headlineSmall!.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                    ),
+                  ),
+                ),
+              ),
         Text(
           maxLines: 1,
-          "partenaire.nom",// TODO: rendre dynamique cette partie
+          partenaire.nom,
           style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                overflow: TextOverflow.ellipsis
-              ),
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              overflow: TextOverflow.ellipsis),
         ),
         Text(
           maxLines: 1,
-          "Type de parte",
+          partenaire.type,
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Colors.black87,
-                fontSize: 14,
-                overflow: TextOverflow.ellipsis
-              ),
+              color: Colors.black87,
+              fontSize: 14,
+              overflow: TextOverflow.ellipsis),
         ),
       ],
     );

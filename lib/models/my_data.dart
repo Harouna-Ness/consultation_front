@@ -4,6 +4,7 @@ import 'package:medstory/models/consultation.dart';
 import 'package:medstory/models/direction.dart';
 import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/motif_de_consultation.dart';
+import 'package:medstory/models/partenaire.dart';
 import 'package:medstory/models/patient.dart';
 import 'package:medstory/models/rendez_vous.dart';
 import 'package:medstory/models/site_de_tavail.dart';
@@ -16,6 +17,7 @@ import 'package:medstory/service/consultation_service.dart';
 import 'package:medstory/service/direction_service.dart';
 import 'package:medstory/service/medecin_service.dart';
 import 'package:medstory/service/motif_de_consultation_service.dart';
+import 'package:medstory/service/partenaire_service.dart';
 import 'package:medstory/service/patient_service.dart';
 import 'package:medstory/service/rendez_vous_service.dart';
 import 'package:medstory/service/site_de_travail_service.dart';
@@ -37,13 +39,17 @@ class MyData extends ChangeNotifier {
   final rendezVousService = RendezVousService();
   final medecinsService = MedecinService();
   final userService = UserService();
+  final partenaireService = PartenaireService();
+
+  List<Partenaire> _partenaires = [];
+  List<Partenaire> get partenaires => _partenaires;
 
   Utilisateur? _currentUser;
   Utilisateur? get currentUser => _currentUser;
 
   int _nombrePatient = -1;
   int get nombrePatient => _nombrePatient;
-  
+
   double _moyenneAge = -1;
   double get moyenneAge => _moyenneAge;
 
@@ -76,10 +82,10 @@ class MyData extends ChangeNotifier {
 
   List<Statut> _statut = [];
   List<Statut> get statuts => _statut;
-  
+
   List<RendezVous> _rendezVous = [];
   List<RendezVous> get rendezVous => _rendezVous;
-  
+
   List<Medecin> _medecins = [];
   List<Medecin> get medecins => _medecins;
 
@@ -98,7 +104,7 @@ class MyData extends ChangeNotifier {
     _nombrePatient = await patientService.getPatientCount();
     notifyListeners();
   }
-  
+
   Future<void> getMoyenneAge() async {
     _moyenneAge = await patientService.getAllmoyenneAge();
     notifyListeners();
@@ -123,7 +129,7 @@ class MyData extends ChangeNotifier {
     _patients.removeAt(index);
     notifyListeners();
   }
- 
+
   // Crud direction
   Future<void> fetchDirections() async {
     _directions = await directionService.getAllDirections();
@@ -144,10 +150,28 @@ class MyData extends ChangeNotifier {
     _directions.removeAt(index);
     notifyListeners();
   }
- 
+
+  //crud Partenaire
+  Future<void> fetchPartenaire() async {
+    final partenaireService = PartenaireService();
+    _partenaires = await partenaireService.getAllPartenaires();
+    notifyListeners();
+  }
+
+  Future<void> fetchPartenaireBytype(String type) async {
+    final partenaireService = PartenaireService();
+    _partenaires = await partenaireService.getAllPartenairesBytype(type);
+    notifyListeners();
+  }
+
   // Crud medecin
   Future<void> fetchMedecins() async {
     _medecins = await medecinsService.getAllMedecin();
+    notifyListeners();
+  }
+
+  Future<void> fetchMedecinsbySpeciatilite(String specialite) async {
+    _medecins = await medecinsService.getAllMedecinbySpecialite(specialite);
     notifyListeners();
   }
 
@@ -262,7 +286,8 @@ class MyData extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateMotifDeConsultion(MotifDeConsultation motif, int index) async {
+  Future<void> updateMotifDeConsultion(
+      MotifDeConsultation motif, int index) async {
     _motifDeConsultations[index] = motif;
     notifyListeners();
   }
@@ -305,7 +330,8 @@ class MyData extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateTypeDeConsultation(TypeDeConsultation type, int index) async {
+  Future<void> updateTypeDeConsultation(
+      TypeDeConsultation type, int index) async {
     _typeDeConsultation[index] = type;
     notifyListeners();
   }

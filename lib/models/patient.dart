@@ -28,7 +28,7 @@ class Patient extends Utilisateur {
     required this.sitedetravail,
     required this.direction,
     required this.dossierMedical,
-    required this.statut,
+    required this.statut, required super.profileImage,
   });
 
   factory Patient.fromMap(Map<String, dynamic> map) {
@@ -42,6 +42,7 @@ class Patient extends Utilisateur {
       telephone: map['telephone'],
       motDePasse: map['motDePasse'],
       sexe: map['sexe'],
+      profileImage: map['profileImage'],
       dateDeNaissance: DateTime.parse(map['dateDeNaissance']),
       proffession: map['proffession'],
       sitedetravail: map['siteDeTravail'] != null ? Sitedetravail.fromMap(map['siteDeTravail']): null,
@@ -63,6 +64,7 @@ class Patient extends Utilisateur {
       'telephone': telephone,
       'motDePasse': motDePasse,
       'sexe': sexe,
+      'profileImage': profileImage,
       'dateDeNaissance': dateDeNaissance!.toIso8601String(),
       'proffession': proffession,
       'Sitedetravail': sitedetravail?.toMap(),

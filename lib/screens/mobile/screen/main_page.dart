@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/models/my_data.dart';
 import 'package:medstory/screens/mobile/screen/home.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -29,6 +31,8 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    context.read<MyData>().fetchMedecins();
+    context.read<MyData>().fetchPartenaire();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -129,19 +133,5 @@ class Medecinn {
     required this.specialite,
     required this.imageAssetPath,
     required this.profileImage,
-  });
-}
-
-class Partenaire {
-  final String nom;
-  final String prenom;
-  final String specialite;
-  final String imageAssetPath;
-
-  Partenaire({
-    required this.nom,
-    required this.prenom,
-    required this.specialite,
-    required this.imageAssetPath,
   });
 }

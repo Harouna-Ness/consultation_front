@@ -5,6 +5,7 @@ import 'package:medstory/models/utilisateur.dart';
 import 'package:medstory/screens/login_page.dart';
 import 'package:medstory/screens/main_screen.dart';
 import 'package:medstory/screens/medecin_portail.dart';
+import 'package:medstory/screens/mobile/screen/login_moble.dart';
 import 'package:medstory/screens/mobile/screen/main_page.dart';
 import 'package:medstory/screens/splash_sreen.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       initialRoute: '', // Route de démarrage
       routes: {
-        '': (context) => const MainPage(), // TODO: decommenter cette ligne.
+        '': (context) => const LoginMoble(), // TODO: changer par la page initial.
         // '': (context) => const MyHomePage(), // TODO: decommenter cette ligne.
         '/login': (context) => const LoginPage(),
         '/admin': (context) => const MainScreen(),

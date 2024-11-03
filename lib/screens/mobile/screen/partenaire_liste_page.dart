@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:medstory/constantes.dart';
+import 'package:medstory/models/my_data.dart';
 import 'package:medstory/screens/mobile/component/categorie_liste.dart';
 import 'package:medstory/screens/mobile/component/partenaire_liste.dart';
-import 'package:medstory/screens/mobile/screen/main_page.dart';
+import 'package:medstory/service/partenaire_service.dart';
+import 'package:provider/provider.dart';
 
 class PartenaireListePage extends StatefulWidget {
   const PartenaireListePage({super.key});
@@ -13,81 +14,24 @@ class PartenaireListePage extends StatefulWidget {
 }
 
 class _PartenaireListePageState extends State<PartenaireListePage> {
-  final List<Partenaire> partenaire = [
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    // Ajoutez plus de médecins ici...
-  ];
+  final partenaireService = PartenaireService();
+  List<String> typePatenaire = ["Tout"];
+
+  void recupType() async {
+    List<String> types = await partenaireService.getAllCategorie();
+    for (var element in types) {
+      setState(() {
+        typePatenaire.add(element);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    recupType();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,31 +40,32 @@ class _PartenaireListePageState extends State<PartenaireListePage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: SvgPicture.asset("assets/icons/MedStory.svg"),
-        actions: [
-          InkWell(
-            child: CircleAvatar(
-              backgroundColor: Colors.grey[200],
-              child: SvgPicture.asset(
-                "assets/icons/Notification.svg",
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-        ],
+        //
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const CategorieListe(categories: [],),
+            CategorieListe(
+              categories: typePatenaire.map((categorie) {
+                return Categorie(
+                  onTap: () {
+                    if (typePatenaire[0] == categorie) {
+                      context.read<MyData>().fetchPartenaire();
+                    } else {
+                      context.read<MyData>().fetchPartenaireBytype(categorie);
+                    }
+                  },
+                  label: categorie,
+                );
+              }).toList(),
+            ),
             const SizedBox(
               height: 10,
             ),
             PartenaireListe(
-              partenaires: partenaire,
-              count: partenaire.length,
+              partenaires: context.watch<MyData>().partenaires,
+              count: context.watch<MyData>().partenaires.length,
             ),
           ],
         ),

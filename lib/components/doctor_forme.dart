@@ -105,7 +105,7 @@ class DoctorStateForm extends State<DoctorForm> {
           joursIntervention: joursInterventionFiltres,
           id: 0,
           role: Role(id: 0, libelle: 'libelle'),
-          motDePasse: passwordController.text.trim(),
+          motDePasse: passwordController.text.trim(), profileImage: null,
         );
 
         // Soumission données medecin.

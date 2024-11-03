@@ -18,12 +18,13 @@ class Medecin extends Utilisateur {
     required super.sexe,
     required this.specialite,
     required this.matricule,
-    required this.joursIntervention,
+    required this.joursIntervention, required super.profileImage,
   });
 
   factory Medecin.fromMap(Map<String, dynamic> map) {
     return Medecin(
-      id: map['id'] ?? 0, // exemple de valeur par défaut
+      id: map['id'] ?? 0,
+      profileImage: map['profileImage'],
       nom: map['nom'] ?? 'Nom Inconnu',
       prenom: map['prenom'] ?? 'Prénom Inconnu',
       role: Role.fromMap(map['role']),
@@ -51,6 +52,7 @@ class Medecin extends Utilisateur {
       'motDePasse': motDePasse,
       'sexe': sexe,
       'specialite': specialite,
+      'profileImage': profileImage,
       'matricule': matricule,
       'joursIntervention': joursIntervention,
     };

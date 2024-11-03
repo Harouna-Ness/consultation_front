@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/main.dart';
 import 'package:medstory/models/utilisateur.dart';
+import 'package:medstory/screens/mobile/screen/main_page.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginMoble extends StatefulWidget {
+  const LoginMoble({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginMoble> createState() => _LoginMobleState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginMobleState extends State<LoginMoble> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -45,16 +46,16 @@ class _LoginPageState extends State<LoginPage> {
           final utilisateur = Utilisateur.fromMap(userData);
 
           // Redirection en fonction du rôle
-          if (utilisateur.role.libelle == 'admin') {
-            Navigator.pushReplacementNamed(context, '/admin').then((_) {
-              context.read<MyMenuController>().changePage(0);
-            });
-          } else if (utilisateur.role.libelle == 'medecin') {
-            Navigator.pushReplacementNamed(context, '/medecin').then((_) {
-              context.read<MyMenuController>().changePage(2);
-            });
-          } else if (utilisateur.role.libelle == 'patient') {
-            Navigator.pushReplacementNamed(context, '/patient');
+          if (utilisateur.role.libelle == 'patient') {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const MainPage()), // Remplacez par votre page spécifique
+              (Route<dynamic> route) =>
+                  false, // Supprime toutes les routes précédentes
+            );
+            // Navigator.pushReplacementNamed(context, '/patient');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Rôle utilisateur non reconnu')),
@@ -100,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                "assets/icons/logo.svg",
+                "assets/icons/logo_mobile.svg",
                 height: 120,
               ),
               const SizedBox(
@@ -164,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        backgroundColor: primaryColor,
+                        backgroundColor: tertiaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),

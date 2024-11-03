@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:medstory/screens/mobile/screen/main_page.dart';
+import 'package:medstory/models/medecin.dart';
 
 class MedecinListe extends StatefulWidget {
-  final List<Medecinn> medecins;
+  final List<Medecin> medecins;
   final int count;
   const MedecinListe({
     super.key,
@@ -43,8 +43,8 @@ class _MedecinListeState extends State<MedecinListe> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
                         ),
-                        child: Image.asset(
-                          medecin.imageAssetPath,
+                        child: Image.network(
+                          medecin.profileImage!,
                           fit: BoxFit.cover,
                         ),
                       ),

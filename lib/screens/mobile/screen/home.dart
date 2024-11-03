@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:medstory/components/add_user_form.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/models/medecin.dart';
+import 'package:medstory/models/my_data.dart';
+import 'package:medstory/models/partenaire.dart';
 import 'package:medstory/screens/mobile/component/image_carousel.dart';
 import 'package:medstory/screens/mobile/component/medecin_liste.dart';
 import 'package:medstory/screens/mobile/component/partenaire_liste.dart';
 import 'package:medstory/screens/mobile/screen/main_page.dart';
 import 'package:medstory/screens/mobile/screen/medecin_liste_page.dart';
 import 'package:medstory/screens/mobile/screen/partenaire_liste_page.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,75 +20,15 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Medecinn> medecins = [
-    Medecinn(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png", profileImage: null,
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png", profileImage: null,
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png", profileImage: null,
-    ),
-    Medecinn(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png", profileImage: null,
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png", profileImage: null,
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png", profileImage: null,
-    ),
-    // Ajoutez plus de médecins ici...
+  List<Medecin> medecins = [
   ];
 
-  final List<Partenaire> partenaire = [ //Mettre une condition: si parteListe.size > 4, ajouter que les 4 premiers.
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png",
-    ),
-    Partenaire(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Partenaire(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    // Ajoutez plus de médecins ici...
+  List<Partenaire> partenaire = [
   ];
   @override
   Widget build(BuildContext context) {
+    medecins = context.watch<MyData>().medecins.take(3).toList();
+    partenaire = context.watch<MyData>().partenaires.take(4).toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -116,7 +61,7 @@ class _HomeState extends State<Home> {
           const SizedBox(
             height: 10,
           ),
-          MedecinListe(medecins: medecins, count: 3),
+          MedecinListe(medecins: medecins, count: medecins.length),
           const SizedBox(
             height: 10,
           ),
@@ -127,8 +72,8 @@ class _HomeState extends State<Home> {
               const Text("Nos partenaires"),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const PartenaireListePage()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const PartenaireListePage()));
                 },
                 child: const Text(
                   "Voir tout",
@@ -142,7 +87,10 @@ class _HomeState extends State<Home> {
           const SizedBox(
             height: 10,
           ),
-          PartenaireListe(partenaires: partenaire, count: partenaire.length,)
+          PartenaireListe(
+            partenaires: partenaire,
+            count: partenaire.length,
+          ),
         ],
       ),
     );
