@@ -9,6 +9,9 @@ import 'package:medstory/screens/mobile/screen/main_page.dart';
 import 'package:medstory/screens/splash_sreen.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
@@ -36,14 +39,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       initialRoute: '', // Route de démarrage
       routes: {
-        '': (context) => const SplashScreen(), // Page d'accueil temporaire
+        '': (context) => const MainPage(), // TODO: decommenter cette ligne.
+        // '': (context) => const MyHomePage(), // TODO: decommenter cette ligne.
         '/login': (context) => const LoginPage(),
         '/admin': (context) => const MainScreen(),
         '/medecin': (context) => const MedecinPortail(),
@@ -53,31 +56,30 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
         useMaterial3: true,
       ),
-      // home: const MainPage(),
+      home: const MainPage(),
       // home: const LoginPage(),
       // home: const MedecinPortail(),
       // home: const LoginPage(),
-      home: const SplashScreen(),
+      // home: const SplashScreen(),
+      // home: const MyHomePage(),// TODO: decommenter cette ligne.
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  final bool authenticated;
-  const MyHomePage({super.key, required this.authenticated});
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   Utilisateur? currentUser;
-  
+
   @override
   void initState() {
     // TODO: implement initState
-    goToUserPortail();
+    // goToUserPortail();
     super.initState();
   }
 
@@ -97,7 +99,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {    
-    return Container();
+  Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return const SplashScreen();
+    } else if (Platform.isAndroid) {
+      return const MainPage();
+    } else {
+      return Container();
+    }
   }
 }

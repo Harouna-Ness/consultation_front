@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medstory/constantes.dart';
-import 'package:medstory/screens/mobile/component/medecin_liste.dart';
+import 'package:medstory/screens/mobile/screen/home.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -116,170 +116,32 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-class Home extends StatefulWidget {
-  const Home({super.key});
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  final List<Medecinn> medecins = [
-    Medecinn(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Medecinn(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    // Ajoutez plus de médecins ici...
-  ];
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Nos Médecins"),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => MedecinListPage()));
-                },
-                child: const Text(
-                  "Voir tout",
-                  style: TextStyle(
-                    color: tertiaryColor,
-                  ),
-                ),
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          MedecinListe(medecins: medecins, count: 3),
-        ],
-      ),
-    );
-  }
-}
-
 class Medecinn {
   final String nom;
   final String prenom;
   final String specialite;
   final String imageAssetPath;
+  final String? profileImage;
 
   Medecinn({
     required this.nom,
     required this.prenom,
     required this.specialite,
     required this.imageAssetPath,
+    required this.profileImage,
   });
 }
 
-class MedecinListPage extends StatelessWidget {
-  final List<Medecinn> medecins = [
-    Medecinn(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    Medecinn(
-      nom: "Kanté",
-      prenom: "Noumouden",
-      specialite: "Cardiologie",
-      imageAssetPath: "assets/images/medecinA.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinB.png",
-    ),
-    Medecinn(
-      nom: "Diallo",
-      prenom: "Hamidou",
-      specialite: "Dermatologie",
-      imageAssetPath: "assets/images/medecinC.png",
-    ),
-    // Ajoutez plus de médecins ici...
-  ];
+class Partenaire {
+  final String nom;
+  final String prenom;
+  final String specialite;
+  final String imageAssetPath;
 
-  MedecinListPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: SvgPicture.asset("assets/icons/MedStory.svg"),
-        actions: [
-          InkWell(
-            child: CircleAvatar(
-              backgroundColor: Colors.grey[200],
-              child: SvgPicture.asset(
-                "assets/icons/Notification.svg",
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-        ],
-      ),
-      body: MedecinListe(
-        medecins: medecins,
-        count: medecins.length,
-      ),
-    );
-  }
+  Partenaire({
+    required this.nom,
+    required this.prenom,
+    required this.specialite,
+    required this.imageAssetPath,
+  });
 }

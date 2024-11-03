@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DioClient {
   // URL de base pour toutes les requêtes
-  static const String baseUrl = "http://192.168.137.19:8080/";
+  static const String baseUrl = "http://localhost:8080/";
 
   static final Dio _dio = Dio(
     BaseOptions(
