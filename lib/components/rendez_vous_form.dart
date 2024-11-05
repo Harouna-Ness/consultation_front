@@ -15,7 +15,7 @@ import 'package:intl/intl.dart';
 
 class RendezVousForm extends StatefulWidget {
   final void Function() changeView;
-   const RendezVousForm({super.key, required this.changeView});
+  const RendezVousForm({super.key, required this.changeView});
 
   @override
   State<RendezVousForm> createState() => _RendezVousFormState();
@@ -268,10 +268,10 @@ class _RendezVousFormState extends State<RendezVousForm> {
                           context.hideLoader();
                           context.showSuccess(
                               "Le rendez-vous a été ajouté avec succès.");
-                              widget.changeView();
+                          widget.changeView();
                         }).catchError((onError) {
                           context.hideLoader();
-                          context.showError(onError.toString());
+                          context.showError("créneau non disponible !");
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -368,7 +368,8 @@ class _RendezVousFormState extends State<RendezVousForm> {
             selectedTime.hour <= heureFin.hour)) {
       setState(() {
         _selectedTime = selectedTime;
-        heureRdv = '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
+        heureRdv =
+            '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

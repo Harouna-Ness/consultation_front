@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/main.dart';
+import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/utilisateur.dart';
 import 'package:medstory/screens/mobile/screen/main_page.dart';
 import 'package:medstory/service/dio_client.dart';
@@ -44,7 +45,8 @@ class _LoginMobleState extends State<LoginMoble> {
         if (userResponse.statusCode == 200) {
           final userData = userResponse.data;
           final utilisateur = Utilisateur.fromMap(userData);
-
+          await context.read<MyData>().getCurrentPatient(utilisateur.id!);
+          await context.read<MyData>().fetchRendezVouspatient(utilisateur.id!);
           // Redirection en fonction du rôle
           if (utilisateur.role.libelle == 'patient') {
             Navigator.pushAndRemoveUntil(
@@ -65,6 +67,9 @@ class _LoginMobleState extends State<LoginMoble> {
           throw Exception(
               "Impossible de récupérer les informations utilisateur");
         }
+        context.read<MyData>().fetchMedecins();
+        context.read<MyData>().fetchPartenaire();
+        context.read<MyData>().getCurrentUser();
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
@@ -140,21 +145,21 @@ class _LoginMobleState extends State<LoginMoble> {
                 ),
                 obscureText: isNotVisible,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Mot de passe oublié ?",
-                      style: TextStyle(
-                        color: Colors.black54,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 24),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.end,
+              //   children: [
+              //     TextButton(
+              //       onPressed: () {},
+              //       child: const Text(
+              //         "Mot de passe oublié ?",
+              //         style: TextStyle(
+              //           color: Colors.black54,
+              //         ),
+              //       ),
+              //     )
+              //   ],
+              // ),
+              const SizedBox(height: 40),
               Row(
                 children: [
                   Expanded(

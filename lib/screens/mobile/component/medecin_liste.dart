@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/models/medecin.dart';
+import 'package:medstory/screens/mobile/screen/medecin_detail.dart';
 
 class MedecinListe extends StatefulWidget {
   final List<Medecin> medecins;
@@ -30,49 +31,63 @@ class _MedecinListeState extends State<MedecinListe> {
       ),
       itemBuilder: (context, index) {
         final medecin = widget.medecins[index];
-        return Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            children: [
-              medecin.profileImage != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(5), // Arrondi de 5px
-                      child: Container(
-                        width: 55,
-                        height: 69,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Image.network(
-                          medecin.profileImage!,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(5), // Arrondi de 5px
-                      child: Container(
-                        width: 55,
-                        height: 69,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: const Icon(Icons.person_outlined),
-                      ),
-                    ),
-              Expanded(
-                child: ListTile(
-                  title: Text("${medecin.nom} ${medecin.prenom}"),
-                  subtitle: Text(medecin.specialite),
-                  trailing: SvgPicture.asset(
-                    "assets/icons/timeAdd.svg",
-                    width: 24,
-                    height: 24,
-                  ),
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MedecinDetail(
+                  medecin: medecin,
                 ),
               ),
-            ],
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                medecin.profileImage != null
+                    ? ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(5), // Arrondi de 5px
+                        child: Container(
+                          width: 55,
+                          height: 69,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Image.network(
+                            medecin.profileImage!,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(5), // Arrondi de 5px
+                        child: Container(
+                          width: 55,
+                          height: 69,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: const Icon(Icons.person_outlined),
+                        ),
+                      ),
+                Expanded(
+                  child: ListTile(
+                    title: Text("${medecin.nom} ${medecin.prenom}"),
+                    subtitle: Text(medecin.specialite),
+                    trailing: SvgPicture.asset(
+                      "assets/icons/timeAdd.svg",
+                      width: 24,
+                      height: 24,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

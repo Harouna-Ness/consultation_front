@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/models/my_data.dart';
+import 'package:medstory/models/patient.dart';
+import 'package:medstory/screens/mobile/screen/dossier_medical.dart';
 import 'package:medstory/screens/mobile/screen/home.dart';
+import 'package:medstory/screens/mobile/screen/profil_page.dart';
+import 'package:medstory/screens/mobile/screen/rendez_page.dart';
 import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
@@ -13,6 +17,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  Patient? patient;
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
 
@@ -31,27 +36,25 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    context.read<MyData>().fetchMedecins();
-    context.read<MyData>().fetchPartenaire();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: SvgPicture.asset("assets/icons/MedStory.svg"),
-        actions: [
-          InkWell(
-            child: CircleAvatar(
-              backgroundColor: Colors.grey[200],
-              child: SvgPicture.asset(
-                "assets/icons/Notification.svg",
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-        ],
+        // actions: [
+        //   InkWell(
+        //     child: CircleAvatar(
+        //       backgroundColor: Colors.grey[200],
+        //       child: SvgPicture.asset(
+        //         "assets/icons/Notification.svg",
+        //       ),
+        //     ),
+        //   ),
+        //   const SizedBox(
+        //     width: 10,
+        //   ),
+        // ],
       ),
       body: PageView(
         controller: _pageController,
@@ -62,10 +65,13 @@ class _MainPageState extends State<MainPage> {
         },
         children: const [
           Home(),
-          Center(child: Text('Page Dossier', style: TextStyle(fontSize: 24))),
-          Center(
-              child: Text('Page Rendez-vous', style: TextStyle(fontSize: 24))),
-          Center(child: Text('Page Profif', style: TextStyle(fontSize: 24))),
+          // Center(child: Text('Page Dossier', style: TextStyle(fontSize: 24))),
+          DossierMedicalPage(),
+          // Center(
+          //     child: Text('Page Rendez-vous', style: TextStyle(fontSize: 24))),
+          RendezPage(),
+          // Center(child: Text('Page Profif', style: TextStyle(fontSize: 24))),
+          ProfilPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

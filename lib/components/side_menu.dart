@@ -28,18 +28,18 @@ class _SideMenuState extends State<SideMenu> {
           DrawerHeader(
             child: SvgPicture.asset("assets/icons/logo.svg"),
           ),
-          DrawerListTile(
-            title: "Dashboard",
-            svgSrc: "assets/icons/dashbordd.svg",
-            press: () => {
-              setState(
-                () {
-                  context.read<MyMenuController>().changePage(0);
-                  context.read<MyMenuController>().closeDrawer();
-                },
-              )
-            },
-          ),
+          // DrawerListTile(
+          //   title: "Dashboard",
+          //   svgSrc: "assets/icons/dashbordd.svg",
+          //   press: () => {
+          //     setState(
+          //       () {
+          //         context.read<MyMenuController>().changePage(0);
+          //         context.read<MyMenuController>().closeDrawer();
+          //       },
+          //     )
+          //   },
+          // ),
           DrawerListTile(
             title: "Patients",
             svgSrc: "assets/icons/patients.svg",

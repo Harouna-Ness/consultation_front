@@ -62,7 +62,7 @@ class PartenaireItemBox extends StatelessWidget {
                       "Partenaire",
                       style:
                           Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                color: Colors.black,
+                                color: Colors.grey,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),

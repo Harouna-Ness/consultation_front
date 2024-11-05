@@ -42,19 +42,6 @@ class _MedecinListPageState extends State<MedecinListPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: SvgPicture.asset("assets/icons/MedStory.svg"),
-        actions: [
-          InkWell(
-            child: CircleAvatar(
-              backgroundColor: Colors.grey[200],
-              child: SvgPicture.asset(
-                "assets/icons/Notification.svg",
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

@@ -42,7 +42,7 @@ class Patient extends Utilisateur {
       telephone: map['telephone'],
       motDePasse: map['motDePasse'],
       sexe: map['sexe'],
-      profileImage: map['profileImage'],
+      profileImage: map['profileImage']?? '',
       dateDeNaissance: DateTime.parse(map['dateDeNaissance']),
       proffession: map['proffession'],
       sitedetravail: map['siteDeTravail'] != null ? Sitedetravail.fromMap(map['siteDeTravail']): null,

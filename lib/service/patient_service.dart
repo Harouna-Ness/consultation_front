@@ -50,6 +50,20 @@ class PatientService {
     }
   }
   
+  Future<Patient> getPatient(int id) async {
+    try {
+      Response response = await apiService.getData('admin/recupererPatient/$id');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return Patient.fromMap(data);
+      } else {
+        throw Exception('Erreur lors de la récupération des patients');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET patient_list: $e");
+    }
+  }
+  
   Future<double> getAllmoyenneAge() async {
     try {
       Response response = await apiService.getData('statistics/patients-age-moyenne');

@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       initialRoute: '', // Route de démarrage
       routes: {
-        '': (context) => const LoginMoble(), // TODO: changer par la page initial.
-        // '': (context) => const MyHomePage(), // TODO: decommenter cette ligne.
+        '': (context) => const MyHomePage(), 
+        '': (context) => const MyHomePage(), // TODO: decommenter cette ligne.
         '/login': (context) => const LoginPage(),
         '/admin': (context) => const MainScreen(),
         '/medecin': (context) => const MedecinPortail(),
@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (kIsWeb) {
       return const SplashScreen();
     } else if (Platform.isAndroid) {
-      return const MainPage();
+      return const LoginMoble();
     } else {
       return Container();
     }

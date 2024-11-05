@@ -358,6 +358,21 @@ class _RdvFormMedPortailState extends State<RdvFormMedPortail> {
     }
   }
 
+  DateTime getNextAvailableDate(Medecin medecin) {
+    DateTime today = DateTime.now();
+    for (int i = 0; i < 7; i++) {
+      DateTime dateToCheck = today.add(Duration(days: i));
+      String dayOfWeek = DateFormat('EEEE').format(dateToCheck).toUpperCase();
+      bool isInterventionDay = medecin.joursIntervention
+          .map((e) => e['jour'] as String)
+          .contains(dayOfWeek);
+      if (isInterventionDay) {
+        return dateToCheck;
+      }
+    }
+    return today; // Retourne la date d'aujourd'hui si aucun jour d'intervention n'est trouvé
+  }
+
   void _selectDate(BuildContext context) async {
     selectedMedecin = medecins.first;
     if (selectedMedecin == null) {
@@ -384,6 +399,7 @@ class _RdvFormMedPortailState extends State<RdvFormMedPortail> {
         break;
       }
     }
+    DateTime initialDate = getNextAvailableDate(selectedMedecin!);
 
     DateTime? selectedDate = await showDatePicker(
       context: context,

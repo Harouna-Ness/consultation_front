@@ -26,14 +26,16 @@ class DossierMedical {
               map['consultations'].map((x) => Consultation.fromMap(x)))
           : [],
       allergies: map['allergies'] != null
-          ? List<Allergie>.from(map['allergies'].map((x) => Allergie.fromMap(x)))
+          ? List<Allergie>.from(
+              map['allergies'].map((x) => Allergie.fromMap(x)))
           : [],
       antecedents: map['antecedents'] != null
-          ? List<Antecedent>.from(map['antecedents'].map((x) => Antecedent.fromMap(x)))
+          ? List<Antecedent>.from(
+              map['antecedents'].map((x) => Antecedent.fromMap(x)))
           : [],
       antecedentFamiliaux: map['antecedentFamiliaux'] != null
-          ? List<AntecedentFamilial>.from(
-              map['antecedentFamiliaux'].map((x) => AntecedentFamilial.fromMap(x)))
+          ? List<AntecedentFamilial>.from(map['antecedentFamiliaux']
+              .map((x) => AntecedentFamilial.fromMap(x)))
           : [],
     );
   }
@@ -44,7 +46,8 @@ class DossierMedical {
       'consultations': consultations?.map((e) => e.toMap()).toList(),
       'allergies': allergies?.map((e) => e.toMap()).toList(),
       'antecedents': antecedents?.map((e) => e.toMap()).toList(),
-      'antecedentFamiliaux': antecedentFamiliaux?.map((e) => e.toMap()).toList(),
+      'antecedentFamiliaux':
+          antecedentFamiliaux?.map((e) => e.toMap()).toList(),
     };
   }
 }

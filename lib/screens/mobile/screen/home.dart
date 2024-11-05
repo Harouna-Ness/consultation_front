@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => MedecinListPage()));
+                      MaterialPageRoute(builder: (_) => const MedecinListPage()));
                 },
                 child: const Text(
                   "Voir tout",

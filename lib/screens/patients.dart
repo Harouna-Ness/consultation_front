@@ -147,20 +147,20 @@ class _PatientsState extends State<Patients> {
                   ),
                 ),
                 const SizedBox(width: 5),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: entry.value.entries.map((professionEntry) {
-                    String profession = professionEntry.key;
-                    int count = professionEntry.value;
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: entry.value.entries.map((professionEntry) {
+                //     String profession = professionEntry.key;
+                //     int count = professionEntry.value;
 
-                    return Text(
-                      "$profession: $count",
-                      style: const TextStyle(
-                        color: Colors.grey,
-                      ),
-                    );
-                  }).toList(),
-                ),
+                //     return Text(
+                //       "$profession: $count",
+                //       style: const TextStyle(
+                //         color: Colors.grey,
+                //       ),
+                //     );
+                //   }).toList(),
+                // ),
               ],
             ),
           );
@@ -270,7 +270,7 @@ class _PatientsState extends State<Patients> {
             Text(
               context.watch<MyData>().moyenneAge == -1
                   ? "-"
-                  : "${context.watch<MyData>().moyenneAge}",
+                  : "${context.watch<MyData>().moyenneAge.round()}",
               style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -315,7 +315,7 @@ class _PatientsState extends State<Patients> {
                   ),
             ),
             Text(
-              "348",
+              "38",
               style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,

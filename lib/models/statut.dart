@@ -2,7 +2,7 @@ class Statut {
   final int id;
   final String libelle;
 
-  Statut({required this.id, required this.libelle,});
+  Statut({required this.id, required this.libelle});
 
   Map<String, dynamic> toMap() {
     return {

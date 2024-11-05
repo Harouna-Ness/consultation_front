@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
           // Redirection en fonction du rôle
           if (utilisateur.role.libelle == 'admin') {
             Navigator.pushReplacementNamed(context, '/admin').then((_) {
-              context.read<MyMenuController>().changePage(0);
+              context.read<MyMenuController>().changePage(1);
             });
           } else if (utilisateur.role.libelle == 'medecin') {
             Navigator.pushReplacementNamed(context, '/medecin').then((_) {
@@ -139,20 +139,20 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 obscureText: isNotVisible,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Mot de passe oublié ?",
-                      style: TextStyle(
-                        color: Colors.black54,
-                      ),
-                    ),
-                  )
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.end,
+              //   children: [
+              //     TextButton(
+              //       onPressed: () {},
+              //       child: const Text(
+              //         "Mot de passe oublié ?",
+              //         style: TextStyle(
+              //           color: Colors.black54,
+              //         ),
+              //       ),
+              //     )
+              //   ],
+              // ),
               const SizedBox(height: 24),
               Row(
                 children: [
