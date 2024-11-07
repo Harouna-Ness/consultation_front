@@ -29,7 +29,7 @@ class _MedecinPortailState extends State<MedecinPortail> {
     final Size size = MediaQuery.of(context).size;
     context.read<MyData>().fetchPatients();
     context.read<MyData>().fetchAnalyse();
-    context.read<MyData>().fetchConsultation(); // TODO: Remplacer par celles faites uniquement par le médecin connecté
+     // TODO: Remplacer par celles faites uniquement par le médecin connecté
     context.read<MyData>().fetchStatut();
     context.read<MyData>().fetchRendezVous();
     context.read<MyData>().fetchMotifDeConsultion();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/rendez_vous.dart';
 import 'package:medstory/service/rendez_vous_service.dart';
@@ -16,8 +17,11 @@ class RdvTabMedPortail extends StatefulWidget {
 }
 
 class _RdvTabMedPortailState extends State<RdvTabMedPortail> {
+  final rendezVousService = RendezVousService();
+  Medecin? medecin;
   @override
   Widget build(BuildContext context) {
+    medecin = context.watch<MyData>().currentMedecin!;
     return Column(
       children: [
         DataTable(
@@ -57,18 +61,52 @@ class _RdvTabMedPortailState extends State<RdvTabMedPortail> {
             return DataRow(cells: [
               DataCell(Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () {
-                      // Action pour accepter le rendez-vous
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.cancel, color: Colors.orange),
-                    onPressed: () {
-                      // Action pour annuler le rendez-vous
-                    },
-                  ),
+                  rendezVous.statut.libelle.contains("confirmé")
+                      ? const Icon(Icons.check, color: Colors.grey)
+                      : IconButton(
+                          icon: const Icon(Icons.check, color: Colors.green),
+                          onPressed: () async {
+                            // Action pour accepter le rendez-vous
+                            context.showLoader();
+
+                            await rendezVousService.changeRendezVousStatut(
+                                rendezVous.id,
+                                {"id": 3, "libelle": "confirmé"}).then((value) {
+                              context
+                                  .read<MyData>()
+                                  .fetchRendezVousmedecin(medecin!.id!);
+                              context.hideLoader();
+                              context.showSuccess(
+                                  "Le rendez-vous a été confirmé avec succès.");
+                            }).catchError((onError) {
+                              context.hideLoader();
+                              context.showError("Oups !");
+                            });
+                          },
+                        ),
+                  rendezVous.statut.libelle.contains("annulé")
+                      ? const Icon(Icons.cancel, color: Colors.grey)
+                      : IconButton(
+                          icon: const Icon(Icons.cancel, color: Colors.orange),
+                          onPressed: () async {
+                            // Action pour annuler le rendez-vous
+                            context.showLoader();
+
+                            await rendezVousService.changeRendezVousStatut(
+                                rendezVous.id,
+                                {"id": 2, "libelle": "annulé"}).then((value) {
+                              context
+                                  .read<MyData>()
+                                  .fetchRendezVousmedecin(medecin!.id!);
+                              context.hideLoader();
+                              context.showSuccess(
+                                  "Le rendez-vous a été annulé avec succès.");
+                            }).catchError((onError) {
+                              context.hideLoader();
+                              context.showError("Oups !");
+                            });
+                          },
+                        ),
                   IconButton(
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",

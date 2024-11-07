@@ -16,6 +16,7 @@ class RendezVousTable extends StatefulWidget {
 }
 
 class _RendezVousTableState extends State<RendezVousTable> {
+  final rendezVousService = RendezVousService();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -62,18 +63,48 @@ class _RendezVousTableState extends State<RendezVousTable> {
             return DataRow(cells: [
               DataCell(Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () {
-                      // Action pour accepter le rendez-vous
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.cancel, color: Colors.orange),
-                    onPressed: () {
-                      // Action pour annuler le rendez-vous
-                    },
-                  ),
+                  rendezVous.statut.libelle.contains("confirmé")
+                      ? const Icon(Icons.check, color: Colors.grey)
+                      : IconButton(
+                          icon: const Icon(Icons.check, color: Colors.green),
+                          onPressed: () async {
+                            // Action pour accepter le rendez-vous
+                            context.showLoader();
+
+                            await rendezVousService.changeRendezVousStatut(
+                                rendezVous.id,
+                                {"id": 3, "libelle": "confirmé"}).then((value) {
+                              context.read<MyData>().fetchRendezVous();
+                              context.hideLoader();
+                              context.showSuccess(
+                                  "Le rendez-vous a été confirmé avec succès.");
+                            }).catchError((onError) {
+                              context.hideLoader();
+                              context.showError("Oups !");
+                            });
+                          },
+                        ),
+                  rendezVous.statut.libelle.contains("annulé")
+                      ? const Icon(Icons.cancel, color: Colors.grey)
+                      : IconButton(
+                          icon: const Icon(Icons.cancel, color: Colors.orange),
+                          onPressed: () async {
+                            // Action pour annuler le rendez-vous
+                            context.showLoader();
+
+                            await rendezVousService.changeRendezVousStatut(
+                                rendezVous.id,
+                                {"id": 2, "libelle": "annulé"}).then((value) {
+                              context.read<MyData>().fetchRendezVous();
+                              context.hideLoader();
+                              context.showSuccess(
+                                  "Le rendez-vous a été annulé avec succès.");
+                            }).catchError((onError) {
+                              context.hideLoader();
+                              context.showError("Oups !");
+                            });
+                          },
+                        ),
                   IconButton(
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",
@@ -87,7 +118,9 @@ class _RendezVousTableState extends State<RendezVousTable> {
                       await rendezVousService
                           .deleteRendezVous(rendezVous.id)
                           .then((value) {
-                        context.read<MyData>().fetchRendezVous(); //TODO: Remplacer la logique (fetch only for current user)
+                        context
+                            .read<MyData>()
+                            .fetchRendezVous(); //TODO: Remplacer la logique (fetch only for current user)
                         context.hideLoader();
                         context.showSuccess(
                             "Le rendez-vous a été supprimé avec succès.");

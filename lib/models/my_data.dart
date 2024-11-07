@@ -49,6 +49,9 @@ class MyData extends ChangeNotifier {
   
   Patient? _currentPatient;
   Patient? get currentPatient => _currentPatient;
+  
+  Medecin? _currentMedecin;
+  Medecin? get currentMedecin => _currentMedecin;
 
   int _nombrePatient = -1;
   int get nombrePatient => _nombrePatient;
@@ -91,6 +94,9 @@ class MyData extends ChangeNotifier {
   
   List<RendezVous> _rendezVousPatient = [];
   List<RendezVous> get rendezVousPatient => _rendezVousPatient;
+  
+  List<RendezVous> _rendezVousMedecin = [];
+  List<RendezVous> get rendezVousMedecin => _rendezVousMedecin;
 
   List<Medecin> _medecins = [];
   List<Medecin> get medecins => _medecins;
@@ -102,6 +108,11 @@ class MyData extends ChangeNotifier {
 
   Future<void> getCurrentPatient(int id) async {
     _currentPatient = await patientService.getPatient(id);
+    notifyListeners();
+  }
+  
+  Future<void> getCurrentMedecin(int id) async {
+    _currentMedecin = await medecinsService.getMedecin(id);
     notifyListeners();
   }
 
@@ -206,8 +217,14 @@ class MyData extends ChangeNotifier {
     _rendezVous = await rendezVousService.getAllRendezVous();
     notifyListeners();
   }
+  
   Future<void> fetchRendezVouspatient(int patientId) async {
     _rendezVousPatient = await rendezVousService.getAllRendezVousbypatient(patientId);
+    notifyListeners();
+  }
+  
+  Future<void> fetchRendezVousmedecin(int medecinId) async {
+    _rendezVousMedecin = await rendezVousService.getAllRendezVousbyMedecin(medecinId);
     notifyListeners();
   }
 

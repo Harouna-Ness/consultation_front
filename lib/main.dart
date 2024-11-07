@@ -46,7 +46,6 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       initialRoute: '', // Route de démarrage
       routes: {
-        '': (context) => const MyHomePage(), 
         '': (context) => const MyHomePage(), // TODO: decommenter cette ligne.
         '/login': (context) => const LoginPage(),
         '/admin': (context) => const MainScreen(),

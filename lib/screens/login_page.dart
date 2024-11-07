@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/main.dart';
+import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/utilisateur.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:medstory/utils/lodder.dart';
@@ -43,6 +44,13 @@ class _LoginPageState extends State<LoginPage> {
         if (userResponse.statusCode == 200) {
           final userData = userResponse.data;
           final utilisateur = Utilisateur.fromMap(userData);
+
+          if (utilisateur.role.libelle == 'medecin') {
+            await context.read<MyData>().getCurrentMedecin(utilisateur.id!);
+            await context
+                .read<MyData>()
+                .fetchRendezVousmedecin(utilisateur.id!);
+          }
 
           // Redirection en fonction du rôle
           if (utilisateur.role.libelle == 'admin') {

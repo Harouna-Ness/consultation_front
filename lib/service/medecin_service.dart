@@ -19,6 +19,21 @@ class MedecinService {
     }
   }
 
+  Future<Medecin> getMedecin(int id) async {
+    try {
+      Response response = await apiService.getData('admin/recupererMedecin/$id');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return Medecin.fromMap(data);
+      } else {
+        throw Exception('Erreur lors de la récupération des medecin');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET patient_list: $e");
+    }
+  }
+
+
   // Créer une nouveau Medecin
   Future<void> createMedecin(Medecin medecin) async {
     try {
