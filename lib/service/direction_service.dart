@@ -19,11 +19,21 @@ class DirectionService {
     }
   }
 
+  Future<int> getDirectionCount() async {
+    try {
+      Response response =
+          await apiService.getData('admin/voirNombreDirections');
+      return response.data;
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET direction_count: $e");
+    }
+  }
+
   // Créer une nouvelle direction
   Future<void> createDirection(Direction direction) async {
     try {
       Map<String, dynamic> data = direction.toMap();
-      await apiService.postData('admin/creerDirection', data);      
+      await apiService.postData('admin/creerDirection', data);
     } catch (e) {
       throw Exception("Erreur : $e");
     }
@@ -33,8 +43,7 @@ class DirectionService {
   Future<void> updateDirection(Direction direction) async {
     try {
       Map<String, dynamic> data = direction.toMap();
-       await apiService.putData('admin/modifierDirection', data);
-      
+      await apiService.putData('admin/modifierDirection', data);
     } catch (e) {
       throw Exception("Erreur : $e");
     }

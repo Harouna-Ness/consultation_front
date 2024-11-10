@@ -46,15 +46,21 @@ class MyData extends ChangeNotifier {
 
   Utilisateur? _currentUser;
   Utilisateur? get currentUser => _currentUser;
-  
+
   Patient? _currentPatient;
   Patient? get currentPatient => _currentPatient;
-  
+
   Medecin? _currentMedecin;
   Medecin? get currentMedecin => _currentMedecin;
 
   int _nombrePatient = -1;
   int get nombrePatient => _nombrePatient;
+
+  int _nombreDirection = -1;
+  int get nombreDirection => _nombreDirection;
+  
+  int _nombreSiteDeTravail = -1;
+  int get nombreSiteDeTravail => _nombreSiteDeTravail;
 
   double _moyenneAge = -1;
   double get moyenneAge => _moyenneAge;
@@ -91,10 +97,10 @@ class MyData extends ChangeNotifier {
 
   List<RendezVous> _rendezVous = [];
   List<RendezVous> get rendezVous => _rendezVous;
-  
+
   List<RendezVous> _rendezVousPatient = [];
   List<RendezVous> get rendezVousPatient => _rendezVousPatient;
-  
+
   List<RendezVous> _rendezVousMedecin = [];
   List<RendezVous> get rendezVousMedecin => _rendezVousMedecin;
 
@@ -110,7 +116,7 @@ class MyData extends ChangeNotifier {
     _currentPatient = await patientService.getPatient(id);
     notifyListeners();
   }
-  
+
   Future<void> getCurrentMedecin(int id) async {
     _currentMedecin = await medecinsService.getMedecin(id);
     notifyListeners();
@@ -173,6 +179,11 @@ class MyData extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> getNombreDirection() async {
+    _nombreDirection = await directionService.getDirectionCount();
+    notifyListeners();
+  }
+
   //crud Partenaire
   Future<void> fetchPartenaire() async {
     final partenaireService = PartenaireService();
@@ -217,14 +228,16 @@ class MyData extends ChangeNotifier {
     _rendezVous = await rendezVousService.getAllRendezVous();
     notifyListeners();
   }
-  
+
   Future<void> fetchRendezVouspatient(int patientId) async {
-    _rendezVousPatient = await rendezVousService.getAllRendezVousbypatient(patientId);
+    _rendezVousPatient =
+        await rendezVousService.getAllRendezVousbypatient(patientId);
     notifyListeners();
   }
-  
+
   Future<void> fetchRendezVousmedecin(int medecinId) async {
-    _rendezVousMedecin = await rendezVousService.getAllRendezVousbyMedecin(medecinId);
+    _rendezVousMedecin =
+        await rendezVousService.getAllRendezVousbyMedecin(medecinId);
     notifyListeners();
   }
 
@@ -261,6 +274,11 @@ class MyData extends ChangeNotifier {
 
   void deleteSiteDeTraivailst(int index) {
     _siteDetravails.removeAt(index);
+    notifyListeners();
+  }
+
+  Future<void> getNombreSiteDeTravail() async {
+    _nombreSiteDeTravail = await siteDetravailService.getSiteDeTravailCount();
     notifyListeners();
   }
 

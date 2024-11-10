@@ -1,7 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:convert';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -292,7 +288,9 @@ class _PatientsState extends State<Patients> {
                   ),
             ),
             Text(
-              "34",
+              context.watch<MyData>().nombreDirection == -1
+                  ? "-"
+                  : "${context.watch<MyData>().nombreDirection}",
               style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -315,7 +313,9 @@ class _PatientsState extends State<Patients> {
                   ),
             ),
             Text(
-              "38",
+              context.watch<MyData>().nombreSiteDeTravail == -1
+                  ? "-"
+                  : "${context.watch<MyData>().nombreSiteDeTravail}",
               style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,

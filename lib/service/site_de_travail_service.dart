@@ -19,6 +19,16 @@ class SiteDeTravailService {
     }
   }
 
+  Future<int> getSiteDeTravailCount() async {
+    try {
+      Response response =
+          await apiService.getData('admin/voirNombreSiteDTravail');
+      return response.data;
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET site_count: $e");
+    }
+  }
+
   Future<void> createSitedetravail(Sitedetravail sitedetravail) async {
     try {
       Map<String, dynamic> data = sitedetravail.toMap();
