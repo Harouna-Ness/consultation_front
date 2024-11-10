@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:medstory/components/customTable.dart';
+import 'package:medstory/constantes.dart';
 import 'package:medstory/models/consultation.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/patient.dart';
 import 'package:medstory/service/patient_service.dart';
+import 'package:medstory/service/pdf_service.dart';
+import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
 
 class DossierMedicalPage extends StatefulWidget {
@@ -14,6 +18,12 @@ class DossierMedicalPage extends StatefulWidget {
 
 class _DossierMedicalPageState extends State<DossierMedicalPage> {
   Patient? _patient;
+  String formatDate(DateTime? date) {
+    if (date == null) {
+      return 'Date non disponible';
+    }
+    return 'Le ${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
 
   @override
   void initState() {
@@ -142,7 +152,9 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${consultation.creationDate!.day.toString().padLeft(2, '0')}/${consultation.creationDate!.month.toString().padLeft(2, '0')}/${consultation.creationDate!.year.toString().padLeft(2, '0')}',
+                                                  formatDate(consultation
+                                                      .creationDate),
+                                                  // '${consultation.creationDate!.day.toString().padLeft(2, '0')}/${consultation.creationDate!.month.toString().padLeft(2, '0')}/${consultation.creationDate!.year.toString().padLeft(2, '0')}',
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 16.0,
@@ -173,13 +185,15 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                                           ),
                                                         ),
                                                         subtitle: Text(
-                                                          consultation.symptome!,
+                                                          consultation
+                                                              .symptome!,
                                                         ),
                                                       )
                                                     : const Text(
                                                         "pas de symptôme",
                                                         style: TextStyle(
-                                                          fontWeight: FontWeight.w600,
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                           fontSize: 16.0,
                                                         ),
                                                       ),
@@ -194,13 +208,15 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                                           ),
                                                         ),
                                                         subtitle: Text(
-                                                          consultation.diagnostic!,
+                                                          consultation
+                                                              .diagnostic!,
                                                         ),
                                                       )
                                                     : const Text(
                                                         "pas de diagnostic",
                                                         style: TextStyle(
-                                                          fontWeight: FontWeight.w600,
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                           fontSize: 16.0,
                                                         ),
                                                       ),
@@ -215,23 +231,32 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                                 ),
                                               ),
                                               children: [
-                                                if (consultation.bilan != null &&
-                                                    consultation.bilan!.analyses !=
+                                                if (consultation.bilan !=
                                                         null &&
                                                     consultation
-                                                        .bilan!.analyses!.isNotEmpty)
-                                                  ...consultation.bilan!.analyses!
-                                                      .map((analysis) => Padding(
-                                                            padding: const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 4.0),
+                                                            .bilan!.analyses !=
+                                                        null &&
+                                                    consultation.bilan!
+                                                        .analyses!.isNotEmpty)
+                                                  ...consultation
+                                                      .bilan!.analyses!
+                                                      .map((analysis) =>
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        4.0),
                                                             child: Text(
                                                               textAlign:
-                                                                  TextAlign.left,
+                                                                  TextAlign
+                                                                      .left,
                                                               analysis.libelle!,
-                                                              style: const TextStyle(
+                                                              style:
+                                                                  const TextStyle(
                                                                 fontWeight:
-                                                                    FontWeight.w600,
+                                                                    FontWeight
+                                                                        .w600,
                                                                 fontSize: 16.0,
                                                               ),
                                                             ),
@@ -239,12 +264,14 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                                       .toList()
                                                 else
                                                   const Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: 8.0),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 8.0),
                                                     child: Text(
                                                       "-",
                                                       style: TextStyle(
-                                                        fontWeight: FontWeight.w600,
+                                                        fontWeight:
+                                                            FontWeight.w600,
                                                         fontSize: 16.0,
                                                       ),
                                                     ),
@@ -263,30 +290,38 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                                 if (consultation
                                                     .prescriptions!.isNotEmpty)
                                                   ...consultation.prescriptions!
-                                                      .map((analysis) => Padding(
-                                                            padding: const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 4.0),
-                                                            child: Text(
-                                                              textAlign:
-                                                                  TextAlign.left,
-                                                              analysis,
-                                                              style: const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight.w600,
-                                                                fontSize: 16.0,
-                                                              ),
-                                                            ),
-                                                          ))
+                                                      .map(
+                                                          (analysis) => Padding(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        4.0),
+                                                                child: Text(
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .left,
+                                                                  analysis,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize:
+                                                                        16.0,
+                                                                  ),
+                                                                ),
+                                                              ))
                                                       .toList()
                                                 else
                                                   const Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: 8.0),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 8.0),
                                                     child: Text(
                                                       "-",
                                                       style: TextStyle(
-                                                        fontWeight: FontWeight.w600,
+                                                        fontWeight:
+                                                            FontWeight.w600,
                                                         fontSize: 16.0,
                                                       ),
                                                     ),
@@ -298,34 +333,75 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                       ),
                                     ),
                                     Row(
-                                        children: [
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                padding: const EdgeInsets.symmetric(
-                                                    vertical: 10),
-                                                backgroundColor: Colors.black,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () async {
+                                              context.showLoader();
+                                              final pdfService = PdfService();
+                                              await pdfService
+                                                  .generatePdf(consultation)
+                                                  .then((onValue) {
+                                                context.showSuccess(
+                                                    "Téléchargé !");
+                                                context.hideLoader();
+                                              });
+                                              Navigator.of(context).pop();
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
+                                              backgroundColor: tertiaryColor,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
                                               ),
-                                              child: const Text(
-                                                'Fermer',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                            ),
+                                            child: const Text(
+                                              'Télécharger',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 20,)
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
+                                              backgroundColor: Colors.black,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              'Fermer',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    )
                                   ],
                                 ),
                               );
@@ -346,7 +422,8 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                               height: 5,
                             ),
                             Text(
-                              'Le ${consultation.creationDate!.day.toString().padLeft(2, '0')}/${consultation.creationDate!.month.toString().padLeft(2, '0')}/${consultation.creationDate!.year.toString().padLeft(2, '0')}',
+                              formatDate(consultation.creationDate),
+                              // 'Le {consultation.creationDate!.day.toString().padLeft(2, '0')}/{consultation.creationDate!.month.toString().padLeft(2, '0')}/{consultation.creationDate!.year.toString().padLeft(2, '0')}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w300,
                                 fontSize: 16.0,

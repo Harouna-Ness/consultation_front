@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/models/medecin.dart';
 import 'package:medstory/screens/mobile/screen/medecin_detail.dart';
+import 'package:medstory/service/dio_client.dart';
 
 class MedecinListe extends StatefulWidget {
   final List<Medecin> medecins;
@@ -57,7 +58,7 @@ class _MedecinListeState extends State<MedecinListe> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: Image.network(
-                            medecin.profileImage!,
+                            "${DioClient.baseUrl}profile-images/${medecin.profileImage!}",
                             fit: BoxFit.cover,
                           ),
                         ),

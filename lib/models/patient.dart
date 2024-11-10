@@ -28,27 +28,46 @@ class Patient extends Utilisateur {
     required this.sitedetravail,
     required this.direction,
     required this.dossierMedical,
-    required this.statut, required super.profileImage,
+    required this.statut,
+    required super.profileImage,
   });
+
+  int? calculateAge() {
+    if (dateDeNaissance == null) return null;
+    final today = DateTime.now();
+    int age = today.year - dateDeNaissance!.year;
+    if (today.month < dateDeNaissance!.month ||
+        (today.month == dateDeNaissance!.month &&
+            today.day < dateDeNaissance!.day)) {
+      age--;
+    }
+    return age;
+  }
 
   factory Patient.fromMap(Map<String, dynamic> map) {
     return Patient(
       id: map['id'],
       nom: map['nom'],
       prenom: map['prenom'],
-      role:  Role.fromMap(map['role']),
+      role: Role.fromMap(map['role']),
       adresse: map['adresse'],
       email: map['email'],
       telephone: map['telephone'],
       motDePasse: map['motDePasse'],
       sexe: map['sexe'],
-      profileImage: map['profileImage']?? '',
-      dateDeNaissance: DateTime.parse(map['dateDeNaissance']),
+      profileImage: map['profileImage'] ?? '',
+      dateDeNaissance: map['dateDeNaissance'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['dateDeNaissance'])
+          : null,
       proffession: map['proffession'],
-      sitedetravail: map['siteDeTravail'] != null ? Sitedetravail.fromMap(map['siteDeTravail']): null,
+      sitedetravail: map['siteDeTravail'] != null
+          ? Sitedetravail.fromMap(map['siteDeTravail'])
+          : null,
       direction: Direction.fromMap(map['direction']),
-      statut: StatutPatient.fromMap(map['statut']), 
-      dossierMedical: map['dossierMedical'] != null ? DossierMedical.fromMap(map['dossierMedical']) : null,
+      statut: StatutPatient.fromMap(map['statut']),
+      dossierMedical: map['dossierMedical'] != null
+          ? DossierMedical.fromMap(map['dossierMedical'])
+          : null,
     );
   }
 

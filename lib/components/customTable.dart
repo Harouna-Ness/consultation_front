@@ -342,7 +342,7 @@ DataRow customDataRow(
           child: Text(patient.nom),
         ),
       ),
-      DataCell(Text(patient.dateDeNaissance!.day.toString())),
+      DataCell(Text("${patient.calculateAge() ?? 'inconnu'}")),
       DataCell(Text(patient.telephone)),
       DataCell(patient.proffession != null
           ? Text(patient.proffession!)

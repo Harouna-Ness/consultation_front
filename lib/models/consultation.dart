@@ -34,7 +34,9 @@ class Consultation {
       id: map['id'],
       diagnostic: map['diagnostic'],
       symptome: map['symptome'],
-      creationDate: DateTime.parse(map['creationDate']),
+      creationDate: map['creationDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['creationDate'])
+          : null,
       medecin: map['medecin'] != null ? Medecin.fromMap(map['medecin']) : null,
       typeDeConsultation: map['typeDeConsultation'] != null
           ? TypeDeConsultation.fromMap(map['typeDeConsultation'])
@@ -60,7 +62,7 @@ class Consultation {
       'motifDeConsultation': motifDeConsultation?.toMap(),
       'bilan': bilan?.toMap(),
       'prescriptions': prescriptions?.map((item) => item).toList(),
-      'patientFullName':patientFullName,
+      'patientFullName': patientFullName,
     };
   }
 }

@@ -18,7 +18,8 @@ class Medecin extends Utilisateur {
     required super.sexe,
     required this.specialite,
     required this.matricule,
-    required this.joursIntervention, required super.profileImage,
+    required this.joursIntervention,
+    required super.profileImage,
   });
 
   factory Medecin.fromMap(Map<String, dynamic> map) {
@@ -35,7 +36,8 @@ class Medecin extends Utilisateur {
       sexe: map['sexe'] ?? '',
       specialite: map['specialite'] ?? 'Spécialité Inconnue',
       matricule: map['matricule'] ?? '0000000000',
-      joursIntervention: List<Map<String, dynamic>>.from(map['joursIntervention'] ?? []),
+      joursIntervention:
+          List<Map<String, dynamic>>.from(map['joursIntervention'] ?? []),
     );
   }
 

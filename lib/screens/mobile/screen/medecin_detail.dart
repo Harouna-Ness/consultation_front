@@ -10,6 +10,7 @@ import 'package:medstory/models/site_de_tavail.dart';
 import 'package:medstory/models/statut_patient.dart';
 import 'package:medstory/models/utilisateur.dart';
 import 'package:medstory/screens/mobile/component/rdv_dialog.dart';
+import 'package:medstory/service/dio_client.dart';
 import 'package:provider/provider.dart';
 
 class MedecinDetail extends StatelessWidget {
@@ -21,7 +22,6 @@ class MedecinDetail extends StatelessWidget {
     Utilisateur user = context.watch<MyData>().currentUser!;
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -40,7 +40,7 @@ class MedecinDetail extends StatelessWidget {
                 },
                 icon: const Icon(
                   Icons.arrow_back_ios_rounded,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -53,18 +53,34 @@ class MedecinDetail extends StatelessWidget {
             color: Colors.grey,
             height: size.height,
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            child: Container(
-              color: const Color.fromARGB(255, 101, 83, 116),
-              height: size.height * 0.56,
-              child: Image.asset(
-                "assets/images/medecinC.png",
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+          medecin.profileImage != null
+              ? Positioned(
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    color: const Color.fromARGB(255, 101, 83, 116),
+                    height: size.height * 0.56,
+                    child: Image.network(
+                      "${DioClient.baseUrl}profile-images/${medecin.profileImage!}",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                )
+              : Positioned(
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    color: Colors.grey[200],
+                    height: size.height * 0.56,
+                    child: const Center(
+                      child: Icon(
+                        Icons.person_outlined,
+                        color: Colors.grey,
+                        size: 150,
+                      ),
+                    ),
+                  ),
+                ),
           Positioned(
             bottom: 0,
             left: 0,
