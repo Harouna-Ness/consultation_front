@@ -234,7 +234,7 @@ class _RdvFormMedPortailState extends State<RdvFormMedPortail> {
                             motif: motifController.text,
                             date: _selectedDate!,
                             heure: heureRdv!,
-                            statut: Statut(id: 1, libelle: "libelle"),
+                            statut: Statut(id: 0, libelle: "en attente"),
                             medecin: selectedMedecin!,
                             patient: selectedPatient!);
 
