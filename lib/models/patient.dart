@@ -86,7 +86,7 @@ class Patient extends Utilisateur {
       'profileImage': profileImage,
       'dateDeNaissance': dateDeNaissance!.toIso8601String(),
       'proffession': proffession,
-      'Sitedetravail': sitedetravail?.toMap(),
+      'siteDeTravail': sitedetravail?.toMap(),
       'direction': direction?.toMap(),
       'statut': statut?.toMap(),
     };

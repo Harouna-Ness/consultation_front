@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class ChampsTexte {
-
   // champs de saisie
   static Widget buildTextField(String label, TextEditingController controller,
       {TextInputType keyboardType = TextInputType.text}) {
@@ -21,12 +20,21 @@ class ChampsTexte {
   }
 
   // champs de saisie pour mot de passe.
-  static Widget buildPasswordField(TextEditingController mdpController) {
+  static Widget buildPasswordField(TextEditingController mdpController,
+      bool obscureText, VoidCallback toggleVisibility) {
     return TextFormField(
       controller: mdpController,
-      obscureText: true,
-      decoration: const InputDecoration(
+      obscureText: obscureText,
+      decoration: InputDecoration(
         labelText: 'Mot de passe',
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscureText
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+          onPressed: toggleVisibility,
+        ),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {

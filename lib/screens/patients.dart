@@ -5,6 +5,7 @@ import 'package:medstory/components/add_user_form.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/components/customTable.dart';
+import 'package:medstory/components/patient_form.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/controllers/resposive.dart';
@@ -24,6 +25,7 @@ class Patients extends StatefulWidget {
 }
 
 class _PatientsState extends State<Patients> {
+  bool showFrom = false;
   Patient? selectedPatient;
   final patientService = PatientService();
   bool showDossier = false;
@@ -167,41 +169,46 @@ class _PatientsState extends State<Patients> {
     var screens = [
       InkWell(
         onTap: () {
-          final parentContext = context;
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                child: FractionallySizedBox(
-                  widthFactor:
-                      0.8, // Ajuster la largeur pour que le dialog soit responsive
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0 * 2),
-                    child: AddUserForm(
-                      onSubmit: (formData) async {
-                        context.showLoader();
-                        // Afficher les données soumises
-                        await patientService.addPatient(formData).then((value) {
-                          parentContext.read<MyData>().getNombrePatient();
-                          context.read<MyData>().getMoyenneAge();
-                          fetchPatientStatistics();
-                          fetchPatientPieStatistics();
-                          context.hideLoader();
-                        }).catchError((onError) {
-                          context.showError(onError.toString());
-                        }).whenComplete(() {
-                          context.showSuccess(
-                              "Le patient a été ajouté avec succès.");
-                          parentContext.read<MyMenuController>().changePage(1);
-                        });
-                      },
-                      contexte: parentContext,
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
+          setState(() {
+            showFrom = true;
+          });
+
+          // final parentContext = context;
+          // showDialog(
+          //   context: context,
+          //   builder: (context) {
+          //     return Dialog(
+          //       child: FractionallySizedBox(
+          //         widthFactor:
+          //             0.8, // Ajuster la largeur pour que le dialog soit responsive
+          //         child: Padding(
+          //           padding: const EdgeInsets.all(16.0 * 2),
+          //           child: AddUserForm(
+          //             //TODO: changer le pop up en formulaire.
+          //             onSubmit: (formData) async {
+          //               context.showLoader();
+          //               // Afficher les données soumises
+          //               await patientService.addPatient(formData).then((value) {
+          //                 parentContext.read<MyData>().getNombrePatient();
+          //                 context.read<MyData>().getMoyenneAge();
+          //                 fetchPatientStatistics();
+          //                 fetchPatientPieStatistics();
+          //                 context.hideLoader();
+          //               }).catchError((onError) {
+          //                 context.showError(onError.toString());
+          //               }).whenComplete(() {
+          //                 context.showSuccess(
+          //                     "Le patient a été ajouté avec succès.");
+          //                 parentContext.read<MyMenuController>().changePage(1);
+          //               });
+          //             },
+          //             contexte: parentContext,
+          //           ),
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // );
         },
         child: Container(
           decoration: const BoxDecoration(
@@ -326,247 +333,215 @@ class _PatientsState extends State<Patients> {
         ),
       ),
     ];
-    return !showDossier
-        ? SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(defaultPadding),
-              child: Column(
-                children: [
-                  Responsive(
-                    mobile: CustomGridView(
-                      crossAxisCount: size.width < 650 ? 2 : 4,
-                      childAspectRatio: size.width < 320 ? 1.1 : 1.8,
-                      // childAspectRatio: size.width < 320 ? 1.1 : 1.8,
-                      screens: screens,
+    if (showFrom) {
+      return Box(
+        child: PatientForm(
+          changeView: () {
+            setState(() {
+              showFrom = false;
+            });
+          },
+        ),
+      );
+    } else {
+      return !showDossier
+          ? SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: Column(
+                  children: [
+                    Responsive(
+                      mobile: CustomGridView(
+                        crossAxisCount: size.width < 650 ? 2 : 4,
+                        childAspectRatio: size.width < 320 ? 1.1 : 1.8,
+                        // childAspectRatio: size.width < 320 ? 1.1 : 1.8,
+                        screens: screens,
+                      ),
+                      tablet: CustomGridView(
+                        childAspectRatio: size.width < 920 ? 2.3 : 2.9,
+                        screens: screens,
+                      ),
+                      desktop: CustomGridView(
+                        childAspectRatio: size.width < 1200 ? 2.8 : 2.9,
+                        // childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
+                        screens: screens,
+                      ),
                     ),
-                    tablet: CustomGridView(
-                      childAspectRatio: size.width < 920 ? 2.3 : 2.9,
-                      screens: screens,
+                    const SizedBox(
+                      height: defaultPadding,
                     ),
-                    desktop: CustomGridView(
-                      childAspectRatio: size.width < 1200 ? 2.8 : 2.9,
-                      // childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
-                      screens: screens,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: defaultPadding,
-                  ),
-                  Responsive(
-                    mobile: CustomGridView(
-                      crossAxisCount: 1,
-                      childAspectRatio: size.width < 650 ? 1.7 : 2.1,
-                      screens: [
-                        Container(
-                          color: Colors.grey,
-                        ),
-                        Container(
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                    tablet: CustomGridView(
-                      crossAxisCount: 2,
-                      childAspectRatio: 2.1,
-                      screens: [
-                        Container(
-                          color: Colors.grey,
-                        ),
-                        Container(
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                    desktop: CustomGridView(
-                      crossAxisCount: 2,
-                      childAspectRatio: 2.1,
-                      screens: [
-                        Box(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Patients par direction",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              const SizedBox(
-                                height: defaultPadding,
-                              ),
-                              Expanded(
-                                child: patientStatistics.isEmpty
-                                    ? const Center(
-                                        child: CircularProgressIndicator())
-                                    : BarChart(
-                                        BarChartData(
-                                          maxY: patientStatistics.values
-                                                  .reduce(
-                                                      (a, b) => a > b ? a : b)
-                                                  .toDouble() +
-                                              10,
-                                          barGroups: buildBarGroups(),
-                                          borderData: FlBorderData(show: false),
-                                          titlesData: FlTitlesData(
-                                            rightTitles: const AxisTitles(),
-                                            topTitles: const AxisTitles(),
-                                            leftTitles: AxisTitles(
-                                              sideTitles: SideTitles(
-                                                reservedSize: 30,
-                                                showTitles: true,
-                                                getTitlesWidget:
-                                                    (value, meta) => Text(
-                                                  value.toString(),
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14,
+                    Responsive(
+                      mobile: CustomGridView(
+                        crossAxisCount: 1,
+                        childAspectRatio: size.width < 650 ? 1.7 : 2.1,
+                        screens: [
+                          Container(
+                            color: Colors.grey,
+                          ),
+                          Container(
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                      tablet: CustomGridView(
+                        crossAxisCount: 2,
+                        childAspectRatio: 2.1,
+                        screens: [
+                          Container(
+                            color: Colors.grey,
+                          ),
+                          Container(
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                      desktop: CustomGridView(
+                        crossAxisCount: 2,
+                        childAspectRatio: 2.1,
+                        screens: [
+                          Box(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Patients par direction",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                                const SizedBox(
+                                  height: defaultPadding,
+                                ),
+                                Expanded(
+                                  child: patientStatistics.isEmpty
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : BarChart(
+                                          BarChartData(
+                                            maxY: patientStatistics.values
+                                                    .reduce(
+                                                        (a, b) => a > b ? a : b)
+                                                    .toDouble() +
+                                                10,
+                                            barGroups: buildBarGroups(),
+                                            borderData:
+                                                FlBorderData(show: false),
+                                            titlesData: FlTitlesData(
+                                              rightTitles: const AxisTitles(),
+                                              topTitles: const AxisTitles(),
+                                              leftTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  reservedSize: 30,
+                                                  showTitles: true,
+                                                  getTitlesWidget:
+                                                      (value, meta) => Text(
+                                                    value.toString(),
+                                                    style: const TextStyle(
+                                                      color: Colors.grey,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                            bottomTitles: AxisTitles(
-                                              sideTitles: SideTitles(
-                                                reservedSize: 23,
-                                                showTitles: true,
-                                                getTitlesWidget:
-                                                    getBottomTitles,
+                                              bottomTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  reservedSize: 23,
+                                                  showTitles: true,
+                                                  getTitlesWidget:
+                                                      getBottomTitles,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Box(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Patients par site de travail",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              const SizedBox(height: 16),
-                              Expanded(
-                                child: patientStatistics.isEmpty
-                                    ? const Center(
-                                        child: CircularProgressIndicator())
-                                    : Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            // PieChart Section
-                                            SizedBox(
-                                              height: 200,
-                                              width: 200,
-                                              child: PieChart(
-                                                PieChartData(
-                                                  sectionsSpace: 0,
-                                                  centerSpaceRadius: 30,
-                                                  startDegreeOffset: -90,
-                                                  sections:
-                                                      buildPieChartSections(),
+                          Box(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Patients par site de travail",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                                const SizedBox(height: 16),
+                                Expanded(
+                                  child: patientStatistics.isEmpty
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              // PieChart Section
+                                              SizedBox(
+                                                height: 200,
+                                                width: 200,
+                                                child: PieChart(
+                                                  PieChartData(
+                                                    sectionsSpace: 0,
+                                                    centerSpaceRadius: 30,
+                                                    startDegreeOffset: -90,
+                                                    sections:
+                                                        buildPieChartSections(),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            // Legend Section
-                                            buildLegend(),
-                                          ],
+                                              // Legend Section
+                                              buildLegend(),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                              ),
-                              // Expanded(
-                              //   child: Row(
-                              //     mainAxisAlignment:
-                              //         MainAxisAlignment.spaceAround,
-                              //     children: [
-                              //       // const SizedBox(height: defaultPadding),
-                              //       SizedBox(
-                              //         height: 100,
-                              //         width: 100,
-                              //         child: PieChart(
-                              //           PieChartData(
-                              //             sectionsSpace: 0,
-                              //             centerSpaceRadius: 30,
-                              //             startDegreeOffset: -90,
-                              //             sections: pieChartSectionData,
-                              //           ),
-                              //         ),
-                              //       ),
-                              //       // const SizedBox(height: defaultPadding),
-                              //       Column(
-                              //         children: [
-                              //           Row(
-                              //             children: [
-                              //               const CircleAvatar(
-                              //                 radius: 3,
-                              //                 backgroundColor: primaryColor,
-                              //               ),
-                              //               const SizedBox(
-                              //                 width: 7,
-                              //               ),
-                              //               Text(
-                              //                 "Bamako",
-                              //                 style: Theme.of(context)
-                              //                     .textTheme
-                              //                     .bodySmall!
-                              //                     .copyWith(
-                              //                       color: Colors.black,
-                              //                     ),
-                              //               ),
-                              //             ],
-                              //           )
-                              //         ],
-                              //       )
-                              //     ],
-                              //   ),
-                              // ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: defaultPadding,
-                  ),
-                  Box(
-                    padding: 10,
-                    child: Customtable(
-                      changeView: (Patient patient) {
-                        setState(() {
-                          selectedPatient = patient;
-                        });
-                        if (selectedPatient != null) {
-                          showDossier = true;
-                        }
-                      },
+                    const SizedBox(
+                      height: defaultPadding,
                     ),
-                  )
-                ],
+                    Box(
+                      padding: 10,
+                      child: Customtable(
+                        changeView: (Patient patient) {
+                          setState(() {
+                            selectedPatient = patient;
+                          });
+                          if (selectedPatient != null) {
+                            showDossier = true;
+                          }
+                        },
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          )
-        : DossierPatient(
-            patient: selectedPatient!,
-            changeView: () {
-              setState(() {
-                showDossier = false;
-              });
-            },
-          );
+            )
+          : DossierPatient(
+              patient: selectedPatient!,
+              changeView: () {
+                setState(() {
+                  showDossier = false;
+                });
+              },
+            );
+    }
   }
 
   List<BarChartGroupData> buildBarGroups() {

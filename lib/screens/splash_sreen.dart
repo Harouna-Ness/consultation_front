@@ -21,6 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final token = prefs.getString('auth_token');
 
     if (token != null) {
+      print("object::: le token: $token");
       // Ajouter le token à l'en-tête Authorization pour toutes les futures requêtes
       // DioClient.dio.options.headers['Authorization'] = 'Bearer $token';
       // DioClient.addAuthInterceptor(token);
@@ -51,6 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.pushReplacementNamed(context, '/login');
       }
     } else {
+      print("object::: le token disparu: $token ");
       Navigator.pushReplacementNamed(context, '/login');
     }
   }

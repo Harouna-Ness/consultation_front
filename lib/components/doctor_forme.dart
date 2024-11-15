@@ -17,7 +17,15 @@ class DoctorForm extends StatefulWidget {
 }
 
 class DoctorStateForm extends State<DoctorForm> {
-  int _currentStep = 0; 
+  bool _obscureText = true;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
+  int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
   final medecinService = MedecinService();
 
@@ -105,7 +113,8 @@ class DoctorStateForm extends State<DoctorForm> {
           joursIntervention: joursInterventionFiltres,
           id: 0,
           role: Role(id: 0, libelle: 'libelle'),
-          motDePasse: passwordController.text.trim(), profileImage: null,
+          motDePasse: passwordController.text.trim(),
+          profileImage: null,
         );
 
         // Soumission données medecin.
@@ -357,9 +366,17 @@ class DoctorStateForm extends State<DoctorForm> {
                 ChampsTexte.buildTextField('Email', emailController,
                     keyboardType: TextInputType.emailAddress),
                 // Champ mot de passe
-                ChampsTexte.buildPasswordField(passwordController),
-                // Champ confirmation mdp
-                ChampsTexte.buildPasswordField(passwordConfirmeController),
+                ChampsTexte.buildPasswordField(
+                  passwordController,
+                  _obscureText,
+                  _togglePasswordVisibility,
+                ),
+                // // Champ confirmation mdp
+                ChampsTexte.buildPasswordField(
+                  passwordConfirmeController,
+                  _obscureText,
+                  _togglePasswordVisibility,
+                ),
               ],
             ),
           ),
