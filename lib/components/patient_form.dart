@@ -54,6 +54,34 @@ class _PatientFormState extends State<PatientForm> {
   Direction? selectedDirection;
   Sitedetravail? selectedsitedetravail;
   DateTime? _selectedDate;
+
+  @override
+  void initState() {
+    selectedStatut = null;
+    selectedDirection = null;
+    selectedsitedetravail = null;
+    selectedSexe = null;
+    _selectedDate = null;
+
+    directions = [];
+    sitesDeTravails = [];
+    statutPatients = [];
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    surnameController.dispose();
+    passwordController.dispose();
+    passwordConfirmeController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
+    addressController.dispose();
+    professionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     directions = context.watch<MyData>().directions;

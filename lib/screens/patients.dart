@@ -1,31 +1,29 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:medstory/components/add_user_form.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/components/customTable.dart';
 import 'package:medstory/components/patient_form.dart';
 import 'package:medstory/constantes.dart';
-import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/patient.dart';
 import 'package:medstory/screens/dossier_patient.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:medstory/service/patient_service.dart';
-import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
 
 class Patients extends StatefulWidget {
-  const Patients({super.key});
+  bool showForm;
+  Patients({super.key, required this.showForm});
 
   @override
   State<Patients> createState() => _PatientsState();
 }
 
 class _PatientsState extends State<Patients> {
-  bool showFrom = false;
+  // bool showFrom = false;
   Patient? selectedPatient;
   final patientService = PatientService();
   bool showDossier = false;
@@ -170,7 +168,7 @@ class _PatientsState extends State<Patients> {
       InkWell(
         onTap: () {
           setState(() {
-            showFrom = true;
+            widget.showForm = true;
           });
 
           // final parentContext = context;
@@ -333,12 +331,12 @@ class _PatientsState extends State<Patients> {
         ),
       ),
     ];
-    if (showFrom) {
+    if (widget.showForm == true) {
       return Box(
         child: PatientForm(
           changeView: () {
             setState(() {
-              showFrom = false;
+              widget.showForm = false;
             });
           },
         ),

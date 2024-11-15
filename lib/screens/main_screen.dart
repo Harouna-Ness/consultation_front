@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen> {
     return (size.width <= 272)
         ? const ErreurTaille()
         : Scaffold(
-          backgroundColor: const Color.fromARGB(255, 245, 254, 255),
+            backgroundColor: const Color.fromARGB(255, 245, 254, 255),
             key: context.read<MyMenuController>().scaffoldKey,
             drawer: const SideMenu(),
             body: SafeArea(
@@ -83,9 +83,11 @@ class _MainScreenState extends State<MainScreen> {
                               child: Dashboard(),
                             ),
                           if (currentPages == 1)
-                            const Expanded(
+                            Expanded(
                               // child: AddUserFormDialog(),
-                              child: Patients(),
+                              child: Patients(
+                                showForm: false,
+                              ),
                             ),
                           if (currentPages == 3)
                             const Expanded(
