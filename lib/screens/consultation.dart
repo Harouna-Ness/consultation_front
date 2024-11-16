@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/champs_texte.dart';
+import 'package:medstory/components/empty_content.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/models/analyse.dart';
 import 'package:medstory/models/bilan.dart';
@@ -78,8 +79,11 @@ class _ConsultationState extends State<ConsultationScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Expanded(
-                      child: consultationListSection(context, consultations)),
+                  consultations.isEmpty
+                      ? const EmptyContent()
+                      : Expanded(
+                          child:
+                              consultationListSection(context, consultations)),
                 ],
               ),
             ),
@@ -102,8 +106,9 @@ class _ConsultationState extends State<ConsultationScreen> {
       builder: (contexte) {
         return Dialog(
           child: FractionallySizedBox(
-            widthFactor:
-                0.8, // Ajuster la largeur pour que le dialog soit responsive
+            heightFactor: 0.85,
+            // widthFactor:
+            //     0.8, // Ajuster la largeur pour que le dialog soit responsive
             child: Box(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -112,48 +117,61 @@ class _ConsultationState extends State<ConsultationScreen> {
                       style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: DataTable(
-                      headingTextStyle:
-                          const TextStyle(fontWeight: FontWeight.bold),
-                      columns: const [
-                        DataColumn(label: Text("Prénom")),
-                        DataColumn(label: Text("Nom")),
-                        DataColumn(label: Text("Matricule")),
-                        DataColumn(label: Text("Proffession")),
-                        DataColumn(label: Text("Site de Travail")),
-                        DataColumn(label: Text("Actions")),
-                      ],
-                      rows: List.generate(
-                        patients.length,
-                        (index) => DataRow(
-                          cells: [
-                            DataCell(Text(patients[index].prenom)),
-                            DataCell(Text(patients[index].nom)),
-                            DataCell(Text(patients[index].telephone)),
-                            DataCell(patients[index].proffession != null
-                                ? Text(patients[index].proffession!)
-                                : const Text("Néant")),
-                            DataCell(patients[index].sitedetravail != null
-                                ? Text(patients[index].sitedetravail!.nom)
-                                : const Text("Néant")),
-                            DataCell(
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Remplir les champs du formulaire avec les infos du patient sélectionné
-                                  setState(() {
-                                    _selectedPatient = patients[index];
-                                    print(
-                                        "::::: le patient: ${_selectedPatient!.email}.");
-                                  });
-                                  Navigator.of(context).pop();
-                                  if (_selectedPatient != null) {
-                                    showForm = true;
-                                  }
-                                },
-                                child: const Text('Sélectionner'),
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        headingTextStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                        columns: const [
+                          DataColumn(label: Text("Prénom")),
+                          DataColumn(label: Text("Nom")),
+                          DataColumn(label: Text("Matricule")),
+                          DataColumn(label: Text("Proffession")),
+                          DataColumn(label: Text("Site de Travail")),
+                          DataColumn(label: Text("Actions")),
+                        ],
+                        rows: List.generate(
+                          patients.length,
+                          (index) => DataRow(
+                            cells: [
+                              DataCell(Text(patients[index].prenom)),
+                              DataCell(Text(patients[index].nom)),
+                              DataCell(Text(patients[index].telephone)),
+                              DataCell(patients[index].proffession != null
+                                  ? Text(patients[index].proffession!)
+                                  : const Text("Néant")),
+                              DataCell(patients[index].sitedetravail != null
+                                  ? Text(patients[index].sitedetravail!.nom)
+                                  : const Text("Néant")),
+                              DataCell(
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // Remplir les champs du formulaire avec les infos du patient sélectionné
+                                    setState(() {
+                                      _selectedPatient = patients[index];
+                                      print(
+                                          "::::: le patient: ${_selectedPatient!.email}.");
+                                    });
+                                    Navigator.of(context).pop();
+                                    if (_selectedPatient != null) {
+                                      showForm = true;
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Sélectionner',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

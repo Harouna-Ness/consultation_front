@@ -56,17 +56,17 @@ class DioClient {
         handler.next(e);
       },
     );
-  }/////
+  } /////
 
-
-   static InterceptorsWrapper authInterceptor(String token) {
+  static InterceptorsWrapper authInterceptor(String token) {
     return InterceptorsWrapper(
       onRequest: (options, handler) {
         options.headers['Authorization'] = 'Bearer $token';
         handler.next(options);
       },
       onError: (e, handler) {
-        if (e.response?.statusCode == 401 && navigatorKey.currentContext != null) {
+        if (e.response?.statusCode == 401 &&
+            navigatorKey.currentContext != null) {
           showDialog(
             context: navigatorKey.currentContext!,
             builder: (context) => AlertDialog(

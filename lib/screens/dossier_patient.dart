@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/components/box.dart';
+import 'package:medstory/components/empty_content.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/models/patient.dart';
 
@@ -120,45 +121,71 @@ class _DossierPatientState extends State<DossierPatient> {
             // allergie
             Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Allergie",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Allergie",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Column(
-                        children: widget.patient.dossierMedical != null
-                            ? widget.patient.dossierMedical!.allergies!
-                                .map(
-                                  (allergie) => Column(
-                                    children: [
-                                      Text(
-                                        " - ${allergie.nom}",
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        (widget.patient.dossierMedical != null &&
+                                widget
+                                    .patient.dossierMedical!.allergies!.isEmpty)
+                            ? Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      color: const Color.fromARGB(
+                                          255, 240, 239, 239),
+                                      height: 100,
+                                      child: const Center(
+                                        child: Text(
+                                          "Pas de contenu !",
+                                          style: TextStyle(
+                                            color: tertiaryColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                )
-                                .toList()
-                            : [],
-                      ),
-                    ],
+                                ],
+                              )
+                            : Column(
+                                children: widget.patient.dossierMedical != null
+                                    ? widget.patient.dossierMedical!.allergies!
+                                        .map(
+                                          (allergie) => Column(
+                                            children: [
+                                              Text(
+                                                " - ${allergie.nom}",
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                        .toList()
+                                    : [],
+                              ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -172,87 +199,122 @@ class _DossierPatientState extends State<DossierPatient> {
               child: Row(
                 children: [
                   // antecedent
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Antecedent",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Antecedent",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Column(
-                        children: widget.patient.dossierMedical != null
-                            ? widget.patient.dossierMedical!.antecedents!
-                                .map(
-                                  (antecedent) => Column(
-                                    children: [
-                                      Text(
-                                        "- ${antecedent.nomMaladie}",
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        (widget.patient.dossierMedical != null &&
+                                widget.patient.dossierMedical!.antecedents!
+                                    .isEmpty)
+                            ? Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      color: const Color.fromARGB(
+                                          255, 240, 239, 239),
+                                      height: 100,
+                                      child: const Center(
+                                        child: Text(
+                                          "Pas de contenu !",
+                                          style: TextStyle(
+                                            color: tertiaryColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                )
-                                .toList()
-                            : [],
-                      ),
-                    ],
+                                ],
+                              )
+                            : Column(
+                                children: widget.patient.dossierMedical != null
+                                    ? widget
+                                        .patient.dossierMedical!.antecedents!
+                                        .map(
+                                          (antecedent) => Column(
+                                            children: [
+                                              Text(
+                                                "- ${antecedent.nomMaladie}",
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                        .toList()
+                                    : [],
+                              ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(
-                    width: 100,
+
+                  SizedBox(
+                    width: (widget.patient.dossierMedical != null &&
+                            widget.patient.dossierMedical!.antecedents!.isEmpty)
+                        ? 0
+                        : 100,
                   ),
                   // antecedent familial
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Antecedent familial",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Column(
-                        children: widget.patient.dossierMedical != null
-                            ? widget
-                                .patient.dossierMedical!.antecedentFamiliaux!
-                                .map(
-                                  (antecedent) => Column(
-                                    children: [
-                                      Text(
-                                        "- ${antecedent.nomMaladie}",
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
+                  (widget.patient.dossierMedical != null &&
+                          widget.patient.dossierMedical!.antecedentFamiliaux!
+                              .isEmpty)
+                      ? const SizedBox()
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Antecedent familial",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Column(
+                              children: widget.patient.dossierMedical != null
+                                  ? widget.patient.dossierMedical!
+                                      .antecedentFamiliaux!
+                                      .map(
+                                        (antecedent) => Column(
+                                          children: [
+                                            Text(
+                                              "- ${antecedent.nomMaladie}",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                .toList()
-                            : [],
-                      ),
-                    ],
-                  ),
+                                      )
+                                      .toList()
+                                  : [],
+                            ),
+                          ],
+                        ),
                 ],
               ),
             ),
@@ -265,14 +327,17 @@ class _DossierPatientState extends State<DossierPatient> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Consultation",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  (widget.patient.dossierMedical != null &&
+                          widget.patient.dossierMedical!.consultations!.isEmpty)
+                      ? const SizedBox()
+                      : const Text(
+                          "Consultation",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                   const SizedBox(
                     height: 10,
                   ),

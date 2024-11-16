@@ -417,8 +417,9 @@ class _RendezVousFormState extends State<RendezVousForm> {
       builder: (contexte) {
         return Dialog(
           child: FractionallySizedBox(
-            widthFactor:
-                0.8, // Ajuster la largeur pour que le dialog soit responsive
+            heightFactor: 0.85,
+            // widthFactor:
+            //     0.8, // Ajuster la largeur pour que le dialog soit responsive
             child: Box(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -427,56 +428,58 @@ class _RendezVousFormState extends State<RendezVousForm> {
                       style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: DataTable(
-                      headingTextStyle:
-                          const TextStyle(fontWeight: FontWeight.bold),
-                      columns: const [
-                        DataColumn(label: Text("Prénom")),
-                        DataColumn(label: Text("Nom")),
-                        DataColumn(label: Text("Matricule")),
-                        DataColumn(label: Text("Proffession")),
-                        DataColumn(label: Text("Site de Travail")),
-                        DataColumn(label: Text("Actions")),
-                      ],
-                      rows: List.generate(
-                        patients.length,
-                        (index) => DataRow(
-                          cells: [
-                            DataCell(Text(patients[index].prenom)),
-                            DataCell(Text(patients[index].nom)),
-                            DataCell(Text(patients[index].telephone)),
-                            DataCell(patients[index].proffession != null
-                                ? Text(patients[index].proffession!)
-                                : const Text("Néant")),
-                            DataCell(patients[index].sitedetravail != null
-                                ? Text(patients[index].sitedetravail!.nom)
-                                : const Text("Néant")),
-                            DataCell(
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Remplir les champs du formulaire avec les infos du patient sélectionné
-                                  setState(() {
-                                    selectedPatient = patients[index];
-                                    print(
-                                        "::::: le patient: ${selectedPatient!.email}.");
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        headingTextStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                        columns: const [
+                          DataColumn(label: Text("Prénom")),
+                          DataColumn(label: Text("Nom")),
+                          DataColumn(label: Text("Matricule")),
+                          DataColumn(label: Text("Proffession")),
+                          DataColumn(label: Text("Site de Travail")),
+                          DataColumn(label: Text("Actions")),
+                        ],
+                        rows: List.generate(
+                          patients.length,
+                          (index) => DataRow(
+                            cells: [
+                              DataCell(Text(patients[index].prenom)),
+                              DataCell(Text(patients[index].nom)),
+                              DataCell(Text(patients[index].telephone)),
+                              DataCell(patients[index].proffession != null
+                                  ? Text(patients[index].proffession!)
+                                  : const Text("Néant")),
+                              DataCell(patients[index].sitedetravail != null
+                                  ? Text(patients[index].sitedetravail!.nom)
+                                  : const Text("Néant")),
+                              DataCell(
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // Remplir les champs du formulaire avec les infos du patient sélectionné
+                                    setState(() {
+                                      selectedPatient = patients[index];
+                                      print(
+                                          "::::: le patient: ${selectedPatient!.email}.");
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
                                   ),
-                                ),
-                                child: const Text(
-                                  'Sélectionner',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                  child: const Text(
+                                    'Sélectionner',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -497,82 +500,91 @@ class _RendezVousFormState extends State<RendezVousForm> {
       builder: (contexte) {
         return Dialog(
           child: FractionallySizedBox(
-            widthFactor:
-                0.8, // Ajuster la largeur pour que le dialog soit responsive
+            heightFactor: 0.85,
+            // widthFactor:
+            //     0.8, // Ajuster la largeur pour que le dialog soit responsive
             child: Box(
                 child: Column(
               children: [
-                DataTable(
-                  columns: const [
-                    DataColumn(
-                        label: Text(
-                      'Nom',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      'Prénom',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      'Matricule',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      'Téléphone',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      'Spécialité',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      'Actions',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                  ],
-                  rows: medecinList.map((medecin) {
-                    return DataRow(cells: [
-                      DataCell(
-                          SizedBox(width: 100, child: Text(medecin.prenom))),
-                      DataCell(SizedBox(width: 100, child: Text(medecin.nom))),
-                      DataCell(Text(medecin.matricule)),
-                      DataCell(
-                          SizedBox(width: 100, child: Text(medecin.telephone))),
-                      DataCell(Text(medecin.specialite)),
-                      DataCell(Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              // Remplir les champs du formulaire avec les infos du patient sélectionné
-                              setState(() {
-                                selectedMedecin = medecin;
-                                print(
-                                    "::::: le selectedMedecin: ${selectedMedecin!.email}.");
-                              });
-                              Navigator.of(context).pop();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
+                const Text("Sélection de médecin",
+                    style: TextStyle(fontSize: 18)),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(
+                            label: Text(
+                          'Nom',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          'Prénom',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          'Matricule',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          'Téléphone',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          'Spécialité',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          'Actions',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                      ],
+                      rows: medecinList.map((medecin) {
+                        return DataRow(cells: [
+                          DataCell(SizedBox(
+                              width: 100, child: Text(medecin.prenom))),
+                          DataCell(
+                              SizedBox(width: 100, child: Text(medecin.nom))),
+                          DataCell(Text(medecin.matricule)),
+                          DataCell(SizedBox(
+                              width: 100, child: Text(medecin.telephone))),
+                          DataCell(Text(medecin.specialite)),
+                          DataCell(Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Remplir les champs du formulaire avec les infos du patient sélectionné
+                                  setState(() {
+                                    selectedMedecin = medecin;
+                                    print(
+                                        "::::: le selectedMedecin: ${selectedMedecin!.email}.");
+                                  });
+                                  Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Sélectionner',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: const Text(
-                              'Sélectionner',
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )),
-                    ]);
-                  }).toList(),
+                            ],
+                          )),
+                        ]);
+                      }).toList(),
+                    ),
+                  ),
                 ),
               ],
             )),

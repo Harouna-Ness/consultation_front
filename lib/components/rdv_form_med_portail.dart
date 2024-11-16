@@ -429,8 +429,9 @@ class _RdvFormMedPortailState extends State<RdvFormMedPortail> {
       builder: (contexte) {
         return Dialog(
           child: FractionallySizedBox(
-            widthFactor:
-                0.8, // Ajuster la largeur pour que le dialog soit responsive
+            heightFactor: 0.85,
+            // widthFactor:
+            //     0.8, // Ajuster la largeur pour que le dialog soit responsive
             child: Box(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -439,56 +440,58 @@ class _RdvFormMedPortailState extends State<RdvFormMedPortail> {
                       style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: DataTable(
-                      headingTextStyle:
-                          const TextStyle(fontWeight: FontWeight.bold),
-                      columns: const [
-                        DataColumn(label: Text("Prénom")),
-                        DataColumn(label: Text("Nom")),
-                        DataColumn(label: Text("Matricule")),
-                        DataColumn(label: Text("Proffession")),
-                        DataColumn(label: Text("Site de Travail")),
-                        DataColumn(label: Text("Actions")),
-                      ],
-                      rows: List.generate(
-                        patients.length,
-                        (index) => DataRow(
-                          cells: [
-                            DataCell(Text(patients[index].prenom)),
-                            DataCell(Text(patients[index].nom)),
-                            DataCell(Text(patients[index].telephone)),
-                            DataCell(patients[index].proffession != null
-                                ? Text(patients[index].proffession!)
-                                : const Text("Néant")),
-                            DataCell(patients[index].sitedetravail != null
-                                ? Text(patients[index].sitedetravail!.nom)
-                                : const Text("Néant")),
-                            DataCell(
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Remplir les champs du formulaire avec les infos du patient sélectionné
-                                  setState(() {
-                                    selectedPatient = patients[index];
-                                    print(
-                                        "::::: le patient: ${selectedPatient!.email}.");
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        headingTextStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                        columns: const [
+                          DataColumn(label: Text("Prénom")),
+                          DataColumn(label: Text("Nom")),
+                          DataColumn(label: Text("Matricule")),
+                          DataColumn(label: Text("Proffession")),
+                          DataColumn(label: Text("Site de Travail")),
+                          DataColumn(label: Text("Actions")),
+                        ],
+                        rows: List.generate(
+                          patients.length,
+                          (index) => DataRow(
+                            cells: [
+                              DataCell(Text(patients[index].prenom)),
+                              DataCell(Text(patients[index].nom)),
+                              DataCell(Text(patients[index].telephone)),
+                              DataCell(patients[index].proffession != null
+                                  ? Text(patients[index].proffession!)
+                                  : const Text("Néant")),
+                              DataCell(patients[index].sitedetravail != null
+                                  ? Text(patients[index].sitedetravail!.nom)
+                                  : const Text("Néant")),
+                              DataCell(
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // Remplir les champs du formulaire avec les infos du patient sélectionné
+                                    setState(() {
+                                      selectedPatient = patients[index];
+                                      print(
+                                          "::::: le patient: ${selectedPatient!.email}.");
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
                                   ),
-                                ),
-                                child: const Text(
-                                  'Sélectionner',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                  child: const Text(
+                                    'Sélectionner',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
