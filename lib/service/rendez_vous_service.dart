@@ -21,7 +21,8 @@ class RendezVousService {
 
   Future<List<RendezVous>> getAllRendezVousbypatient(int patientId) async {
     try {
-      Response response = await apiService.getData('admin/rendez-vous/$patientId');
+      Response response =
+          await apiService.getData('admin/rendez-vous/$patientId');
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         return data.map((e) => RendezVous.fromMap(e)).toList();
@@ -32,10 +33,11 @@ class RendezVousService {
       throw Exception("Erreur : $e");
     }
   }
-  
+
   Future<List<RendezVous>> getAllRendezVousbyMedecin(int medecinId) async {
     try {
-      Response response = await apiService.getData('admin/rendez-vous-par/$medecinId');
+      Response response =
+          await apiService.getData('admin/rendez-vous-par/$medecinId');
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         return data.map((e) => RendezVous.fromMap(e)).toList();
@@ -50,15 +52,26 @@ class RendezVousService {
   Future<void> createRendezVous(RendezVous rendezVous) async {
     try {
       Map<String, dynamic> data = rendezVous.toMap();
-      String date = '${rendezVous.date.year}-${rendezVous.date.month}-${rendezVous.date.day}';
-      await apiService.postData('admin/planifier-rendez-vous?medecinId=${rendezVous.medecin.id}&patientId=${rendezVous.patient.id}&date=$date&heure=${rendezVous.heure}', data);
+      String date =
+          '${rendezVous.date.year}-${rendezVous.date.month.toString().padLeft(2, '0')}-${rendezVous.date.day.toString().padLeft(2, '0')}';
+      print(
+        'admin/planifier-rendez-vous?medecinId=${rendezVous.medecin.id}&patientId=${rendezVous.patient.id}&date=$date&heure=${rendezVous.heure}',
+      );
+      print("data");
+      print(data);
+      await apiService.postData(
+          'admin/planifier-rendez-vous?medecinId=${rendezVous.medecin.id}&patientId=${rendezVous.patient.id}&date=$date&heure=${rendezVous.heure}',
+          data);
+    } on DioException catch (e) {
+      print(e.response!);
     } catch (e) {
       // throw Exception("Erreur : $e");
-      print("créneau non disponible !");
+      print("Erreur : $e");
     }
   }
 
-  Future<void> changeRendezVousStatut(int rdvId, Map<String, dynamic> data) async {
+  Future<void> changeRendezVousStatut(
+      int rdvId, Map<String, dynamic> data) async {
     try {
       await apiService.putData('admin/modifier-statut-rdv/$rdvId', data);
     } catch (e) {

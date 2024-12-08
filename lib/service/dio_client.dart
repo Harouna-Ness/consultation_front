@@ -15,49 +15,6 @@ class DioClient {
   static Dio get dio => _dio;
 
   // Méthode pour ajouter l'intercepteur, seulement si non ajouté
-  static void addAuthInterceptor(String token) {
-    // if (!_dio.interceptors.contains(_authInterceptor)) {
-    //   _dio.interceptors.add(_authInterceptor(token));
-    // }
-    _dio.interceptors.add(_authInterceptor(token));
-  }
-
-  // Intercepteur d'authentification
-  static InterceptorsWrapper _authInterceptor(String token) {
-    return InterceptorsWrapper(
-      onRequest: (options, handler) {
-        options.headers['Authorization'] = 'Bearer $token';
-        handler.next(options);
-      },
-      onError: (e, handler) {
-        if (e.response?.statusCode == 401) {
-          // Gérer une redirection à la page de connexion si non autorisé
-          if (navigatorKey.currentContext != null) {
-            showDialog(
-              context: navigatorKey.currentContext!,
-              builder: (context) => AlertDialog(
-                title: const Text('Erreur d\'authentification'),
-                content: const Text(
-                  'Votre session a expiré ou vous n\'êtes pas autorisé. Veuillez vous reconnecter.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.pushReplacementNamed(context, '/login');
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            );
-          }
-        }
-        handler.next(e);
-      },
-    );
-  } /////
-
   static InterceptorsWrapper authInterceptor(String token) {
     return InterceptorsWrapper(
       onRequest: (options, handler) {
@@ -66,6 +23,28 @@ class DioClient {
       },
       onError: (e, handler) {
         if (e.response?.statusCode == 401 &&
+            navigatorKey.currentContext != null) {
+          showDialog(
+            context: navigatorKey.currentContext!,
+            builder: (context) => AlertDialog(
+              title: const Text('Session Expirée'),
+              content: const Text(
+                'Votre session a expiré, veuillez vous reconnecter.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (e.response?.statusCode == 403 &&
             navigatorKey.currentContext != null) {
           showDialog(
             context: navigatorKey.currentContext!,
@@ -101,6 +80,9 @@ class ApiService {
     try {
       Response response = await _dio.get(url);
       return response;
+    } on DioException catch (e) {
+      print("l'erreur ${e.response!}");
+      return e.response!;
     } catch (e) {
       throw Exception("Erreur lors de la requête GET : $e");
     }
@@ -110,6 +92,9 @@ class ApiService {
     try {
       Response response = await _dio.post(url, data: data);
       return response;
+    } on DioException catch (e) {
+      print(e.response!);
+      return e.response!;
     } catch (e) {
       throw Exception("Erreur lors de la requête POST : $e");
     }
@@ -119,6 +104,9 @@ class ApiService {
     try {
       Response response = await _dio.put(url, data: data);
       return response;
+    } on DioException catch (e) {
+      print("l'erreur ${e.response!}");
+      return e.response!;
     } catch (e) {
       throw Exception("Erreur lors de la requête PUT : $e");
     }
@@ -128,6 +116,9 @@ class ApiService {
     try {
       Response response = await _dio.delete(url);
       return response;
+    } on DioException catch (e) {
+      print("l'erreur ${e.response!}");
+      return e.response!;
     } catch (e) {
       throw Exception("Erreur lors de la requête DELETE : $e");
     }

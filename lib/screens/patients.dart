@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:medstory/components/ajout_patient_grouper.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/components/customTable.dart';
@@ -164,49 +165,42 @@ class _PatientsState extends State<Patients> {
       );
     }
 
-    var screens = [
-      InkWell(
-        onTap: () {
-          setState(() {
-            widget.showForm = true;
-          });
+    Future<dynamic> selectionFichierModal(BuildContext contexte) {
+      return showDialog(
+        context: contexte,
+        builder: (contexte) {
+          return const Dialog(
+            child: FractionallySizedBox(
+              heightFactor: 0.85,
+              child: AjoutPatientGrouper(),
+            ),
+          );
+        },
+      );
+    }
 
-          // final parentContext = context;
-          // showDialog(
-          //   context: context,
-          //   builder: (context) {
-          //     return Dialog(
-          //       child: FractionallySizedBox(
-          //         widthFactor:
-          //             0.8, // Ajuster la largeur pour que le dialog soit responsive
-          //         child: Padding(
-          //           padding: const EdgeInsets.all(16.0 * 2),
-          //           child: AddUserForm(
-          //             //TODO: changer le pop up en formulaire.
-          //             onSubmit: (formData) async {
-          //               context.showLoader();
-          //               // Afficher les données soumises
-          //               await patientService.addPatient(formData).then((value) {
-          //                 parentContext.read<MyData>().getNombrePatient();
-          //                 context.read<MyData>().getMoyenneAge();
-          //                 fetchPatientStatistics();
-          //                 fetchPatientPieStatistics();
-          //                 context.hideLoader();
-          //               }).catchError((onError) {
-          //                 context.showError(onError.toString());
-          //               }).whenComplete(() {
-          //                 context.showSuccess(
-          //                     "Le patient a été ajouté avec succès.");
-          //                 parentContext.read<MyMenuController>().changePage(1);
-          //               });
-          //             },
-          //             contexte: parentContext,
-          //           ),
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // );
+    var screens = [
+      PopupMenuButton<String>(
+        tooltip: "Ouvrir le menu !",
+        onSelected: (value) {
+          if (value == 'Un patient') {
+            // Changer la vue.
+            setState(() {
+              widget.showForm = true;
+            });
+          } else if (value == 'Plusieurs patients via excel') {
+            // ouvrir le modal de selection de fichier.
+            selectionFichierModal(context);
+          }
+        },
+        itemBuilder: (BuildContext context) {
+          return {'Un patient', 'Plusieurs patients via excel'}
+              .map((String choice) {
+            return PopupMenuItem<String>(
+              value: choice,
+              child: Text(choice),
+            );
+          }).toList();
         },
         child: Container(
           decoration: const BoxDecoration(
@@ -256,6 +250,97 @@ class _PatientsState extends State<Patients> {
           ),
         ),
       ),
+      // InkWell(
+      //   onTap: () {
+      //     setState(() {
+      //       widget.showForm = true;
+      //     });
+
+      //     // final parentContext = context;
+      //     // showDialog(
+      //     //   context: context,
+      //     //   builder: (context) {
+      //     //     return Dialog(
+      //     //       child: FractionallySizedBox(
+      //     //         widthFactor:
+      //     //             0.8, // Ajuster la largeur pour que le dialog soit responsive
+      //     //         child: Padding(
+      //     //           padding: const EdgeInsets.all(16.0 * 2),
+      //     //           child: AddUserForm(
+      //     //             //TODO: changer le pop up en formulaire.
+      //     //             onSubmit: (formData) async {
+      //     //               context.showLoader();
+      //     //               // Afficher les données soumises
+      //     //               await patientService.addPatient(formData).then((value) {
+      //     //                 parentContext.read<MyData>().getNombrePatient();
+      //     //                 context.read<MyData>().getMoyenneAge();
+      //     //                 fetchPatientStatistics();
+      //     //                 fetchPatientPieStatistics();
+      //     //                 context.hideLoader();
+      //     //               }).catchError((onError) {
+      //     //                 context.showError(onError.toString());
+      //     //               }).whenComplete(() {
+      //     //                 context.showSuccess(
+      //     //                     "Le patient a été ajouté avec succès.");
+      //     //                 parentContext.read<MyMenuController>().changePage(1);
+      //     //               });
+      //     //             },
+      //     //             contexte: parentContext,
+      //     //           ),
+      //     //         ),
+      //     //       ),
+      //     //     );
+      //     //   },
+      //     // );
+      //   },
+      //   child: Container(
+      //     decoration: const BoxDecoration(
+      //       color: primaryColor,
+      //       borderRadius: BorderRadius.all(
+      //         Radius.circular(5),
+      //       ),
+      //       boxShadow: [
+      //         BoxShadow(
+      //           blurRadius: .1,
+      //           spreadRadius: .1,
+      //           offset: Offset(0, 1),
+      //           blurStyle: BlurStyle.outer,
+      //           color: Colors.grey,
+      //         ),
+      //       ],
+      //     ),
+      //     child: Padding(
+      //       padding: const EdgeInsets.all(defaultPadding),
+      //       child: size.width >= 310
+      //           ? Row(
+      //               mainAxisAlignment: MainAxisAlignment.center,
+      //               children: [
+      //                 if (!(size.width >= 650 && size.width < 715))
+      //                   SvgPicture.asset(
+      //                     "assets/icons/personAdd.svg",
+      //                     height: size.width < 880 ? 20 : null,
+      //                   ),
+      //                 if (size.width >= 340)
+      //                   const SizedBox(
+      //                     width: defaultPadding,
+      //                   ),
+      //                 Text(
+      //                   "Ajouter",
+      //                   style: Theme.of(context)
+      //                       .textTheme
+      //                       .headlineMedium!
+      //                       .copyWith(
+      //                         color: Colors.white,
+      //                         fontWeight: FontWeight.bold,
+      //                         fontSize: size.width < 880 ? 20 : null,
+      //                       ),
+      //                 ),
+      //               ],
+      //             )
+      //           : SvgPicture.asset("assets/icons/personAdd.svg"),
+      //     ),
+      //   ),
+      // ),
       Box(
         padding: 10,
         child: Column(

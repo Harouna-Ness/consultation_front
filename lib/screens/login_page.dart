@@ -75,11 +75,20 @@ class _LoginPageState extends State<LoginPage> {
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
+      } else if (response.statusCode == 401) {
+        if (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response.data['description'])),
+        );
       }
     } catch (e) {
       if (Navigator.canPop(context)) {
         Navigator.of(context).pop();
       }
+
+      print("le print du catch: ${e.toString()}");
       // Gérer l'erreur de connexion
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),

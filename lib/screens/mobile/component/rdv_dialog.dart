@@ -140,24 +140,36 @@ class _RdvDialogState extends State<RdvDialog> {
                         id: 0,
                         motif: _motif,
                         date: _selectedDate!,
-                        heure:
-                            heureRdv!,
-                        statut: Statut(id: 1, libelle: ""),
+                        heure: heureRdv!,
+                        statut: Statut(id: 0, libelle: "en attente"),
                         medecin: widget.medecin,
-                        patient:widget.patient,
+                        patient: widget.patient,
                       );
-                      // Logique d'enregistrement du rendez-vous
-                      //Soumission de rdv
-                      await rendezVousService
-                          .createRendezVous(rdv)
-                          .then((value) {
+
+                      // TODO: à des fin de vidéo utiliser cette logige
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        context.read<MyData>().addRendezVous(rdv);
                         context.hideLoader();
                         context.showSuccess(
                             "Le rendez-vous a été ajouté avec succès.");
-                      }).catchError((onError) {
-                        context.hideLoader();
-                        context.showError("créneau non disponible !");
                       });
+
+                      // Logique d'enregistrement du rendez-vous
+                      //Soumission de rdv
+                      // try {
+                      //   await rendezVousService
+                      //       .createRendezVous(rdv)
+                      //       .then((value) {
+                      //     context.hideLoader();
+                      //     context.showSuccess(
+                      //         "Le rendez-vous a été ajouté avec succès.");
+                      //   }).catchError((onError) {
+                      //     context.hideLoader();
+                      //     context.showError("créneau non disponible !");
+                      //   });
+                      // } catch (e) {
+                      //   print(e);
+                      // }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

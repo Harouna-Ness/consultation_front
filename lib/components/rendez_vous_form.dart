@@ -260,19 +260,28 @@ class _RendezVousFormState extends State<RendezVousForm> {
                             medecin: selectedMedecin!,
                             patient: selectedPatient!);
 
-                        //Soumission de rdv
-                        await rendezVousService
-                            .createRendezVous(rdv)
-                            .then((value) {
-                          context.read<MyData>().fetchRendezVous();
+                        // TODO: à des fin de vidéo utiliser cette logige
+                        Future.delayed(const Duration(milliseconds: 300), () {
+                          context.read<MyData>().addRendezVous(rdv);
                           context.hideLoader();
                           context.showSuccess(
                               "Le rendez-vous a été ajouté avec succès.");
                           widget.changeView();
-                        }).catchError((onError) {
-                          context.hideLoader();
-                          context.showError("créneau non disponible !");
                         });
+
+                        //Soumission de rdv
+                        // await rendezVousService
+                        //     .createRendezVous(rdv)
+                        //     .then((value) {
+                        //   context.read<MyData>().fetchRendezVous();
+                        //   context.hideLoader();
+                        //   context.showSuccess(
+                        //       "Le rendez-vous a été ajouté avec succès.");
+                        //   widget.changeView();
+                        // }).catchError((onError) {
+                        //   context.hideLoader();
+                        //   context.showError("créneau non disponible !");
+                        // });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,

@@ -32,7 +32,8 @@ class _RdvMedPortailState extends State<RdvMedPortail> {
   List<RendezVous> _rendezVous = [];
   @override
   Widget build(BuildContext context) {
-    _rendezVous = context.watch<MyData>().rendezVousMedecin;
+    // _rendezVous = context.watch<MyData>().rendezVousMedecin;// TODO: Decommenter cette ligne.
+    _rendezVous = context.watch<MyData>().rendezVous;
 
     List<RendezVous> filteredRendezVous = _rendezVous.where((rendezVous) {
       bool matchesSearch =

@@ -12,6 +12,7 @@ class SiteDeTravailService {
         List<dynamic> data = response.data;
         return data.map((e) => Sitedetravail.fromMap(e)).toList();
       } else {
+        print("le code icciii:: ${response.data}");
         throw Exception("Erreur lors de la récupération des Site de travail");
       }
     } catch (e) {
@@ -49,7 +50,8 @@ class SiteDeTravailService {
 
   Future<void> deleteSitedetravail(int sitedetravailId) async {
     try {
-      await apiService.deleteData('admin/supprimeSiteDeTravail/$sitedetravailId');
+      await apiService
+          .deleteData('admin/supprimeSiteDeTravail/$sitedetravailId');
     } catch (e) {
       throw Exception("Erreur : $e");
     }

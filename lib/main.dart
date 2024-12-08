@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medstory/components/ajout_patient_grouper.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/utilisateur.dart';
@@ -16,10 +17,6 @@ import 'dart:io' show Platform;
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // final prefs = await SharedPreferences.getInstance();
-  // final token = prefs.getString('auth_token');
-
   runApp(
     MultiProvider(
       providers: [
