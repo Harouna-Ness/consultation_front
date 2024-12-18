@@ -7,6 +7,7 @@ import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/screens/consultation.dart';
 import 'package:medstory/screens/patient_med_portail.dart';
+import 'package:medstory/screens/patients.dart';
 import 'package:medstory/screens/rdv_med_portail.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +30,7 @@ class _MedecinPortailState extends State<MedecinPortail> {
     final Size size = MediaQuery.of(context).size;
     context.read<MyData>().fetchPatients();
     context.read<MyData>().fetchAnalyse();
-     // TODO: Remplacer par celles faites uniquement par le médecin connecté
+    // TODO: Remplacer par celles faites uniquement par le médecin connecté
     context.read<MyData>().fetchStatut();
     context.read<MyData>().fetchRendezVous();
     context.read<MyData>().fetchMotifDeConsultion();
@@ -68,8 +69,13 @@ class _MedecinPortailState extends State<MedecinPortail> {
                             height: defaultPadding,
                           ),
                           if (currentPages == 7)
-                            const Expanded(
-                              child: PatientMedPortail(),
+                            // const Expanded(
+                            //   child: PatientMedPortail(),
+                            // ),
+                            Expanded(
+                              child: Patients(
+                                showForm: false,
+                              ),
                             ),
                           if (currentPages == 8)
                             const Expanded(

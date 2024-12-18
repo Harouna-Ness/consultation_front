@@ -11,6 +11,7 @@ import 'package:medstory/screens/pathologie.dart';
 import 'package:medstory/screens/patients.dart';
 import 'package:medstory/screens/rendez_vous.dart';
 import 'package:medstory/screens/setting_screen.dart';
+import 'package:medstory/screens/tableau_de_bord.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -80,11 +81,11 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                           if (currentPages == 0)
                             const Expanded(
-                              child: Dashboard(),
+                              child: TableauDeBord(),
+                              // child: Dashboard(),
                             ),
                           if (currentPages == 1)
                             Expanded(
-                              // child: AddUserFormDialog(),
                               child: Patients(
                                 showForm: false,
                               ),

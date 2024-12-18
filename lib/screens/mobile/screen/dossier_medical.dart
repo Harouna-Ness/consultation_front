@@ -165,119 +165,119 @@ class _DossierMedicalPageState extends State<DossierMedicalPage> {
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            ExpansionTile(
-                                              title: const Text(
-                                                "Symptômes et Diagnostic",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 16.0,
-                                                ),
-                                              ),
-                                              children: [
-                                                consultation.symptome != null
-                                                    ? ListTile(
-                                                        title: const Text(
-                                                          "Symptômes",
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontSize: 16.0,
-                                                          ),
-                                                        ),
-                                                        subtitle: Text(
-                                                          consultation
-                                                              .symptome!,
-                                                        ),
-                                                      )
-                                                    : const Text(
-                                                        "pas de symptôme",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize: 16.0,
-                                                        ),
-                                                      ),
-                                                consultation.diagnostic != null
-                                                    ? ListTile(
-                                                        title: const Text(
-                                                          "Diagnostic",
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontSize: 16.0,
-                                                          ),
-                                                        ),
-                                                        subtitle: Text(
-                                                          consultation
-                                                              .diagnostic!,
-                                                        ),
-                                                      )
-                                                    : const Text(
-                                                        "pas de diagnostic",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize: 16.0,
-                                                        ),
-                                                      ),
-                                              ],
-                                            ),
-                                            ExpansionTile(
-                                              title: const Text(
-                                                "Analyses",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 16.0,
-                                                ),
-                                              ),
-                                              children: [
-                                                if (consultation.bilan !=
-                                                        null &&
-                                                    consultation
-                                                            .bilan!.analyses !=
-                                                        null &&
-                                                    consultation.bilan!
-                                                        .analyses!.isNotEmpty)
-                                                  ...consultation
-                                                      .bilan!.analyses!
-                                                      .map((analysis) =>
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    vertical:
-                                                                        4.0),
-                                                            child: Text(
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .left,
-                                                              analysis.libelle!,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 16.0,
-                                                              ),
-                                                            ),
-                                                          ))
-                                                      .toList()
-                                                else
-                                                  const Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 8.0),
-                                                    child: Text(
-                                                      "-",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 16.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
+                                            // ExpansionTile(
+                                            //   title: const Text(
+                                            //     "Symptômes et Diagnostic",
+                                            //     style: TextStyle(
+                                            //       fontWeight: FontWeight.w400,
+                                            //       fontSize: 16.0,
+                                            //     ),
+                                            //   ),
+                                            //   children: [
+                                            //     consultation.symptome != null
+                                            //         ? ListTile(
+                                            //             title: const Text(
+                                            //               "Symptômes",
+                                            //               style: TextStyle(
+                                            //                 fontWeight:
+                                            //                     FontWeight.w600,
+                                            //                 fontSize: 16.0,
+                                            //               ),
+                                            //             ),
+                                            //             subtitle: Text(
+                                            //               consultation
+                                            //                   .symptome!,
+                                            //             ),
+                                            //           )
+                                            //         : const Text(
+                                            //             "pas de symptôme",
+                                            //             style: TextStyle(
+                                            //               fontWeight:
+                                            //                   FontWeight.w600,
+                                            //               fontSize: 16.0,
+                                            //             ),
+                                            //           ),
+                                            //     consultation.diagnostic != null
+                                            //         ? ListTile(
+                                            //             title: const Text(
+                                            //               "Diagnostic",
+                                            //               style: TextStyle(
+                                            //                 fontWeight:
+                                            //                     FontWeight.w600,
+                                            //                 fontSize: 16.0,
+                                            //               ),
+                                            //             ),
+                                            //             subtitle: Text(
+                                            //               consultation
+                                            //                   .diagnostic!,
+                                            //             ),
+                                            //           )
+                                            //         : const Text(
+                                            //             "pas de diagnostic",
+                                            //             style: TextStyle(
+                                            //               fontWeight:
+                                            //                   FontWeight.w600,
+                                            //               fontSize: 16.0,
+                                            //             ),
+                                            //           ),
+                                            //   ],
+                                            // ),
+                                            // ExpansionTile(
+                                            //   title: const Text(
+                                            //     "Analyses",
+                                            //     style: TextStyle(
+                                            //       fontWeight: FontWeight.w400,
+                                            //       fontSize: 16.0,
+                                            //     ),
+                                            //   ),
+                                            //   children: [
+                                            //     if (consultation.bilan !=
+                                            //             null &&
+                                            //         consultation
+                                            //                 .bilan!.analyses !=
+                                            //             null &&
+                                            //         consultation.bilan!
+                                            //             .analyses!.isNotEmpty)
+                                            //       ...consultation
+                                            //           .bilan!.analyses!
+                                            //           .map((analysis) =>
+                                            //               Padding(
+                                            //                 padding:
+                                            //                     const EdgeInsets
+                                            //                         .symmetric(
+                                            //                         vertical:
+                                            //                             4.0),
+                                            //                 child: Text(
+                                            //                   textAlign:
+                                            //                       TextAlign
+                                            //                           .left,
+                                            //                   analysis.libelle!,
+                                            //                   style:
+                                            //                       const TextStyle(
+                                            //                     fontWeight:
+                                            //                         FontWeight
+                                            //                             .w600,
+                                            //                     fontSize: 16.0,
+                                            //                   ),
+                                            //                 ),
+                                            //               ))
+                                            //           .toList()
+                                            //     else
+                                            //       const Padding(
+                                            //         padding:
+                                            //             EdgeInsets.symmetric(
+                                            //                 vertical: 8.0),
+                                            //         child: Text(
+                                            //           "-",
+                                            //           style: TextStyle(
+                                            //             fontWeight:
+                                            //                 FontWeight.w600,
+                                            //             fontSize: 16.0,
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //   ],
+                                            // ),
                                             ExpansionTile(
                                               title: const Text(
                                                 "Prescription",

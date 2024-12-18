@@ -4,35 +4,17 @@ import 'package:medstory/service/dio_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientService {
-  
   int? _cachedPatientCount;
   final apiService = ApiService(DioClient.dio);
 
   Future<int> getPatientCount() async {
-    // Vérifier si le nombre d'utilisateurs est déjà mis en cache
-    if (_cachedPatientCount != null) {
-      return _cachedPatientCount!;
-    }
-
-    // Charger le nombre d'utilisateurs à partir de Shared Preferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _cachedPatientCount = prefs.getInt('patient_count');
-
-    if (_cachedPatientCount != null) {
-      
-      return _cachedPatientCount!;
-    }
-
-    // Si pas de données en cache, récupérer depuis l'API
     try {
       Response response = await apiService.getData('admin/voirNombrePatient');
-      _cachedPatientCount = response.data;
-
-      // Sauvegarder le nombre d'utilisateurs dans Shared Preferences
-      await prefs.setInt('patient_count', _cachedPatientCount!);
-      return _cachedPatientCount!;
+      return response.data;
     } catch (e) {
-      throw Exception("Erreur lors de la requête GET patient_count: $e");
+      print("Erreur lors de la requête GET patient_count: $e");
+      return -1;
+      // throw Exception("Erreur lors de la requête GET patient_count: $e");
     }
   }
 
@@ -49,10 +31,11 @@ class PatientService {
       throw Exception("Erreur lors de la requête GET patient_list: $e");
     }
   }
-  
+
   Future<Patient> getPatient(int id) async {
     try {
-      Response response = await apiService.getData('admin/recupererPatient/$id');
+      Response response =
+          await apiService.getData('admin/recupererPatient/$id');
       if (response.statusCode == 200) {
         final data = response.data;
         return Patient.fromMap(data);
@@ -63,15 +46,17 @@ class PatientService {
       throw Exception("Erreur lors de la requête GET patient_list: $e");
     }
   }
-  
+
   Future<double> getAllmoyenneAge() async {
     try {
-      Response response = await apiService.getData('statistics/patients-age-moyenne');
+      Response response =
+          await apiService.getData('statistics/patients-age-moyenne');
       if (response.statusCode == 200) {
         double data = response.data;
         return data;
       } else {
-        throw Exception('Erreur lors de la récupération de patients-age-moyenne');
+        throw Exception(
+            'Erreur lors de la récupération de patients-age-moyenne');
       }
     } catch (e) {
       throw Exception("Erreur lors de la requête GET patients-age-moyenne: $e");
@@ -127,5 +112,73 @@ class PatientService {
     } catch (e) {
       throw Exception("Erreur lors de la suppression de l'utilisateur : $e");
     }
+  }
+
+  Future<Map<String, int>> fetchStatistics() async {
+    try {
+      final response = await apiService.getData('statistics/patients-by-sex');
+      if (response.statusCode == 200) {
+        return Map<String, int>.from(response.data);
+      }
+    } catch (e) {
+      print('Erreur : $e');
+    }
+    return {};
+  }
+
+  Future<Map<String, int>> getAgeRange() async {
+    try {
+      final response = await apiService.getData('statistics/age-range');
+      if (response.statusCode == 200) {
+        return Map<String, int>.from(response.data);
+      }
+    } catch (e) {
+      print('Erreur : $e');
+    }
+    return {};
+  }
+
+  Future<Map<String, int>> fetchPatientsBySite() async {
+    try {
+      final response = await apiService.getData('statistics/patients-by-site');
+      if (response.statusCode == 200) {
+        return Map<String, int>.from(response.data);
+      }
+    } catch (e) {
+      print('Erreur : $e');
+    }
+    return {};
+  }
+
+  Future<Map<String, int>> getPatientsByProfession() async {
+    try {
+      final response =
+          await apiService.getData('statistics/patients-by-profession');
+      if (response.statusCode == 200) {
+        return (response.data as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, value as int),
+        );
+      }
+    } catch (e) {
+      print('Erreur : $e');
+      // throw Exception('Erreur lors de la récupération des statistiques');
+    }
+    return {};
+  }
+
+  Future<Map<String, int>> getPatientsByTypeDeContrat() async {
+    try {
+      final response =
+          await apiService.getData('statistics/patients-by-typeDeContrat');
+      if (response.statusCode == 200) {
+        return (response.data as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, value as int),
+        );
+      }
+    } catch (e) {
+      print('Erreur : $e');
+      // throw Exception('Erreur lors de la récupération des statistiques');
+    }
+    return {};
   }
 }

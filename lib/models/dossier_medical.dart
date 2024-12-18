@@ -9,6 +9,7 @@ class DossierMedical {
   List<Allergie>? allergies;
   List<Antecedent>? antecedents;
   List<AntecedentFamilial>? antecedentFamiliaux;
+  List<dynamic>? fichiers;
 
   DossierMedical({
     this.id,
@@ -16,6 +17,7 @@ class DossierMedical {
     this.allergies,
     this.antecedents,
     this.antecedentFamiliaux,
+    this.fichiers,
   });
 
   factory DossierMedical.fromMap(Map<String, dynamic> map) {
@@ -37,6 +39,7 @@ class DossierMedical {
           ? List<AntecedentFamilial>.from(map['antecedentFamiliaux']
               .map((x) => AntecedentFamilial.fromMap(x)))
           : [],
+      fichiers: map['fichiers'] ?? [],
     );
   }
 
@@ -48,6 +51,7 @@ class DossierMedical {
       'antecedents': antecedents?.map((e) => e.toMap()).toList(),
       'antecedentFamiliaux':
           antecedentFamiliaux?.map((e) => e.toMap()).toList(),
+      'fichiers': fichiers,
     };
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MyMenuController extends ChangeNotifier {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _index = 1;
+  int _index = 0;
   int get index => _index;
 
   GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
@@ -15,10 +15,9 @@ class MyMenuController extends ChangeNotifier {
 
   void closeDrawer() {
     if (_scaffoldKey.currentState!.isDrawerOpen) {
-  _scaffoldKey.currentState!.closeDrawer();
-}
+      _scaffoldKey.currentState!.closeDrawer();
+    }
   }
-  
 
   void changePage(int current) {
     _index = current;

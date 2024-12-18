@@ -43,6 +43,9 @@ class _CustomtableState extends State<Customtable> {
               patient.proffession!
                   .toLowerCase()
                   .contains(searchText.toLowerCase()) ||
+              patient.direction!.nom
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase()) ||
               patient.sitedetravail!.nom
                   .toLowerCase()
                   .contains(searchText.toLowerCase()) ??
@@ -52,15 +55,21 @@ class _CustomtableState extends State<Customtable> {
         switch (selectedFilter) {
           case "Direction":
             matchesFilter = patient.direction?.nom != null &&
-                patient.direction!.nom.toLowerCase().contains(searchText);
+                patient.direction!.nom
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase());
             break;
           case "Site de Travail":
             matchesFilter = patient.sitedetravail?.nom != null &&
-                patient.sitedetravail!.nom.toLowerCase().contains(searchText);
+                patient.sitedetravail!.nom
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase());
             break;
           case "profession":
             matchesFilter = patient.proffession != null &&
-                patient.proffession!.toLowerCase().contains(searchText);
+                patient.proffession!
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase());
             break;
         }
       }

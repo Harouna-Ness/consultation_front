@@ -1,12 +1,14 @@
 import 'package:medstory/models/bilan.dart';
 import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/motif_de_consultation.dart';
-import 'package:medstory/models/patient.dart';
 import 'package:medstory/models/type_de_consultation.dart';
 
 class Consultation {
   int? id;
-  String? diagnostic;
+  String? hypotheseDiagnostic;
+  String? diagnosticRetenu;
+  String? examenPhysique;
+  String? histoireDeLaMaladie;
   String? symptome;
   DateTime? creationDate;
   Medecin? medecin;
@@ -18,7 +20,10 @@ class Consultation {
 
   Consultation({
     this.id,
-    this.diagnostic,
+    this.hypotheseDiagnostic,
+    this.diagnosticRetenu,
+    this.examenPhysique,
+    this.histoireDeLaMaladie,
     this.symptome,
     this.creationDate,
     this.medecin,
@@ -32,7 +37,10 @@ class Consultation {
   factory Consultation.fromMap(Map<String, dynamic> map) {
     return Consultation(
       id: map['id'],
-      diagnostic: map['diagnostic'],
+      hypotheseDiagnostic: map['hypotheseDiagnostic'],
+      diagnosticRetenu: map['diagnosticRetenu'],
+      examenPhysique: map['examenPhysique'],
+      histoireDeLaMaladie: map['histoireDeLaMaladie'],
       symptome: map['symptome'],
       creationDate: map['creationDate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['creationDate'])
@@ -54,7 +62,10 @@ class Consultation {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'diagnostic': diagnostic,
+      'hypotheseDiagnostic': hypotheseDiagnostic,
+      'diagnosticRetenu': diagnosticRetenu,
+      'examenPhysique': examenPhysique,
+      'histoireDeLaMaladie': histoireDeLaMaladie,
       'symptome': symptome,
       'creationDate': creationDate?.toIso8601String(),
       'medecin': medecin?.toMap(),

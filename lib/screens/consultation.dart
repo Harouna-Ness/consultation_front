@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/champs_texte.dart';
+import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/components/empty_content.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/models/analyse.dart';
@@ -14,7 +15,9 @@ import 'package:medstory/models/patient.dart';
 import 'package:medstory/models/type_de_consultation.dart';
 import 'package:medstory/service/consultation_service.dart';
 import 'package:medstory/utils/lodder.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class ConsultationScreen extends StatefulWidget {
   const ConsultationScreen({super.key});
@@ -206,7 +209,7 @@ Widget consultationListSection(
           ),
           ListTile(
             title: const Text('Diagnostic'),
-            subtitle: Text('${consultation.diagnostic}'),
+            subtitle: Text('${consultation.diagnosticRetenu}'),
           ),
         ],
       );
@@ -233,7 +236,10 @@ class _FormConsultationState extends State<FormConsultation> {
   TextEditingController motifController = TextEditingController();
   TextEditingController typeConsultationController = TextEditingController();
   TextEditingController symptomeController = TextEditingController();
-  TextEditingController diagnosticController = TextEditingController();
+  TextEditingController hypotheseDiagnosticController = TextEditingController();
+  TextEditingController diagnosticRetenuController = TextEditingController();
+  TextEditingController examenPhysiqueController = TextEditingController();
+  TextEditingController histoireDeLaMaladieController = TextEditingController();
   TextEditingController prescriptionController = TextEditingController();
   List<TextEditingController> prescriptionControllers = [
     TextEditingController()
@@ -243,6 +249,7 @@ class _FormConsultationState extends State<FormConsultation> {
   MotifDeConsultation? _selectedMotifDeConsultation;
   TypeDeConsultation? _selectedTypeDeConsultation;
   List<Analyse?> selectedAnalyses = [null];
+  List<Analyse?> selectedRadiosAnalyses = [null];
 
   @override
   void dispose() {
@@ -305,58 +312,278 @@ class _FormConsultationState extends State<FormConsultation> {
               ),
               // Champ Symptôme
               ChampsTexte.buildTextField("Symptômes", symptomeController),
-              // Champ Diagnostic
-              ChampsTexte.buildTextField("Diagnostic", diagnosticController),
-              // Champ Analyse
-              for (int i = 0; i < selectedAnalyses.length; i++)
-                DropdownButtonFormField<Analyse>(
-                  decoration: InputDecoration(labelText: "Analyse ${i + 1}"),
-                  value: selectedAnalyses[i],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedAnalyses[i] = value;
-                    });
-                  },
-                  items: analyses
-                      .map((analyse) => DropdownMenuItem(
-                            value: analyse,
-                            child: Text(analyse.libelle!),
-                          ))
-                      .toList(),
-                  validator: (value) => value == null ? 'Champ requis' : null,
+              // Champ Histoire de la maladie
+              ChampsTexte.buildTextField(
+                  "Histoire de la maladie", histoireDeLaMaladieController),
+              // Champ Examen physique
+              ChampsTexte.buildTextField(
+                  "Examen physique", examenPhysiqueController),
+              // Champ Hypothese de Diagnostic
+              ChampsTexte.buildTextField(
+                  "Hypothèse de diagnostic", hypotheseDiagnosticController),
+
+              const SizedBox(
+                height: 16,
+              ),
+
+              // Bilan
+              const Text(
+                'Bilan demandé',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
                 ),
-
-              const SizedBox(height: 10),
-
-              // Bouton pour ajouter un nouveau champ
+              ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        selectedAnalyses.add(null); // Ajouter un nouveau champ
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    icon: const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    label: const Text(
-                      "Ajouter une autre analyse",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          const Text("Biologie"),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          // Boucle pour afficher les champs dynamiques
+                          for (int index = 0;
+                              index < selectedAnalyses.length;
+                              index++)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Autocomplete<Analyse>(
+                                  optionsBuilder:
+                                      (TextEditingValue textEditingValue) {
+                                    if (textEditingValue.text.isEmpty) {
+                                      return const Iterable<Analyse>.empty();
+                                    }
+                                    return analyses.where((analyse) => analyse
+                                        .libelle!
+                                        .toLowerCase()
+                                        .contains(textEditingValue.text
+                                            .toLowerCase()));
+                                  },
+                                  displayStringForOption: (Analyse analyse) =>
+                                      analyse.libelle!,
+                                  onSelected: (Analyse selectedAnalyse) {
+                                    setState(() {
+                                      selectedAnalyses[index] = selectedAnalyse;
+                                    });
+                                  },
+                                  fieldViewBuilder: (BuildContext context,
+                                      TextEditingController
+                                          textEditingController,
+                                      FocusNode focusNode,
+                                      VoidCallback onFieldSubmitted) {
+                                    // Remplir automatiquement le champ avec l'analyse sélectionnée
+                                    if (selectedAnalyses[index] != null) {
+                                      textEditingController.text =
+                                          selectedAnalyses[index]!.libelle!;
+                                    }
+                                    return TextFormField(
+                                      controller: textEditingController,
+                                      focusNode: focusNode,
+                                      decoration: InputDecoration(
+                                          labelText: "Analyse ${index + 1}"),
+                                      onFieldSubmitted: (value) {
+                                        if (value.isNotEmpty &&
+                                            !analyses.any((analyse) =>
+                                                analyse.libelle!
+                                                    .toLowerCase() ==
+                                                value.toLowerCase())) {
+                                          // Si aucune analyse ne correspond, créer une nouvelle
+                                          Analyse newAnalyse = Analyse(
+                                            id: 0,
+                                            libelle: value,
+                                          );
+                                          setState(() {
+                                            selectedAnalyses[index] =
+                                                newAnalyse;
+                                          });
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          const SizedBox(height: 10),
+                          // Bouton pour ajouter un nouveau champ
+                          Row(
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    selectedAnalyses
+                                        .add(null); // Ajouter un nouveau champ
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                                label: const Text(
+                                  "Ajouter une autre analyse",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                  // Radio-analyses
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          const Text("Radiographie"),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          // Boucle pour afficher les champs dynamiques
+                          for (int index = 0;
+                              index < selectedRadiosAnalyses.length;
+                              index++)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Autocomplete<Analyse>(
+                                  optionsBuilder:
+                                      (TextEditingValue textEditingValue) {
+                                    if (textEditingValue.text.isEmpty) {
+                                      return const Iterable<Analyse>.empty();
+                                    }
+                                    return analyses.where((analyse) => analyse
+                                        .libelle!
+                                        .toLowerCase()
+                                        .contains(textEditingValue.text
+                                            .toLowerCase()));
+                                  },
+                                  displayStringForOption: (Analyse analyse) =>
+                                      analyse.libelle!,
+                                  onSelected: (Analyse selectedAnalyse) {
+                                    setState(() {
+                                      selectedRadiosAnalyses[index] =
+                                          selectedAnalyse;
+                                    });
+                                  },
+                                  fieldViewBuilder: (BuildContext context,
+                                      TextEditingController
+                                          textEditingController,
+                                      FocusNode focusNode,
+                                      VoidCallback onFieldSubmitted) {
+                                    // Remplir automatiquement le champ avec l'analyse sélectionnée
+                                    if (selectedRadiosAnalyses[index] != null) {
+                                      textEditingController.text =
+                                          selectedRadiosAnalyses[index]!
+                                              .libelle!;
+                                    }
+                                    return TextFormField(
+                                      controller: textEditingController,
+                                      focusNode: focusNode,
+                                      decoration: InputDecoration(
+                                          labelText: "Analyse ${index + 1}"),
+                                      onFieldSubmitted: (value) {
+                                        if (value.isNotEmpty &&
+                                            !analyses.any((analyse) =>
+                                                analyse.libelle!
+                                                    .toLowerCase() ==
+                                                value.toLowerCase())) {
+                                          // Si aucune analyse ne correspond, créer une nouvelle
+                                          Analyse newAnalyse = Analyse(
+                                            id: 0,
+                                            libelle: value,
+                                          );
+                                          setState(() {
+                                            selectedRadiosAnalyses[index] =
+                                                newAnalyse;
+                                          });
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          const SizedBox(height: 10),
+                          // Bouton pour ajouter un nouveau champ
+                          Row(
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    selectedRadiosAnalyses
+                                        .add(null); // Ajouter un nouveau champ
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                                label: const Text(
+                                  "Ajouter une autre analyse",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
+
+              // // Champ Analyse
+              // for (int i = 0; i < selectedAnalyses.length; i++)
+              //   DropdownButtonFormField<Analyse>(
+              //     decoration: InputDecoration(labelText: "Analyse ${i + 1}"),
+              //     value: selectedAnalyses[i],
+              //     onChanged: (value) {
+              //       setState(() {
+              //         selectedAnalyses[i] = value;
+              //       });
+              //     },
+              //     items: analyses
+              //         .map((analyse) => DropdownMenuItem(
+              //               value: analyse,
+              //               child: Text(analyse.libelle!),
+              //             ))
+              //         .toList(),
+              //     validator: (value) => value == null ? 'Champ requis' : null,
+              //   ),
+              // Champ Hypothese de Diagnostic
+              ChampsTexte.buildTextField(
+                  "Diagnostic retenu", diagnosticRetenuController),
+
+              const SizedBox(
+                height: 10,
+              ),
+
               for (int i = 0; i < prescriptionControllers.length; i++)
                 ChampsTexte.buildTextField(
                     "Prescription ${i + 1}", prescriptionControllers[i]),
@@ -401,58 +628,95 @@ class _FormConsultationState extends State<FormConsultation> {
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        context.showLoader();
-
-                        List<Analyse> nonNullAnalyses = selectedAnalyses
-                            .where((analyse) => analyse != null)
-                            .cast<Analyse>()
-                            .toList();
-
-                        // Créer un bilan avec les analyses non nulles
-                        Bilan bilan = Bilan(analyses: nonNullAnalyses);
-
-                        // Données consultation.
-                        Map<String, dynamic> consultation = {
-                          "id": 0,
-                          "diagnostic": diagnosticController.text,
-                          "symptome": "sylto",
-                          "medecin": {"id": 1},
-                          "typeDeConsultation":
-                              _selectedTypeDeConsultation != null
-                                  ? {"id": _selectedTypeDeConsultation!.id}
-                                  : null,
-                          "motifDeConsultation":
-                              _selectedMotifDeConsultation != null
-                                  ? {"id": _selectedMotifDeConsultation!.id}
-                                  : null,
-                          "bilan": bilan.toMap(),
-                          "prescriptions": prescriptionControllers
-                              .map((controller) => controller.text)
-                              .toList(),
-                        };
-
-                        //Logique pour sauvegarder la consultation
-
-                        await consultationService
-                            .creerConsultation(
-                          consultation,
-                          widget.patient.email,
-                        )
-                            .then((onValue) {
-                          context.read<MyData>().getNombreConsultation();
-                          context.read<MyData>().fetchConsultation();
-                          context.hideLoader();
-                          context.showSuccess("Ajoutée avec succès.");
-                        }).catchError((onError) {
-                          context.hideLoader();
-                          context.showError(onError.toString());
-                        }).whenComplete(() {
-                          setState(() {
-                            // context.read<MyMenuController>().changePage(2);
-                            widget.changeView();
-                          });
-                        });
+                        print("object:::okok");
                       }
+                      // if (_formKey.currentState!.validate()) {
+                      //   context.showLoader();
+
+                      //   // TODO: revoir le bouton de soumission d'une consultation.
+
+                      //   List<Analyse> nonNullAnalyses = selectedAnalyses
+                      //       .where((analyse) => analyse != null)
+                      //       .cast<Analyse>()
+                      //       .toList();
+
+                      //   // Créer un bilan avec les analyses non nulles
+                      //   Bilan bilan = Bilan(analyses: nonNullAnalyses);
+
+                      //   print("Bilan créé : ${bilan.toMap()}");
+
+                      //   // Données consultation.
+                      //   Map<String, dynamic> consultation = {
+                      //     "id": 0,
+                      //     "diagnostic": diagnosticController.text,
+                      //     "symptome": "sylto",
+                      //     "medecin": {"id": 1},
+                      //     "typeDeConsultation":
+                      //         _selectedTypeDeConsultation != null
+                      //             ? {"id": _selectedTypeDeConsultation!.id}
+                      //             : null,
+                      //     "motifDeConsultation":
+                      //         _selectedMotifDeConsultation != null
+                      //             ? {"id": _selectedMotifDeConsultation!.id}
+                      //             : null,
+                      //     "bilan": bilan.toMap(),
+                      //     "prescriptions": prescriptionControllers
+                      //         .map((controller) => controller.text)
+                      //         .toList(),
+                      //   };
+
+                      //   print(nonNullAnalyses.toString());
+                      //   print(selectedAnalyses.toString());
+
+                      //   //Logique pour sauvegarder la consultation
+
+                      //   await consultationService
+                      //       .creerConsultation(
+                      //     consultation,
+                      //     widget.patient.email,
+                      //   )
+                      //       .then((onValue) async {
+                      //     context.read<MyData>().getNombreConsultation();
+                      //     context.read<MyData>().fetchConsultation();
+                      //     context.hideLoader();
+                      //     context.showSuccess("Ajoutée avec succès.");
+
+                      //     // Générer les PDFs après l'enregistrement réussi
+
+                      //     // Liste des prescriptions
+                      //     List<String> prescriptions = prescriptionControllers
+                      //         .map((controller) => controller.text)
+                      //         .where((text) => text.isNotEmpty)
+                      //         .toList();
+
+                      //     if (prescriptions.isNotEmpty) {
+                      //       await generatePdf(
+                      //         title: "Ordonnance Médicale",
+                      //         content: prescriptions,
+                      //       );
+                      //     }
+
+                      //     // Liste des analyses
+                      //     List<String> analyses = nonNullAnalyses
+                      //         .map((analyse) =>
+                      //             analyse.libelle ?? "Analyse inconnue")
+                      //         .toList();
+
+                      //     if (analyses.isNotEmpty) {
+                      //       await generatePdf(
+                      //         title: "Bulletin d'Examen",
+                      //         content: analyses,
+                      //       );
+                      //     }
+                      //   }).catchError((onError) {
+                      //     context.hideLoader();
+                      //     context.showError(onError.toString());
+                      //   }).whenComplete(() {
+                      //     setState(() {
+                      //       widget.changeView();
+                      //     });
+                      //   });
+                      // }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
@@ -495,6 +759,38 @@ class _FormConsultationState extends State<FormConsultation> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> generatePdf(
+      {required String title, required List<String> content}) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                title,
+                style: pw.TextStyle(
+                  fontSize: 24,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 16),
+              ...content.map((item) => pw.Text("- $item")),
+            ],
+          );
+        },
+      ),
+    );
+
+    // Sauvegarder ou télécharger le PDF
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename: "$title.pdf",
     );
   }
 }

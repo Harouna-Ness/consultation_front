@@ -28,7 +28,7 @@ class Header extends StatelessWidget {
         ),
         Text(
           pageTitle(context.watch<MyMenuController>().index),
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
       ],
     );
@@ -37,7 +37,7 @@ class Header extends StatelessWidget {
 
 String pageTitle(int currentPages) {
   if (currentPages == 0) {
-    return "Dashboard";
+    return "Tableau de bord";
   } else if (currentPages == 1) {
     return "Patients";
   } else if (currentPages == 2) {
@@ -54,9 +54,7 @@ String pageTitle(int currentPages) {
     return "Dossier Patient";
   } else if (currentPages == 8) {
     return "Rendez-vous";
-  }
-  
-  else {
+  } else {
     return "";
   }
 }

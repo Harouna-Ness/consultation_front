@@ -55,7 +55,8 @@ class _LoginPageState extends State<LoginPage> {
           // Redirection en fonction du rôle
           if (utilisateur.role.libelle == 'admin') {
             Navigator.pushReplacementNamed(context, '/admin').then((_) {
-              context.read<MyMenuController>().changePage(1);
+              context.read<MyMenuController>().changePage(0);
+              // context.read<MyMenuController>().changePage(1);
             });
           } else if (utilisateur.role.libelle == 'medecin') {
             Navigator.pushReplacementNamed(context, '/medecin').then((_) {

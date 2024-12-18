@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:medstory/constantes.dart';
 
+// ignore: must_be_immutable
 class Box extends StatelessWidget {
-   Box({super.key, required this.child, this.padding = 16});
+  Box({super.key, required this.child, this.padding = 16});
   final Widget child;
   double padding;
 

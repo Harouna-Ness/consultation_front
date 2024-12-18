@@ -15,7 +15,7 @@ class PdfService {
             children: [
               pw.Text('Consultation ID: ${consultation.id}',
                   style: const pw.TextStyle(fontSize: 20)),
-              pw.Text('Diagnostic: ${consultation.diagnostic}'),
+              // pw.Text('Diagnostic: ${consultation.diagnostic}'),
               pw.Text('Symptômes: ${consultation.symptome}'),
               pw.Text('Date de Création: ${consultation.creationDate}'),
               pw.Text('Médecin: ${consultation.medecin?.nom}'),

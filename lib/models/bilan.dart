@@ -1,27 +1,30 @@
-import 'package:medstory/models/analyse.dart';
+import 'package:medstory/models/examen_biologique.dart';
+import 'package:medstory/models/radiographie.dart';
 
 class Bilan {
   int? id;
-  List<Analyse>? analyses;
+  ExamenBiologique? examensBiologique;
+  Radiographie? radiographie;
 
-  Bilan({
-    this.id,
-    this.analyses,
-  });
+  Bilan({this.id, this.examensBiologique, this.radiographie});
 
   factory Bilan.fromMap(Map<String, dynamic> map) {
     return Bilan(
       id: map['id'],
-      analyses: map['analyses'] != null
-          ? List<Analyse>.from(map['analyses'].map((item) => Analyse.fromMap(item)))
-          : [],
+      examensBiologique: map['examensBiologique'] != null
+          ? ExamenBiologique.fromMap(map['examensBiologique'])
+          : null,
+      radiographie: map['radiographie'] != null
+          ? Radiographie.fromMap(map['radiographie'])
+          : null,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'analyses': analyses?.map((item) => item.toMap()).toList(),
+      'examensBiologique': examensBiologique?.toMap(),
+      'radiographie': radiographie?.toMap(),
     };
   }
 }
