@@ -27,4 +27,13 @@ class Bilan {
       'radiographie': radiographie?.toMap(),
     };
   }
+
+  @override
+  String toString() {
+    return """{
+      'id': $id,
+      'examensBiologique': ${examensBiologique?.toMap()},
+      'radiographie': ${radiographie?.toMap()},
+    }""";
+  }
 }

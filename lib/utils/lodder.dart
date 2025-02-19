@@ -115,6 +115,50 @@ void showErrorSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+/// 🔥 Fonction d'alerte avec confirmation et annulation
+void showConfirmationDialog(
+  BuildContext context, {
+  required String title,
+  required String message,
+  required VoidCallback onConfirm,
+}) {
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(message),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Annuler', style: TextStyle(color: Colors.grey)),
+            onPressed: () {
+              Navigator.of(context).pop(); // Ferme l'alerte sans action
+            },
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red, // Couleur du bouton confirmer
+            ),
+            child:
+                const Text('Confirmer', style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              Navigator.of(context).pop(); // Ferme le dialogue
+              onConfirm(); // Exécute l'action
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 // Extension pour simplifier l'appel
 extension LoadingDialogExtension on BuildContext {
   void showLoader() => showLoadingDialog(this); // Affiche le loader
@@ -127,4 +171,11 @@ extension LoadingDialogExtension on BuildContext {
       showSuccessSnackBar(this, message); // Affiche un message de succès
   void showSnackError(String message) =>
       showErrorSnackBar(this, message); // Affiche un message de succès
+  void showConfirmation({
+    required String title,
+    required String message,
+    required VoidCallback onConfirm,
+  }) =>
+      showConfirmationDialog(this,
+          title: title, message: message, onConfirm: onConfirm);
 }

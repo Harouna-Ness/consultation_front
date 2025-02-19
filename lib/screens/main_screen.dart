@@ -5,6 +5,7 @@ import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
+import 'package:medstory/screens/archives.dart';
 import 'package:medstory/screens/dashboard.dart';
 import 'package:medstory/screens/medecin_screen.dart';
 import 'package:medstory/screens/pathologie.dart';
@@ -36,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
     context.read<MyData>().getNombreSiteDeTravail();
     context.read<MyData>().getMoyenneAge();
     context.read<MyData>().getNombreConsultation();
-    context.read<MyData>().fetchPatients();
+    // context.read<MyData>().fetchPatients();
     context.read<MyData>().fetchDirections();
     context.read<MyData>().fetchSiteDeTraivails();
     context.read<MyData>().fetchAnalyse();
@@ -105,6 +106,10 @@ class _MainScreenState extends State<MainScreen> {
                           if (currentPages == 6)
                             const Expanded(
                               child: MedecinScreen(),
+                            ),
+                          if (currentPages == 11)
+                            const Expanded(
+                              child: Archives(),
                             ),
                           // if (currentPages == 7)
                           //   const Expanded(

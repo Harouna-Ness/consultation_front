@@ -393,12 +393,15 @@ class _RendezVousFormState extends State<RendezVousForm> {
     if (selectedMedecin == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Veuillez d'abord sélectionner un médecin.")),
+          content: Text("Veuillez d'abord sélectionner un médecin."),
+        ),
       );
       return;
     }
 
-    DateTime today = DateTime.now();
+    DateTime initialDate = getNextAvailableDate(selectedMedecin!);
+
+    DateTime today = initialDate;
     DateTime? selectedDate = await showDatePicker(
       context: context,
       initialDate: today,
@@ -417,6 +420,21 @@ class _RendezVousFormState extends State<RendezVousForm> {
         _selectedDate = selectedDate;
       });
     }
+  }
+
+  DateTime getNextAvailableDate(Medecin medecin) {
+    DateTime today = DateTime.now();
+    for (int i = 0; i < 7; i++) {
+      DateTime dateToCheck = today.add(Duration(days: i));
+      String dayOfWeek = DateFormat('EEEE').format(dateToCheck).toUpperCase();
+      bool isInterventionDay = medecin.joursIntervention
+          .map((e) => e['jour'] as String)
+          .contains(dayOfWeek);
+      if (isInterventionDay) {
+        return dateToCheck;
+      }
+    }
+    return today; // Retourne la date d'aujourd'hui si aucun jour d'intervention n'est trouvé
   }
 
   Future<dynamic> selectionModal(

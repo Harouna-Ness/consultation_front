@@ -58,7 +58,7 @@ class MyData extends ChangeNotifier {
 
   int _nombreDirection = -1;
   int get nombreDirection => _nombreDirection;
-  
+
   int _nombreSiteDeTravail = -1;
   int get nombreSiteDeTravail => _nombreSiteDeTravail;
 
@@ -70,6 +70,13 @@ class MyData extends ChangeNotifier {
 
   List<Patient> _patients = [];
   List<Patient> get patients => _patients;
+  int _currentPage = 0;
+  int _totalPages = 1;
+  bool _isLoading = false;
+  final int _pageSize = 10; // Nombre d'éléments par page
+  int get currentPage => _currentPage;
+  int get totalPages => _totalPages;
+  bool get isLoading => _isLoading;
 
   List<Direction> _directions = [];
   List<Direction> get directions => _directions;
@@ -143,9 +150,57 @@ class MyData extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchPatients() async {
-    _patients = await patientService.getAllPatients();
+  // Future<void> fetchPatients() async {
+  //   _patients = await patientService.getAllPatients();
+  //   notifyListeners();
+  // }
+
+  Future<void> fetchPatients({int page = 0}) async {
+    if (_isLoading || (page >= _totalPages)) return;
+
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      var result =
+          await patientService.getAllPatients(page: page, size: _pageSize);
+      _patients = result['patients'];
+      _totalPages = result['totalPages'];
+      _currentPage = page;
+      notifyListeners();
+    } catch (e) {
+      print("Erreur lors du chargement des patients: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void loadMorePatients() {
+    if (_currentPage + 1 < _totalPages) {
+      fetchPatients(page: _currentPage + 1);
+    }
+  }
+
+  void goToPage(int page) {
+    if (page < 0 || page >= _totalPages) return;
+    _currentPage = page;
+    fetchPatients(page: page);
+  }
+
+  Future<void> fetchPatientsFromDatabase(String query, String? filter) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      _patients = await patientService.fetchPatientsFromServer(query, filter);
+      notifyListeners();
+    } catch (e) {
+      print("Erreur lors de la recherche : $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updatePatients(Patient patient, int index) async {

@@ -10,6 +10,7 @@ import 'package:medstory/models/site_de_tavail.dart';
 import 'package:medstory/models/statut.dart';
 import 'package:medstory/models/statut_patient.dart';
 import 'package:medstory/models/type_de_consultation.dart';
+import 'package:medstory/screens/archives.dart';
 import 'package:medstory/service/analyse_service.dart';
 import 'package:medstory/service/direction_service.dart';
 import 'package:medstory/service/motif_de_consultation_service.dart';
@@ -131,6 +132,23 @@ class _SettingScreenState extends State<SettingScreen> {
               ],
             ),
           ),
+
+          const SizedBox(
+            height: defaultPadding,
+          ),
+
+          // patient Archives
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Archives"),
+            ],
+          ),
+
+          const SizedBox(
+            height: 10,
+          ),
+          const Archives(),
         ],
       ),
     );

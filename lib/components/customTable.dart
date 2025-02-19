@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medstory/components/edit_patient_model.dart';
@@ -22,6 +24,8 @@ class Customtable extends StatefulWidget {
 class _CustomtableState extends State<Customtable> {
   String searchText = '';
   String? selectedFilter;
+  bool rechercherAvancee = false; // Indicateur de recherche API
+  Timer? _debounce;
   List<String> filters = [
     "Aucun Filtre",
     "Direction",
@@ -29,13 +33,47 @@ class _CustomtableState extends State<Customtable> {
     "Profession"
   ];
   TextEditingController searchController = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
 
-    //
-    List<Patient> filteredPatients =
-        context.watch<MyData>().patients.where((patient) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MyData>(context, listen: false).fetchPatients();
+    });
+  }
+
+  void _onSearchChanged(String query, MyData myData) {
+    setState(() {
+      searchText = query;
+    });
+
+    // Annuler le précédent debounce si actif
+    _debounce?.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      List<Patient> filteredPatients = _filterPatients(myData.patients);
+
+      // Si aucun patient trouvé, envoyer une requête API
+      if (filteredPatients.isEmpty && query.isNotEmpty) {
+        setState(() {
+          rechercherAvancee = true;
+        });
+
+        await myData.fetchPatientsFromDatabase(query, selectedFilter);
+
+        setState(() {
+          rechercherAvancee = false;
+        });
+      }
+
+      if (query.isEmpty) {
+        myData.goToPage(myData.currentPage);
+      }
+    });
+  }
+
+  List<Patient> _filterPatients(List<Patient> patients) {
+    return patients.where((patient) {
       bool matchesSearch = patient.prenom
                   .toLowerCase()
                   .contains(searchText.toLowerCase()) ||
@@ -75,228 +113,308 @@ class _CustomtableState extends State<Customtable> {
       }
       return matchesSearch && matchesFilter;
     }).toList();
+  }
 
-    //
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
 
-    return Column(
-      children: [
-        // En-tête
-        Row(
-          children: [
-            Text(
-              "Liste des patients",
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Colors.black87,
-                    fontSize: 18,
-                  ),
-            ),
-            const Spacer(),
-            // les filtres
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                  ),
-                  width: 200,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.5,
+    return Consumer<MyData>(builder: (context, myData, child) {
+      List<Patient> filteredPatients = _filterPatients(myData.patients);
+      //
+      // List<Patient> filteredPatients = myData.patients.where((patient) {
+      //   bool matchesSearch = patient.prenom
+      //               .toLowerCase()
+      //               .contains(searchText.toLowerCase()) ||
+      //           patient.nom.toLowerCase().contains(searchText.toLowerCase()) ||
+      //           patient.proffession!
+      //               .toLowerCase()
+      //               .contains(searchText.toLowerCase()) ||
+      //           patient.direction!.nom
+      //               .toLowerCase()
+      //               .contains(searchText.toLowerCase()) ||
+      //           patient.sitedetravail!.nom
+      //               .toLowerCase()
+      //               .contains(searchText.toLowerCase()) ??
+      //       false;
+      //   bool matchesFilter = true;
+      //   if (selectedFilter != null) {
+      //     switch (selectedFilter) {
+      //       case "Direction":
+      //         matchesFilter = patient.direction?.nom != null &&
+      //             patient.direction!.nom
+      //                 .toLowerCase()
+      //                 .contains(searchText.toLowerCase());
+      //         break;
+      //       case "Site de Travail":
+      //         matchesFilter = patient.sitedetravail?.nom != null &&
+      //             patient.sitedetravail!.nom
+      //                 .toLowerCase()
+      //                 .contains(searchText.toLowerCase());
+      //         break;
+      //       case "profession":
+      //         matchesFilter = patient.proffession != null &&
+      //             patient.proffession!
+      //                 .toLowerCase()
+      //                 .contains(searchText.toLowerCase());
+      //         break;
+      //     }
+      //   }
+      //   return matchesSearch && matchesFilter;
+      // }).toList();
+
+      //
+
+      return Column(
+        children: [
+          // En-tête
+          Row(
+            children: [
+              Text(
+                "Liste des patients",
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Colors.black87,
+                      fontSize: 18,
+                    ),
+              ),
+              const Spacer(),
+              // les filtres
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                    ),
+                    width: 200,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Center(
+                      child: TextField(
+                        controller: searchController,
+                        // onChanged: (value) {
+                        //   setState(() {
+                        //     searchText = value;
+                        //   });
+                        // },
+                        onChanged: (value) => _onSearchChanged(value, myData),
+                        decoration: InputDecoration(
+                          icon: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: SvgPicture.asset(
+                              "assets/icons/search_icon.svg", // Icône SVG pour le bouton
+                            ),
+                          ),
+                          hintText: "Prénom, nom, profession...",
+                          contentPadding: const EdgeInsets.only(
+                            bottom: 10,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
                     ),
                   ),
-                  child: Center(
-                    child: TextField(
-                      controller: searchController,
-                      onChanged: (value) {
-                        setState(() {
-                          searchText = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        icon: SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: SvgPicture.asset(
-                            "assets/icons/search_icon.svg", // Icône SVG pour le bouton
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Center(
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedFilter,
+                          icon: SvgPicture.asset(
+                            "assets/icons/filter_alt.svg",
+                            height: 25,
+                            width: 25,
+                          ),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedFilter = newValue!;
+                            });
+                          },
+                          selectedItemBuilder: (BuildContext context) {
+                            return filters.map<Widget>((String value) {
+                              return Container(); // On cache complètement le texte
+                            }).toList();
+                          },
+                          menuWidth: 200,
+                          items: filters
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 50,
+              ),
+            ],
+          ),
+          Container(
+            child: size.width > 1000
+                ? SizedBox(
+                    width: double.infinity,
+                    child: myData.isLoading
+                        ? SizedBox(
+                            height: size.height * .45,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: tertiaryColor,
+                              ),
+                            ),
+                          )
+                        : DataTable(
+                            headingTextStyle:
+                                const TextStyle(fontWeight: FontWeight.bold),
+                            horizontalMargin: 0,
+                            columnSpacing: defaultPadding,
+                            columns: const [
+                              DataColumn(label: Text("Prénom")),
+                              DataColumn(label: Text("Nom")),
+                              DataColumn(label: Text("Age")),
+                              DataColumn(label: Text("Matricule")),
+                              DataColumn(label: Text("Proffession")),
+                              DataColumn(label: Text("Direction")),
+                              DataColumn(label: Text("Site de Travail")),
+                              DataColumn(label: Text("Actions")),
+                            ],
+                            rows: List.generate(
+                              filteredPatients.length,
+                              (index) => customDataRow(
+                                context,
+                                filteredPatients[index],
+                                () =>
+                                    widget.changeView(filteredPatients[index]),
+                              ),
+                            ),
+                          ),
+                  )
+                : SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Column(
+                              children: [
+                                customtableHeader(),
+                                const Divider(
+                                  height: 1,
+                                  thickness: 5,
+                                  indent: 2,
+                                  endIndent: 0,
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: List.generate(
+                                    10,
+                                    (index) => customDataRow1(),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        hintText: "Prénom, nom, profession...",
-                        contentPadding: const EdgeInsets.only(
-                          bottom: 10,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 0.5,
-                    ),
-                  ),
-                  child: Center(
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedFilter,
-                        icon: SvgPicture.asset(
-                          "assets/icons/filter_alt.svg",
-                          height: 25,
-                          width: 25,
-                        ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedFilter = newValue!;
-                          });
-                        },
-                        selectedItemBuilder: (BuildContext context) {
-                          return filters.map<Widget>((String value) {
-                            return Container(); // On cache complètement le texte
-                          }).toList();
-                        },
-                        menuWidth: 200,
-                        items: filters
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              width: 50,
-            ),
-          ],
-        ),
-        Container(
-          child: size.width > 1000
-              ? SizedBox(
-                  width: double.infinity,
-                  child: DataTable(
-                    headingTextStyle:
-                        const TextStyle(fontWeight: FontWeight.bold),
-                    horizontalMargin: 0,
-                    columnSpacing: defaultPadding,
-                    columns: const [
-                      DataColumn(label: Text("Prénom")),
-                      DataColumn(label: Text("Nom")),
-                      DataColumn(label: Text("Age")),
-                      DataColumn(label: Text("Matricule")),
-                      DataColumn(label: Text("Proffession")),
-                      DataColumn(label: Text("Direction")),
-                      DataColumn(label: Text("Site de Travail")),
-                      DataColumn(label: Text("Actions")),
-                    ],
-                    rows: List.generate(
-                      filteredPatients.length,
-                      (index) => customDataRow(
-                        context,
-                        filteredPatients[index],
-                        () => widget.changeView(filteredPatients[index]),
-                      ),
-                    ),
-                  ),
-                )
-              : SizedBox(
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
+                        SizedBox(
+                          width: 100,
                           child: Column(
                             children: [
-                              customtableHeader(),
-                              const Divider(
-                                height: 1,
-                                thickness: 5,
-                                indent: 2,
-                                endIndent: 0,
-                                color: Colors.black,
+                              Container(
+                                width: 100,
+                                height: 40,
+                                child: const Text(
+                                  "Actions",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                               Column(
                                 children: List.generate(
                                   10,
-                                  (index) => customDataRow1(),
+                                  (index) => Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      SizedBox(
+                                        height: 56,
+                                        child: SvgPicture.asset(
+                                          "assets/icons/Report.svg",
+                                          height: 25,
+                                          width: 25,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 56,
+                                        child: SvgPicture.asset(
+                                          "assets/icons/Report.svg",
+                                          height: 25,
+                                          width: 25,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 56,
+                                        child: SvgPicture.asset(
+                                          "assets/icons/Report.svg",
+                                          height: 25,
+                                          width: 25,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 100,
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 40,
-                              child: const Text(
-                                "Actions",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Column(
-                              children: List.generate(
-                                10,
-                                (index) => Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Container(
-                                      height: 56,
-                                      child: SvgPicture.asset(
-                                        "assets/icons/Report.svg",
-                                        height: 25,
-                                        width: 25,
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 56,
-                                      child: SvgPicture.asset(
-                                        "assets/icons/Report.svg",
-                                        height: 25,
-                                        width: 25,
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 56,
-                                      child: SvgPicture.asset(
-                                        "assets/icons/Report.svg",
-                                        height: 25,
-                                        width: 25,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-        ),
-      ],
-    );
+          ),
+          // Pagination
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: myData.currentPage > 0
+                    ? () => myData.goToPage(myData.currentPage - 1)
+                    : null,
+              ),
+              Text("Page ${myData.currentPage + 1} / ${myData.totalPages}"),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                onPressed: myData.currentPage + 1 < myData.totalPages
+                    ? () => myData.goToPage(myData.currentPage + 1)
+                    : null,
+              ),
+            ],
+          ),
+        ],
+      );
+    });
   }
 }
 
@@ -392,18 +510,29 @@ DataRow customDataRow(
             ),
             InkWell(
               onTap: () async {
+                // logique d'afficher une alerte avant de supprimer.
                 contexte.showLoader();
-                final patientService = PatientService();
-                await patientService.deletePatient(patient.id!).then((value) {
-                  contexte.read<MyData>().getNombrePatient();
-                  contexte.hideLoader();
-                }).catchError((onError) {
-                  contexte.showError(onError.toString());
-                }).whenComplete(() {
-                  contexte
-                      .showSuccess("Le patient a été supprimé avec succès.");
-                  contexte.read<MyMenuController>().changePage(1);
-                });
+
+                contexte.showConfirmation(
+                  title: "Suppression",
+                  message: "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                  onConfirm: () async {
+                    final patientService = PatientService();
+                    await patientService
+                        .archiverPatient(patient.id!)
+                        .then((value) {
+                      contexte.read<MyData>().getNombrePatient();
+                      contexte.hideLoader();
+                    }).catchError((onError) {
+                      contexte.showError(onError.toString());
+                    }).whenComplete(() {
+                      contexte.showSuccess(
+                          "Le patient a été supprimé avec succès.");
+                      contexte.read<MyMenuController>().changePage(1);
+                    });
+                    print("Élément supprimé !");
+                  },
+                );
               },
               child: SvgPicture.asset(
                 "assets/icons/supp.svg",

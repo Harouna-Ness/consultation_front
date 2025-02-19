@@ -1,6 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import 'package:medstory/models/consultation.dart';
+import 'package:medstory/service/pdf_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -112,7 +114,7 @@ class _DossierPatientState extends State<DossierPatient> {
               height: defaultPadding,
             ),
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   Column(
@@ -146,7 +148,7 @@ class _DossierPatientState extends State<DossierPatient> {
                     children: [
                       const Text(
                         "Nom",
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.black,
                           fontSize: 12,
                         ),
@@ -400,54 +402,62 @@ class _DossierPatientState extends State<DossierPatient> {
                     children: widget.patient.dossierMedical != null
                         ? widget.patient.dossierMedical!.consultations!
                             .map(
-                              (consultation) => Container(
-                                height: 170,
-                                width: 140,
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(color: Colors.grey[400]!),
+                              (consultation) => InkWell(
+                                onTap: () => _showConsultationModal(
+                                  context: context,
+                                  consultationData: consultation,
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "Fait par",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      "Dr ${consultation.medecin!.nom}",
-                                      style: const TextStyle(
+                                child: Container(
+                                  height: 170,
+                                  width: 140,
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border:
+                                        Border.all(color: Colors.grey[400]!),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Fait par",
+                                        style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 15,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        "Dr ${consultation.medecin!.nom}",
+                                        style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            overflow: TextOverflow.ellipsis),
+                                      ),
+                                      const Spacer(),
+                                      Center(
+                                        child: SvgPicture.asset(
+                                          "assets/icons/Report.svg",
+                                          height: 65,
+                                          width: 70,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        "Le ${consultation.creationDate!.day}/${consultation.creationDate!.month}/${consultation.creationDate!.year}",
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.w600,
-                                          overflow: TextOverflow.ellipsis),
-                                    ),
-                                    const Spacer(),
-                                    Center(
-                                      child: SvgPicture.asset(
-                                        "assets/icons/Report.svg",
-                                        height: 65,
-                                        width: 70,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      "Le ${consultation.creationDate!.day}/${consultation.creationDate!.month}/${consultation.creationDate!.year}",
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             )
@@ -463,7 +473,391 @@ class _DossierPatientState extends State<DossierPatient> {
     );
   }
 
-  // Modal pour afficher toutes les données
+  // Modal pour afficher les données d'une consultation.
+  Future<void> _showConsultationModal({
+    BuildContext? context,
+    required Consultation consultationData,
+  }) {
+    return showDialog(
+        context: context!,
+        builder: (context) {
+          return Dialog(
+            child: FractionallySizedBox(
+              heightFactor: 0.85,
+              child: Box(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * .8, // Largeur
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Fermer",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: defaultPadding,
+                          ),
+                          const Text(
+                            "Type de consultation:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.typeDeConsultation!.libelle,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Motif de la consultation:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.motifDeConsultation!.motif!,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Histoire de la maladie:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.histoireDeLaMaladie!,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Symptômes:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.symptome!,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Examen physique:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.histoireDeLaMaladie!,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Hypothèse de diagnostic:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.hypotheseDiagnostic!,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Diagnostic retenu:",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.diagnosticRetenu!,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Bilan Biologique:",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.download),
+                                onPressed: () async {
+                                  String calculerAge(DateTime dateDeNaissance) {
+                                    final DateTime aujourdHui = DateTime.now();
+                                    int age =
+                                        aujourdHui.year - dateDeNaissance.year;
+
+                                    // Vérifie si l'anniversaire de cette année est déjà passé
+                                    if (aujourdHui.month <
+                                            dateDeNaissance.month ||
+                                        (aujourdHui.month ==
+                                                dateDeNaissance.month &&
+                                            aujourdHui.day <
+                                                dateDeNaissance.day)) {
+                                      age--;
+                                    }
+
+                                    return "$age";
+                                  }
+
+                                  final pdfService = PdfService();
+                                  await pdfService.generateConsultationPdfs(
+                                    prescriptions: [],
+                                    examenAnalyses: consultationData
+                                            .bilan!.examensBiologique?.analyses
+                                            ?.map((analyse) =>
+                                                analyse.libelle ?? "")
+                                            .toList() ??
+                                        [],
+                                    radiographieAnalyses: [],
+                                    nom: widget.patient.nom,
+                                    prenom: widget.patient.prenom,
+                                    age: calculerAge(
+                                        widget.patient.dateDeNaissance!),
+                                    sexe: widget.patient.sexe[0],
+                                    profession:
+                                        widget.patient.proffession ?? '',
+                                    domicile: '',
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData
+                                    .bilan!.examensBiologique!.analyses!.isEmpty
+                                ? " - "
+                                : consultationData
+                                    .bilan!.examensBiologique!.analyses!
+                                    .map((toElement) => toElement.libelle)
+                                    .toList()
+                                    .join(', '),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Bilan Radiographique:",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.download),
+                                onPressed: () async {
+                                  String calculerAge(DateTime dateDeNaissance) {
+                                    final DateTime aujourdHui = DateTime.now();
+                                    int age =
+                                        aujourdHui.year - dateDeNaissance.year;
+
+                                    // Vérifie si l'anniversaire de cette année est déjà passé
+                                    if (aujourdHui.month <
+                                            dateDeNaissance.month ||
+                                        (aujourdHui.month ==
+                                                dateDeNaissance.month &&
+                                            aujourdHui.day <
+                                                dateDeNaissance.day)) {
+                                      age--;
+                                    }
+
+                                    return "$age";
+                                  }
+
+                                  final pdfService = PdfService();
+                                  await pdfService.generateConsultationPdfs(
+                                    prescriptions: [],
+                                    examenAnalyses: [],
+                                    radiographieAnalyses: consultationData
+                                            .bilan!.radiographie?.analyses
+                                            ?.map((analyse) =>
+                                                analyse.libelle ?? "")
+                                            .toList() ??
+                                        [],
+                                    nom: widget.patient.nom,
+                                    prenom: widget.patient.prenom,
+                                    age: calculerAge(
+                                        widget.patient.dateDeNaissance!),
+                                    sexe: widget.patient.sexe[0],
+                                    profession:
+                                        widget.patient.proffession ?? '',
+                                    domicile: '',
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData
+                                    .bilan!.radiographie!.analyses!.isEmpty
+                                ? " - "
+                                : consultationData
+                                    .bilan!.examensBiologique!.analyses!
+                                    .map((toElement) => toElement.libelle)
+                                    .toList()
+                                    .join(', '),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Prescription:",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.download),
+                                onPressed: () async {
+                                  String calculerAge(DateTime dateDeNaissance) {
+                                    final DateTime aujourdHui = DateTime.now();
+                                    int age =
+                                        aujourdHui.year - dateDeNaissance.year;
+
+                                    // Vérifie si l'anniversaire de cette année est déjà passé
+                                    if (aujourdHui.month <
+                                            dateDeNaissance.month ||
+                                        (aujourdHui.month ==
+                                                dateDeNaissance.month &&
+                                            aujourdHui.day <
+                                                dateDeNaissance.day)) {
+                                      age--;
+                                    }
+
+                                    return "$age";
+                                  }
+
+                                  final pdfService = PdfService();
+                                  await pdfService.generateConsultationPdfs(
+                                    prescriptions:
+                                        consultationData.prescriptions!,
+                                    examenAnalyses: [],
+                                    radiographieAnalyses: [],
+                                    nom: widget.patient.nom,
+                                    prenom: widget.patient.prenom,
+                                    age: calculerAge(
+                                        widget.patient.dateDeNaissance!),
+                                    sexe: widget.patient.sexe[0],
+                                    profession:
+                                        widget.patient.proffession ?? '',
+                                    domicile: '',
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            consultationData.prescriptions!.isEmpty
+                                ? " - "
+                                : consultationData.prescriptions!
+                                    .map((toElement) => toElement)
+                                    .toList()
+                                    .join(', '),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  // Modal pour afficher toutes les données.
   Future<void> _showModal({
     BuildContext? context,
     required List data,
@@ -529,6 +923,7 @@ class _DossierPatientState extends State<DossierPatient> {
     );
   }
 
+  // Fonction pour télécharger le pdf.
   void _downloadFile(String fileName) async {
     try {
       final response = await DioClient.dio.download(
@@ -550,13 +945,13 @@ class _DossierPatientState extends State<DossierPatient> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur lors du téléchargement")),
+          const SnackBar(content: Text("Erreur lors du téléchargement")),
         );
       }
     } catch (e) {
       print(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors du téléchargement")),
+        const SnackBar(content: Text("Erreur lors du téléchargement")),
       );
     }
   }

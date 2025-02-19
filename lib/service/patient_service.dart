@@ -18,9 +18,78 @@ class PatientService {
     }
   }
 
-  Future<List<Patient>> getAllPatients() async {
+  // Future<List<Patient>> getAllPatients() async {
+  //   try {
+  //     Response response = await apiService.getData('admin/voirPatients');
+  //     if (response.statusCode == 200) {
+  //       List data = response.data;
+  //       return data.map((e) => Patient.fromMap(e)).toList();
+  //     } else {
+  //       throw Exception('Erreur lors de la récupération des patients');
+  //     }
+  //   } catch (e) {
+  //     throw Exception("Erreur lors de la requête GET patient_list: $e");
+  //   }
+  // }
+
+  Future<Map<String, dynamic>> getAllPatients(
+      {int page = 0, int size = 10}) async {
     try {
-      Response response = await apiService.getData('admin/voirPatients');
+      Response response =
+          await apiService.getData('admin/voirPatients?page=$page&size=$size');
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = response.data;
+        List<dynamic> content = data[
+            'content']; // Firestore retourne généralement les données sous "content"
+        int totalPages = data['totalPages'];
+        int totalElements = data['totalElements'];
+
+        List<Patient> patients =
+            content.map((e) => Patient.fromMap(e)).toList();
+        return {
+          'patients': patients,
+          'totalPages': totalPages,
+          'totalElements': totalElements,
+        };
+      } else {
+        throw Exception('Erreur lors de la récupération des patients');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET patient_list: $e");
+    }
+  }
+
+  Future<List<Patient>> fetchPatientsFromServer(
+      String query, String? filter) async {
+    Dio dio = DioClient.dio;
+    try {
+      Response response = await dio.get(
+        'admin/searchPatient',
+        queryParameters: {
+          "query": query,
+          "filter": filter,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        List<Patient> newPatients =
+            data.map((json) => Patient.fromMap(json)).toList();
+
+        return newPatients; // Mettre à jour le provider avec les nouveaux patients
+      } else {
+        throw Exception('Erreur lors de la récupération des patients: ');
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des patients : $e");
+      throw Exception('Erreur lors de la récupération des patients: $e');
+    }
+  }
+
+  Future<List<Patient>> getAllArchivedPatients() async {
+    try {
+      Response response =
+          await apiService.getData('admin/voirArchivedPatients');
       if (response.statusCode == 200) {
         List data = response.data;
         return data.map((e) => Patient.fromMap(e)).toList();
@@ -98,6 +167,44 @@ class PatientService {
   Future<void> deletePatient(int patientId) async {
     try {
       await apiService.deleteData('admin/supprimerPatient/$patientId');
+
+      // Décrémenter le compteur et mettre à jour le cache
+      if (_cachedPatientCount != null) {
+        _cachedPatientCount = _cachedPatientCount! - 1;
+      } else {
+        _cachedPatientCount = await getPatientCount();
+      }
+
+      // Mettre à jour le nombre d'utilisateurs dans Shared Preferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('patient_count', _cachedPatientCount!);
+    } catch (e) {
+      throw Exception("Erreur lors de la suppression de l'utilisateur : $e");
+    }
+  }
+
+  Future<void> archiverPatient(int patientId) async {
+    try {
+      await apiService.deleteData('admin/archiveyPatient/$patientId');
+
+      // Décrémenter le compteur et mettre à jour le cache
+      if (_cachedPatientCount != null) {
+        _cachedPatientCount = _cachedPatientCount! - 1;
+      } else {
+        _cachedPatientCount = await getPatientCount();
+      }
+
+      // Mettre à jour le nombre d'utilisateurs dans Shared Preferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('patient_count', _cachedPatientCount!);
+    } catch (e) {
+      throw Exception("Erreur lors de la suppression de l'utilisateur : $e");
+    }
+  }
+
+  Future<void> restaurerPatient(int patientId) async {
+    try {
+      await apiService.putData('admin/restaurerPatient/$patientId', {});
 
       // Décrémenter le compteur et mettre à jour le cache
       if (_cachedPatientCount != null) {
