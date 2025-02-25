@@ -2,6 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:medstory/components/Bar_chart_widget.dart';
 import 'package:medstory/components/box.dart';
+import 'package:medstory/components/consultation_stat_motif_graph.dart';
+import 'package:medstory/components/consultation_stat_type_graph.dart';
 import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/resposive.dart';
@@ -22,6 +24,7 @@ class _TableauDeBordState extends State<TableauDeBord> {
   final _consultationService = ConsultationService();
   List<Consultation> consultations = [];
   DateTimeRange? selectedRange;
+  DateTimeRange? selectedMotifRange;
   Map<String, List<int>> motifData = {};
   Map<String, int> motifTotals = {};
 
@@ -43,6 +46,14 @@ class _TableauDeBordState extends State<TableauDeBord> {
     Colors.cyan
   ];
 
+  // Stats_consultation par type
+  Map<String, Map<String, int>> stats = {};
+  bool isLoading = true;
+
+  // Stats_consultation par motif
+  Map<String, Map<String, int>> motifStats = {};
+  bool motifIsLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +65,9 @@ class _TableauDeBordState extends State<TableauDeBord> {
     fetchPatientStatistics();
     _loadDataProfession();
     _loadDataTypeDeContrat();
-    _fetchConsultations();
+    // _fetchConsultations();
+    fetchStats();
+    fetchMotifStats();
   }
 
   Future<void> _loadData() async {
@@ -152,7 +165,44 @@ class _TableauDeBordState extends State<TableauDeBord> {
     }
   }
 
+  Future<void> fetchStats({String? star, String? end}) async {
+    try {
+      var data = await _consultationService.fetchConsultationStatsByType(
+        startDate: star,
+        endDate: end,
+      );
+      setState(() {
+        stats = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Erreur: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchMotifStats({String? star, String? end}) async {
+    try {
+      var data = await _consultationService.fetchConsultationStatsByMotif(
+        startDate: star,
+        endDate: end,
+      );
+      setState(() {
+        motifStats = data;
+        motifIsLoading = false;
+      });
+    } catch (e) {
+      print("Erreur: $e");
+      setState(() {
+        motifIsLoading = false;
+      });
+    }
+  }
+
   Future<void> _fetchConsultations() async {
+    // TODO: effacer cette fonction
     try {
       // Définir une plage par défaut si aucune n'est sélectionnée
       selectedRange ??= DateTimeRange(
@@ -197,13 +247,65 @@ class _TableauDeBordState extends State<TableauDeBord> {
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
-      initialDateRange: selectedRange,
+      initialDateRange: DateTimeRange(
+        start: DateTime.now().subtract(
+          const Duration(days: 30),
+        ),
+        end: DateTime.now(),
+      ),
+      builder: (context, child) {
+        return Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: child,
+          ),
+        );
+      },
     );
 
     if (pickedRange != null) {
       setState(() {
         selectedRange = pickedRange;
-        _fetchConsultations();
+        fetchStats(
+            star:
+                "${selectedRange!.start.year.toString()}-${selectedRange!.start.month.toString().padLeft(2, '0')}-${selectedRange!.start.day.toString().padLeft(2, '0')}",
+            end:
+                "${selectedRange!.end.year.toString()}-${selectedRange!.end.month.toString().padLeft(2, '0')}-${selectedRange!.end.day.toString().padLeft(2, '0')}");
+      });
+    }
+  }
+
+  Future<void> _selectMotifDateRange() async {
+    DateTimeRange? pickedRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: DateTimeRange(
+        start: DateTime.now().subtract(
+          const Duration(days: 30),
+        ),
+        end: DateTime.now(),
+      ),
+      builder: (context, child) {
+        return Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: child,
+          ),
+        );
+      },
+    );
+
+    if (pickedRange != null) {
+      setState(() {
+        selectedMotifRange = pickedRange;
+        fetchMotifStats(
+            star:
+                "${selectedMotifRange!.start.year.toString()}-${selectedMotifRange!.start.month.toString().padLeft(2, '0')}-${selectedMotifRange!.start.day.toString().padLeft(2, '0')}",
+            end:
+                "${selectedMotifRange!.end.year.toString()}-${selectedMotifRange!.end.month.toString().padLeft(2, '0')}-${selectedMotifRange!.end.day.toString().padLeft(2, '0')}");
       });
     }
   }
@@ -538,58 +640,56 @@ class _TableauDeBordState extends State<TableauDeBord> {
           const SizedBox(
             height: defaultPadding,
           ),
-          // Graphe linear pour motif de consultation
+          // Graphe linear pour type de consultation
           Box(
             child: SizedBox(
               height: 400,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: LineChart(
-                        LineChartData(
-                          titlesData: const FlTitlesData(
-                            topTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: false,
-                              ),
+                  Row(
+                    children: [
+                      Text(
+                        "Consultation par type",
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
-                            rightTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: false,
-                              ),
-                            ),
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                              ),
-                            ),
-                            // bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true,),),
-                          ),
-                          lineBarsData: motifData.entries.map((entry) {
-                            return LineChartBarData(
-                              spots: entry.value
-                                  .asMap()
-                                  .entries
-                                  .map((e) => FlSpot(
-                                      e.key.toDouble() + 1, e.value.toDouble()))
-                                  .toList(),
-                              // isCurved: false,
-                              // color: Colors.blue,
-                              // barWidth: 4,
-                              // dotData: const FlDotData(show: true),
-                            );
-                          }).toList(),
-                        ),
                       ),
-                    ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          _selectDateRange();
+                        },
+                        child: selectedRange != null
+                            ? Text(
+                                "${selectedRange!.start.day.toString().padLeft(2, '0')}/${selectedRange!.start.month.toString().padLeft(2, '0')}/${selectedRange!.start.year.toString()} - ${selectedRange!.end.day.toString().padLeft(2, '0')}/${selectedRange!.end.month.toString().padLeft(2, '0')}/${selectedRange!.end.year.toString()}")
+                            : const Text("Selectionner une periode"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: defaultPadding,
+                  ),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ConsultationStatTypeGraph(stats: stats),
                   ),
                   const Divider(),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: motifTotals.entries.map((entry) {
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: stats.entries.map((entry) {
+                        int typeIndex = stats.keys.toList().indexOf(entry.key);
+                        Color color = Colors
+                            .primaries[typeIndex + 1 % Colors.primaries.length];
+
+                        var data = entry.value;
+                        double total = 0;
+                        data.forEach((key, val) {
+                          total += val;
+                        });
                         return Container(
                           padding: const EdgeInsets.all(8.0),
                           margin: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -598,12 +698,26 @@ class _TableauDeBordState extends State<TableauDeBord> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(entry.key,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              Text(entry.value.toString(),
-                                  style: const TextStyle(color: Colors.blue)),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 5,
+                                    backgroundColor: color,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "${entry.key}: ${total.toString()}",
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                ],
+                              ),
                             ],
                           ),
                         );
@@ -613,6 +727,103 @@ class _TableauDeBordState extends State<TableauDeBord> {
                 ],
               ),
             ),
+          ),
+          const SizedBox(
+            height: defaultPadding,
+          ),
+          // Graphe linear pour motif de consultation
+          Box(
+            child: SizedBox(
+              height: 400,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "Consultation par motif",
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          _selectMotifDateRange();
+                        },
+                        child: selectedMotifRange != null
+                            ? Text(
+                                "${selectedMotifRange!.start.day.toString().padLeft(2, '0')}/${selectedMotifRange!.start.month.toString().padLeft(2, '0')}/${selectedMotifRange!.start.year.toString()} - ${selectedMotifRange!.end.day.toString().padLeft(2, '0')}/${selectedMotifRange!.end.month.toString().padLeft(2, '0')}/${selectedMotifRange!.end.year.toString()}")
+                            : const Text("Selectionner une periode"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: defaultPadding,
+                  ),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ConsultationStatMotifGraph(stats: motifStats),
+                  ),
+                  const Divider(),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: motifStats.entries.map((entry) {
+                        int typeIndex =
+                            motifStats.keys.toList().indexOf(entry.key);
+                        Color color = Colors
+                            .primaries[typeIndex + 1 % Colors.primaries.length];
+
+                        //Pour connaitre nbr de chaque motif sur la periode.
+                        var data = entry.value;
+                        double total = 0;
+                        data.forEach((key, val) {
+                          total += val;
+                        });
+
+                        return Container(
+                          padding: const EdgeInsets.all(8.0),
+                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 5,
+                                    backgroundColor: color,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "${entry.key}: ${total.toString()}",
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: defaultPadding,
           ),
         ],
       ),

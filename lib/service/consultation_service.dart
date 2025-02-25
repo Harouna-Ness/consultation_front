@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:medstory/models/consultation.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -90,5 +91,59 @@ class ConsultationService {
       },
     );
     return response.data;
+  }
+
+  Future<Map<String, Map<String, int>>> fetchConsultationStatsByType({
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final response = await DioClient.dio.get(
+        'statistics/repatition-consultation-type',
+        queryParameters: {
+          // Format ISO "yyyy-MM-dd"
+          'startDate': startDate,
+          'endDate': endDate,
+        },
+      );
+      if (response.statusCode == 200) {
+        // On convertit les valeurs numériques en int
+        Map<String, Map<String, int>> data = {};
+        (response.data as Map<String, dynamic>).forEach((type, dateMap) {
+          data[type] = Map<String, int>.from(dateMap);
+        });
+        return data;
+      } else {
+        throw Exception('Erreur lors de la récupération des statistiques');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET: $e");
+    }
+  }
+
+  Future<Map<String, Map<String, int>>> fetchConsultationStatsByMotif({
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final response = await DioClient.dio.get(
+        'statistics/repartition-consultation-motif', // Endpoint adapté pour la répartition par motif
+        queryParameters: {
+          'startDate': startDate,
+          'endDate': endDate,
+        },
+      );
+      if (response.statusCode == 200) {
+        Map<String, Map<String, int>> data = {};
+        (response.data as Map<String, dynamic>).forEach((motif, dateMap) {
+          data[motif] = Map<String, int>.from(dateMap);
+        });
+        return data;
+      } else {
+        throw Exception('Erreur lors de la récupération des statistiques');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET: $e");
+    }
   }
 }

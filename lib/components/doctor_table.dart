@@ -192,6 +192,9 @@ class _DoctorTableState extends State<DoctorTable> {
                               fit: BoxFit.cover,
                             ),
                           ),
+                          const SizedBox(
+                            height: 12,
+                          ),
                           Text(
                             "${med.prenom} ${med.nom}",
                             style: Theme.of(context)
@@ -235,6 +238,56 @@ class _DoctorTableState extends State<DoctorTable> {
                           ),
                           Text(
                             med.telephone,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall!
+                                .copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          Text(
+                            "Adresse: ",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall!
+                                .copyWith(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14,
+                                ),
+                          ),
+                          Text(
+                            med.adresse ?? '-',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall!
+                                .copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          Text(
+                            "Matricule: ",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall!
+                                .copyWith(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14,
+                                ),
+                          ),
+                          Text(
+                            med.matricule,
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall!
