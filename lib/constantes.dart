@@ -7,6 +7,12 @@ const bgColor = Color(0xFFF2FFFB);
 
 const defaultPadding = 16.0;
 
+String formatTimeOfDay24(TimeOfDay tod) {
+  final hour = tod.hour.toString().padLeft(2, '0');
+  final minute = tod.minute.toString().padLeft(2, '0');
+  return "$hour:$minute";
+}
+
 class ErreurTaille extends StatelessWidget {
   const ErreurTaille({
     super.key,

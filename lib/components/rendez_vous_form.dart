@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/champs_texte.dart';
+import 'package:medstory/components/time_slot_selector.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/my_data.dart';
@@ -22,6 +23,8 @@ class RendezVousForm extends StatefulWidget {
 }
 
 class _RendezVousFormState extends State<RendezVousForm> {
+  final _formKey = GlobalKey<FormState>();
+
   Patient? selectedPatient;
   Medecin? selectedMedecin;
   String? specialite;
@@ -47,31 +50,15 @@ class _RendezVousFormState extends State<RendezVousForm> {
     patients = context.watch<MyData>().patients;
     medecins = context.watch<MyData>().medecins;
 
-    // Liste des jours d'intervention en fonction du médecin sélectionné
-    List<String> joursDisponibles = selectedMedecin != null
-        ? selectedMedecin!.joursIntervention
-            .map((e) => e['jour'] as String)
-            .toList()
-        : [];
-
-// Obtenir les heures de début et de fin en fonction d'un jour spécifique
-    Map<String, String> getHeuresPourJour(String jour) {
-      if (selectedMedecin == null)
-        return {'heureDebut': '00:00', 'heureFin': '23:59'};
-
-      var intervention = selectedMedecin!.joursIntervention.firstWhere(
-        (e) => e['jour'] == jour,
-        orElse: () => {},
-      );
-
-      return {
-        'heureDebut': intervention['heureDebut'] ?? '00:00',
-        'heureFin': intervention['heureFin'] ?? '23:59',
-      };
+    // Obtenir les heures de début et de fin en fonction d'un jour spécifique
+    Map<String, String>? heuresIntervention;
+    if (_selectedDate != null) {
+      heuresIntervention = getHeuresPourJourM(selectedMedecin!, _selectedDate!);
     }
 
     return SingleChildScrollView(
       child: Form(
+        key: _formKey,
         child: Box(
           child: Column(
             children: [
@@ -209,31 +196,55 @@ class _RendezVousFormState extends State<RendezVousForm> {
                   ),
                   const SizedBox(width: 16),
                   // Heure
-                  Column(
-                    children: [
-                      const Text("Heure de rendez-vous"),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () => _selectTime(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: tertiaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        child: Text(
-                          _selectedTime != null
-                              ? _selectedTime!.format(context)
-                              : "Sélectionner une heure",
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Column(
+                  //   children: [
+                  //     const Text("Heure de rendez-vous"),
+                  //     const SizedBox(height: 8),
+                  //     ElevatedButton(
+                  //       onPressed: () => _selectTime(context),
+                  //       style: ElevatedButton.styleFrom(
+                  //         backgroundColor: tertiaryColor,
+                  //         shape: RoundedRectangleBorder(
+                  //           borderRadius: BorderRadius.circular(5),
+                  //         ),
+                  //       ),
+                  //       child: Text(
+                  //         _selectedTime != null
+                  //             ? _selectedTime!.format(context)
+                  //             : "Sélectionner une heure",
+                  //         style: const TextStyle(
+                  //           color: Colors.white,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
+              const SizedBox(width: 16),
+              if (_selectedDate != null && heuresIntervention != null)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TimeSlotSelector(
+                    medecinId: selectedMedecin!.id!,
+                    selectedDate: _selectedDate!,
+                    heureDebut: heuresIntervention['heureDebut']!,
+                    heureFin: heuresIntervention['heureFin']!,
+                    intervalMinutes: 10,
+                    onTimeSelected: (TimeOfDay slot) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _selectedTime = slot;
+                          heureRdv = formatTimeOfDay24(slot);
+                          // heureRdv =
+                          //     "${slot.hour.toString().padLeft(2, '0')}:${slot.minute.toString().padLeft(2, '0')}";
+                          print(heureRdv);
+                        });
+                      });
+                    },
+                  ),
+                ),
+
               // Champ Motif
               ChampsTexte.buildTextField("Motif", motifController),
               const SizedBox(
@@ -248,40 +259,37 @@ class _RendezVousFormState extends State<RendezVousForm> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        context.showLoader();
-                        final rendezVousService = RendezVousService();
-
-                        RendezVous rdv = RendezVous(
-                            id: 0,
-                            motif: motifController.text,
-                            date: _selectedDate!,
-                            heure: heureRdv!,
-                            statut: Statut(id: 0, libelle: "en attente"),
-                            medecin: selectedMedecin!,
-                            patient: selectedPatient!);
-
-                        // TODO: à des fin de vidéo utiliser cette logige
-                        Future.delayed(const Duration(milliseconds: 300), () {
-                          context.read<MyData>().addRendezVous(rdv);
-                          context.hideLoader();
-                          context.showSuccess(
-                              "Le rendez-vous a été ajouté avec succès.");
-                          widget.changeView();
-                        });
-
                         //Soumission de rdv
-                        // await rendezVousService
-                        //     .createRendezVous(rdv)
-                        //     .then((value) {
-                        //   context.read<MyData>().fetchRendezVous();
-                        //   context.hideLoader();
-                        //   context.showSuccess(
-                        //       "Le rendez-vous a été ajouté avec succès.");
-                        //   widget.changeView();
-                        // }).catchError((onError) {
-                        //   context.hideLoader();
-                        //   context.showError("créneau non disponible !");
-                        // });
+                        if (heureRdv != null) {
+                          if (_formKey.currentState!.validate()) {
+                            context.showLoader();
+                            final rendezVousService = RendezVousService();
+
+                            RendezVous rdv = RendezVous(
+                                id: 0,
+                                motif: motifController.text,
+                                date: _selectedDate!,
+                                heure: heureRdv!,
+                                statut: Statut(id: 0, libelle: "en attente"),
+                                medecin: selectedMedecin!,
+                                patient: selectedPatient!);
+
+                            await rendezVousService
+                                .createRendezVous(rdv)
+                                .then((value) {
+                              context.read<MyData>().fetchRendezVous();
+                              context.hideLoader();
+                              context.showSuccess(
+                                  "Le rendez-vous a été ajouté avec succès.");
+                              widget.changeView();
+                            }).catchError((onError) {
+                              context.hideLoader();
+                              context.showError("créneau non disponible !");
+                            });
+                          }
+                        } else {
+                          context.showSnackError("Veuillez choisir l'heure !");
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
@@ -335,6 +343,21 @@ class _RendezVousFormState extends State<RendezVousForm> {
       orElse: () => {},
     );
 
+    return {
+      'heureDebut': intervention['heureDebut'] ?? '00:00',
+      'heureFin': intervention['heureFin'] ?? '23:59',
+    };
+  }
+
+  Map<String, String> getHeuresPourJourM(Medecin medecin, DateTime date) {
+    String dayOfWeek = DateFormat('EEEE').format(date).toUpperCase();
+    var intervention = medecin.joursIntervention.firstWhere(
+      (e) => e['jour'] == dayOfWeek,
+      orElse: () => {},
+    );
+    if (intervention.isEmpty) {
+      return {'heureDebut': '00:00', 'heureFin': '23:59'};
+    }
     return {
       'heureDebut': intervention['heureDebut'] ?? '00:00',
       'heureFin': intervention['heureFin'] ?? '23:59',
@@ -418,6 +441,7 @@ class _RendezVousFormState extends State<RendezVousForm> {
     if (selectedDate != null) {
       setState(() {
         _selectedDate = selectedDate;
+        _selectedTime = null;
       });
     }
   }
@@ -588,6 +612,7 @@ class _RendezVousFormState extends State<RendezVousForm> {
                                   // Remplir les champs du formulaire avec les infos du patient sélectionné
                                   setState(() {
                                     selectedMedecin = medecin;
+                                    _selectedDate = null;
                                     print(
                                         "::::: le selectedMedecin: ${selectedMedecin!.email}.");
                                   });

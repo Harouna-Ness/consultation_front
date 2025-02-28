@@ -25,8 +25,10 @@ class RendezVous {
     return RendezVous(
       id: map['id'],
       motif: map['motif'],
-      date: DateTime.parse("2020-02-02"), //DateTime.parse(map['date']),
-      heure: "00:00", //map['heure'],
+      date: DateTime.parse(
+          "${map['date'][0]}-${map['date'][1].toString().padLeft(2, '0')}-${map['date'][2].toString().padLeft(2, '0')}"),
+      heure:
+          "${map['heure'][0].toString().padLeft(2, '0')}:${map['heure'][1].toString().padLeft(2, '0')}",
       statut: Statut.fromMap(map['statut']),
       medecin: Medecin.fromMap(map['medecin']),
       patient: Patient.fromMap(map['patient']),

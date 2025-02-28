@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:medstory/models/rendez_vous.dart';
 import 'package:medstory/service/dio_client.dart';
 
@@ -10,6 +12,7 @@ class RendezVousService {
       Response response = await apiService.getData('rendezVous/all');
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
+        print(data);
         return data.map((e) => RendezVous.fromMap(e)).toList();
       } else {
         throw Exception("Erreur lors de la récupération des Rdv");
@@ -94,6 +97,34 @@ class RendezVousService {
       await apiService.deleteData('rendezVous/$rendezVousId');
     } catch (e) {
       throw Exception("Erreur : $e");
+    }
+  }
+
+  // Fonction qui appelle l'API pour modifier la date et l'heure du rendez-vous
+  Future<RendezVous> modifierDateRdv({
+    required RendezVous rdv,
+    required DateTime date,
+    required String heure,
+  }) async {
+    // Format de la date en ISO "yyyy-MM-dd"
+    final String dateStr = DateFormat('yyyy-MM-dd').format(date);
+
+    try {
+      Response response = await DioClient.dio.put(
+        'admin/modifier-date-rdv/',
+        queryParameters: {
+          'date': dateStr,
+          'heure': heure,
+        },
+        data: rdv.toMap(),
+      );
+      if (response.statusCode == 200) {
+        return RendezVous.fromMap(response.data);
+      } else {
+        throw Exception('Erreur lors de la mise à jour du rendez-vous');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête PUT: $e");
     }
   }
 }
