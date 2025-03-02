@@ -140,6 +140,26 @@ class _AjoutPatientGrouperState extends State<AjoutPatientGrouper> {
                                 width: 12,
                               ),
                               ElevatedButton(
+                                onPressed: () {
+                                  modelView(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: tertiaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Voir le model de fichier',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 12,
+                              ),
+                              ElevatedButton(
                                 onPressed:
                                     _fileName != null ? envoyerFichier : null,
                                 style: ElevatedButton.styleFrom(
@@ -196,5 +216,22 @@ class _AjoutPatientGrouperState extends State<AjoutPatientGrouper> {
         ],
       ),
     );
+  }
+
+  Future<dynamic> modelView(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              heightFactor: 0.9,
+              child: Image.asset(
+                "assets/images/template.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+          );
+        });
   }
 }

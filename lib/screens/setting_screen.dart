@@ -270,19 +270,26 @@ class _StatutRdvTileState extends State<StatutRdvTile> {
                   ),
                   IconButton(
                     // Delete button
-                    onPressed: () async {
-                      context.showLoader();
+                    onPressed: () {
+                      context.showConfirmation(
+                          title: "Suppression",
+                          message:
+                              "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                          onConfirm: () async {
+                            context.showLoader();
 
-                      await statutService
-                          .deleteStatut(widget.statuts[index].id)
-                          .then((onValue) {
-                        context.read<MyData>().fetchStatut();
-                        context.hideLoader();
-                        context.showSuccess("Statut supprimé");
-                      }).catchError((e) {
-                        context.hideLoader();
-                        context.showError("Erreur lors de la suppression : $e");
-                      });
+                            await statutService
+                                .deleteStatut(widget.statuts[index].id)
+                                .then((onValue) {
+                              context.read<MyData>().fetchStatut();
+                              context.hideLoader();
+                              context.showSuccess("Statut supprimé");
+                            }).catchError((e) {
+                              context.hideLoader();
+                              context.showError(
+                                  "Erreur lors de la suppression : $e");
+                            });
+                          });
                     },
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",
@@ -533,19 +540,26 @@ class _TypeSectionTileState extends State<TypeSectionTile> {
                   IconButton(
                     // Delete button
                     onPressed: () async {
-                      context.showLoader();
+                      context.showConfirmation(
+                          title: "Suppression",
+                          message:
+                              "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                          onConfirm: () async {
+                            context.showLoader();
 
-                      await typeService
-                          .deleteTypeDeConsultation(
-                              widget.typesDeConsultations[index].id)
-                          .then((onValue) {
-                        context.read<MyData>().fetchTypeDeConsultation();
-                        context.hideLoader();
-                        context.showSuccess("Type supprimé");
-                      }).catchError((e) {
-                        context.hideLoader();
-                        context.showError("Erreur lors de la suppression : $e");
-                      });
+                            await typeService
+                                .deleteTypeDeConsultation(
+                                    widget.typesDeConsultations[index].id)
+                                .then((onValue) {
+                              context.read<MyData>().fetchTypeDeConsultation();
+                              context.hideLoader();
+                              context.showSuccess("Type supprimé");
+                            }).catchError((e) {
+                              context.hideLoader();
+                              context.showError(
+                                  "Erreur lors de la suppression : $e");
+                            });
+                          });
                     },
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",
@@ -796,19 +810,26 @@ class _MotifSectionTileState extends State<MotifSectionTile> {
                   IconButton(
                     // Delete button
                     onPressed: () async {
-                      context.showLoader();
+                      context.showConfirmation(
+                          title: "Suppression",
+                          message:
+                              "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                          onConfirm: () async {
+                            context.showLoader();
 
-                      await motifService
-                          .deleteMotifDeConsultation(
-                              widget.motifDeConsultations[index].id!)
-                          .then((onValue) {
-                        context.read<MyData>().fetchMotifDeConsultion();
-                        context.hideLoader();
-                        context.showSuccess("Motif supprimé");
-                      }).catchError((e) {
-                        context.hideLoader();
-                        context.showError("Erreur lors de la suppression : $e");
-                      });
+                            await motifService
+                                .deleteMotifDeConsultation(
+                                    widget.motifDeConsultations[index].id!)
+                                .then((onValue) {
+                              context.read<MyData>().fetchMotifDeConsultion();
+                              context.hideLoader();
+                              context.showSuccess("Motif supprimé");
+                            }).catchError((e) {
+                              context.hideLoader();
+                              context.showError(
+                                  "Erreur lors de la suppression : $e");
+                            });
+                          });
                     },
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",
@@ -1055,18 +1076,25 @@ class _AnalyseSectionTileState extends State<AnalyseSectionTile> {
                   IconButton(
                     // Delete button
                     onPressed: () async {
-                      context.showLoader();
+                      context.showConfirmation(
+                          title: "Suppression",
+                          message:
+                              "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                          onConfirm: () async {
+                            context.showLoader();
 
-                      await analyseService
-                          .deleteAnalyse(widget.analyses[index].id!)
-                          .then((onValue) {
-                        context.read<MyData>().fetchAnalyse();
-                        context.hideLoader();
-                        context.showSuccess("Analyse supprimée");
-                      }).catchError((e) {
-                        context.hideLoader();
-                        context.showError("Erreur lors de la suppression : $e");
-                      });
+                            await analyseService
+                                .deleteAnalyse(widget.analyses[index].id!)
+                                .then((onValue) {
+                              context.read<MyData>().fetchAnalyse();
+                              context.hideLoader();
+                              context.showSuccess("Analyse supprimée");
+                            }).catchError((e) {
+                              context.hideLoader();
+                              context.showError(
+                                  "Erreur lors de la suppression : $e");
+                            });
+                          });
                     },
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",
@@ -1315,18 +1343,26 @@ class _SiteSectionTileState extends State<SiteSectionTile> {
                   IconButton(
                     // Delete button
                     onPressed: () async {
-                      context.showLoader();
+                      context.showConfirmation(
+                          title: "Suppression",
+                          message:
+                              "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                          onConfirm: () async {
+                            context.showLoader();
 
-                      await sitedeTravailService
-                          .deleteSitedetravail(widget.sitesDeTravails[index].id)
-                          .then((onValue) {
-                        context.read<MyData>().fetchSiteDeTraivails();
-                        context.hideLoader();
-                        context.showSuccess("Site supprimé");
-                      }).catchError((e) {
-                        context.hideLoader();
-                        context.showError("Erreur lors de la suppression : $e");
-                      });
+                            await sitedeTravailService
+                                .deleteSitedetravail(
+                                    widget.sitesDeTravails[index].id)
+                                .then((onValue) {
+                              context.read<MyData>().fetchSiteDeTraivails();
+                              context.hideLoader();
+                              context.showSuccess("Site supprimé");
+                            }).catchError((e) {
+                              context.hideLoader();
+                              context.showError(
+                                  "Erreur lors de la suppression : $e");
+                            });
+                          });
                     },
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",
@@ -1574,18 +1610,25 @@ class _DirectionSectionTileState extends State<DirectionSectionTile> {
                   IconButton(
                     // Delete button
                     onPressed: () async {
-                      context.showLoader();
+                      context.showConfirmation(
+                          title: "Suppression",
+                          message:
+                              "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                          onConfirm: () async {
+                            context.showLoader();
 
-                      await directionService
-                          .deleteDirection(widget.directions[index].id)
-                          .then((onValue) {
-                        context.read<MyData>().fetchDirections();
-                        context.hideLoader();
-                        context.showSuccess("Direction supprimée");
-                      }).catchError((e) {
-                        context.hideLoader();
-                        context.showError("Erreur lors de la suppression : $e");
-                      });
+                            await directionService
+                                .deleteDirection(widget.directions[index].id)
+                                .then((onValue) {
+                              context.read<MyData>().fetchDirections();
+                              context.hideLoader();
+                              context.showSuccess("Direction supprimée");
+                            }).catchError((e) {
+                              context.hideLoader();
+                              context.showError(
+                                  "Erreur lors de la suppression : $e");
+                            });
+                          });
                     },
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",
@@ -1837,19 +1880,28 @@ class _StatutSectionTileState extends State<StatutSectionTile> {
                   ),
                   IconButton(
                     // Delete button
-                    onPressed: () async {
-                      context.showLoader();
+                    onPressed: () {
+                      context.showConfirmation(
+                        title: "Suppression",
+                        message:
+                            "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                        onConfirm: () async {
+                          context.showLoader();
 
-                      await statutPatientService
-                          .deleteStatutPatient(widget.statutPatients[index].id)
-                          .then((onValue) {
-                        context.read<MyData>().fetchStatutPatient();
-                        context.hideLoader();
-                        context.showSuccess("Statut supprimé");
-                      }).catchError((e) {
-                        context.hideLoader();
-                        context.showError("Erreur lors de la suppression : $e");
-                      });
+                          await statutPatientService
+                              .deleteStatutPatient(
+                                  widget.statutPatients[index].id)
+                              .then((onValue) {
+                            context.read<MyData>().fetchStatutPatient();
+                            context.hideLoader();
+                            context.showSuccess("Statut supprimé");
+                          }).catchError((e) {
+                            context.hideLoader();
+                            context.showError(
+                                "Erreur lors de la suppression : $e");
+                          });
+                        },
+                      );
                     },
                     icon: SvgPicture.asset(
                       "assets/icons/supp.svg",

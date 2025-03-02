@@ -131,7 +131,20 @@ class _PatientFormState extends State<PatientForm> {
 
     void nextStep() {
       if (_currentStep < 1) {
-        setState(() => _currentStep += 1);
+        if (nameController.text.isNotEmpty &&
+            surnameController.text.isNotEmpty &&
+            selectedSexe != null &&
+            phoneController.text.isNotEmpty &&
+            _selectedDate != null &&
+            professionController.text.isNotEmpty &&
+            selectedsitedetravail != null &&
+            selectedDirection != null &&
+            selectedStatut != null &&
+            addressController.text.isNotEmpty) {
+          setState(() => _currentStep += 1);
+        } else {
+          context.showSnackError("Veuillez remplier tous les champs !");
+        }
       } else {
         if (_formKey.currentState!.validate()) {
           // Soumettre le formulaire
@@ -152,7 +165,26 @@ class _PatientFormState extends State<PatientForm> {
       key: _formKey,
       child: Stepper(
         currentStep: _currentStep,
-        onStepTapped: (step) => setState(() => _currentStep = step),
+        onStepTapped: (step) {
+          if (_currentStep < 1) {
+            if (nameController.text.isNotEmpty &&
+                surnameController.text.isNotEmpty &&
+                selectedSexe != null &&
+                phoneController.text.isNotEmpty &&
+                _selectedDate != null &&
+                professionController.text.isNotEmpty &&
+                selectedsitedetravail != null &&
+                selectedDirection != null &&
+                selectedStatut != null &&
+                addressController.text.isNotEmpty) {
+              setState(() => _currentStep = step);
+            } else {
+              context.showSnackError("Veuillez remplier tous les champs !");
+            }
+          } else {
+            setState(() => _currentStep = step);
+          }
+        },
         onStepContinue: nextStep,
         onStepCancel: previousStep,
         controlsBuilder: (context, details) {

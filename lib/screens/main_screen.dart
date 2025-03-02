@@ -6,7 +6,6 @@ import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/screens/archives.dart';
-import 'package:medstory/screens/dashboard.dart';
 import 'package:medstory/screens/medecin_screen.dart';
 import 'package:medstory/screens/pathologie.dart';
 import 'package:medstory/screens/patients.dart';
@@ -83,7 +82,6 @@ class _MainScreenState extends State<MainScreen> {
                           if (currentPages == 0)
                             const Expanded(
                               child: TableauDeBord(),
-                              // child: Dashboard(),
                             ),
                           if (currentPages == 1)
                             Expanded(

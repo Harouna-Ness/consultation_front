@@ -125,21 +125,28 @@ class _DoctorTableState extends State<DoctorTable> {
                       height: 25,
                       width: 25,
                     ),
-                    onPressed: () async {
-                      // Action pour supprimer le médecin
-                      context.showLoader();
-                      final medecinService = MedecinService();
-                      await medecinService
-                          .deleteMedecin(medecin.id!)
-                          .then((value) {
-                        context.read<MyData>().fetchMedecins();
-                        context.hideLoader();
-                      }).catchError((onError) {
-                        context.showError(onError.toString());
-                      }).whenComplete(() {
-                        context.showSuccess(
-                            "Le médecin a été supprimé avec succès.");
-                      });
+                    onPressed: () {
+                      context.showConfirmation(
+                        title: "Suppression",
+                        message:
+                            "Êtes-vous sûr de vouloir supprimer cet élément ?",
+                        onConfirm: () async {
+                          // Action pour supprimer le médecin
+                          context.showLoader();
+                          final medecinService = MedecinService();
+                          await medecinService
+                              .deleteMedecin(medecin.id!)
+                              .then((value) {
+                            context.read<MyData>().fetchMedecins();
+                            context.hideLoader();
+                          }).catchError((onError) {
+                            context.showError(onError.toString());
+                          }).whenComplete(() {
+                            context.showSuccess(
+                                "Le médecin a été supprimé avec succès.");
+                          });
+                        },
+                      );
                     },
                   ),
                 ],

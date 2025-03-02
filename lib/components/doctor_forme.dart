@@ -135,9 +135,40 @@ class DoctorStateForm extends State<DoctorForm> {
     }
 
     void nextStep() {
-      if (_currentStep < 2) {
-        setState(() => _currentStep += 1);
-      } else {
+      if (_currentStep == 0) {
+        if (nameController.text.isNotEmpty &&
+            surnameController.text.isNotEmpty &&
+            selectedSexe != null &&
+            phoneController.text.isNotEmpty &&
+            matriculeController.text.isNotEmpty &&
+            specialiteController.text.isNotEmpty &&
+            addressController.text.isNotEmpty) {
+          setState(() => _currentStep += 1);
+        } else {
+          context.showSnackError("Veuillez remplier tous les champs !");
+        }
+      } else if (_currentStep == 1) {
+        if (joursIntervention
+            .where((jour) =>
+                jour.isNotEmpty &&
+                jour.values.any((v) => v != null && v.isNotEmpty))
+            .map((jour) {
+              final jourTraduit = jour['jour'] != null
+                  ? joursFrancaisAnglais[jour['jour']]
+                  : null;
+              return {
+                'jour': jourTraduit!.toUpperCase() ?? '',
+                'heureDebut': jour['heureDebut'] ?? '',
+                'heureFin': jour['heureFin'] ?? '',
+              };
+            })
+            .toList()
+            .isNotEmpty) {
+          setState(() => _currentStep += 1);
+        } else {
+          context.showSnackError("Veuillez remplier tous les champs !");
+        }
+      } else if (_currentStep == 2) {
         if (_formKey.currentState!.validate()) {
           // Soumettre le formulaire
           Soumettre();
@@ -157,7 +188,9 @@ class DoctorStateForm extends State<DoctorForm> {
       key: _formKey,
       child: Stepper(
         currentStep: _currentStep,
-        onStepTapped: (step) => setState(() => _currentStep = step),
+        onStepTapped: (step) {
+          // setState(() => _currentStep = step);
+        },
         onStepContinue: nextStep,
         onStepCancel: previousStep,
         controlsBuilder: (context, details) {

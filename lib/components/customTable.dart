@@ -511,12 +511,12 @@ DataRow customDataRow(
             InkWell(
               onTap: () async {
                 // logique d'afficher une alerte avant de supprimer.
-                contexte.showLoader();
 
                 contexte.showConfirmation(
                   title: "Suppression",
                   message: "Êtes-vous sûr de vouloir supprimer cet élément ?",
                   onConfirm: () async {
+                    contexte.showLoader();
                     final patientService = PatientService();
                     await patientService
                         .archiverPatient(patient.id!)

@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:html' as html;
+
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
+import 'package:medstory/components/file_upload_widget.dart';
 import 'package:medstory/models/consultation.dart';
 import 'package:medstory/service/pdf_service.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_html/html.dart' as html;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,6 +15,7 @@ import 'package:medstory/constantes.dart';
 import 'package:medstory/models/patient.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DossierPatient extends StatefulWidget {
@@ -27,6 +30,7 @@ class DossierPatient extends StatefulWidget {
 
 class _DossierPatientState extends State<DossierPatient> {
   String token = '';
+  bool showUploadWidget = false;
 
   Future<void> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -64,6 +68,32 @@ class _DossierPatientState extends State<DossierPatient> {
                 ),
                 const Spacer(),
                 ElevatedButton.icon(
+                  onPressed: () {
+                    showFileImportDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: tertiaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.attachment,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Ajouter un fichier",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                ElevatedButton.icon(
                   onPressed: () => _showModal(
                       context: context,
                       data: widget.patient.dossierMedical!.fichiers!),
@@ -78,7 +108,7 @@ class _DossierPatientState extends State<DossierPatient> {
                     color: Colors.white,
                   ),
                   label: const Text(
-                    "Fichiers",
+                    "Voir fichiers",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -857,6 +887,25 @@ class _DossierPatientState extends State<DossierPatient> {
         });
   }
 
+  Future<dynamic> showFileImportDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: FractionallySizedBox(
+            heightFactor: 0.85,
+            widthFactor: 0.8,
+            child: Box(
+              child: FileUploadWidget(
+                dossierId: widget.patient.dossierMedical!.id!,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // Modal pour afficher toutes les données.
   Future<void> _showModal({
     BuildContext? context,
@@ -926,16 +975,22 @@ class _DossierPatientState extends State<DossierPatient> {
   // Fonction pour télécharger le pdf.
   void _downloadFile(String fileName) async {
     try {
-      final response = await DioClient.dio.download(
-          "${DioClient.baseUrl}admin/dossier-medical/${widget.patient.dossierMedical!.id!}/download/$fileName",
-          "/downloads/$fileName");
+      final response = await DioClient.dio.get(
+        "${DioClient.baseUrl}admin/dossier-medical/${widget.patient.dossierMedical!.id!}/download/$fileName",
+        options: Options(responseType: ResponseType.bytes),
+      );
 
       if (response.statusCode == 200) {
         if (kIsWeb) {
           // Téléchargement en Web
-          downloadFileWeb(response.data, fileName);
+          if (fileName.endsWith('.pdf')) {
+            downloadFile(response.data, fileName, mimeType: "application/pdf");
+          } else {
+            downloadFile(response.data, fileName, mimeType: "application/png");
+          }
         } else {
           // Téléchargement en Desktop/Mobile
+          print("on n'est pas dans web");
           final directory = await getApplicationDocumentsDirectory();
           final filePath = "${directory.path}/$fileName";
           final file = File(filePath);
@@ -957,13 +1012,21 @@ class _DossierPatientState extends State<DossierPatient> {
   }
 
   // Créer un URL temporaire
-  void downloadFileWeb(Uint8List fileBytes, String fileName) {
-    final blob = html.Blob([fileBytes]);
+  void downloadFile(Uint8List fileBytes, String fileName, {String? mimeType}) {
+    mimeType ??= 'application/octet-stream';
+    final blob = html.Blob([fileBytes], mimeType);
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..target = 'blank'
-      ..download = fileName
-      ..click();
-    html.Url.revokeObjectUrl(url); // Nettoyer l'URL temporaire
+    try {
+      final anchor = html.AnchorElement(href: url);
+      // Utiliser setAttribute pour définir le nom du fichier à télécharger
+      anchor.setAttribute("download", fileName);
+      anchor.click();
+    } catch (e) {
+      // En cas d'erreur, ouvrir dans un nouvel onglet pour permettre le téléchargement manuel
+      html.window.open(url, '_blank');
+    } finally {
+      // Libérer l'URL temporaire
+      html.Url.revokeObjectUrl(url);
+    }
   }
 }
