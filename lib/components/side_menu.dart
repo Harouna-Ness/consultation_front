@@ -3,9 +3,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/main.dart';
+import 'package:medstory/models/auth_service.dart';
+import 'package:medstory/models/my_data.dart';
 import 'package:medstory/utils/lodder.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({
@@ -17,8 +18,12 @@ class SideMenu extends StatefulWidget {
 }
 
 class _SideMenuState extends State<SideMenu> {
+  String role = "-";
+
   @override
   Widget build(BuildContext context) {
+    role = context.watch<MyData>().currentUser?.role.libelle ?? "-";
+
     return Drawer(
       backgroundColor: Colors.white,
       elevation: 1,
@@ -49,24 +54,46 @@ class _SideMenuState extends State<SideMenu> {
               })
             },
           ),
-          DrawerListTile(
-            title: "Docteurs",
-            svgSrc: "assets/icons/docIcone.svg",
-            press: () => {
-              setState(() {
-                context.read<MyMenuController>().changePage(6);
-                context.read<MyMenuController>().closeDrawer();
-              })
-            },
-          ),
-          DrawerListTile(
-            title: "Rendez-vous",
-            svgSrc: "assets/icons/rendezvous.svg",
-            press: () => {
-              context.read<MyMenuController>().changePage(3),
-              context.read<MyMenuController>().closeDrawer(),
-            },
-          ),
+          // Ongles admin
+          if (role == "admin")
+            DrawerListTile(
+              title: "Docteurs",
+              svgSrc: "assets/icons/docIcone.svg",
+              press: () => {
+                setState(() {
+                  context.read<MyMenuController>().changePage(6);
+                  context.read<MyMenuController>().closeDrawer();
+                })
+              },
+            ),
+          if (role == "admin")
+            DrawerListTile(
+              title: "Rendez-vous",
+              svgSrc: "assets/icons/rendezvous.svg",
+              press: () => {
+                context.read<MyMenuController>().changePage(3),
+                context.read<MyMenuController>().closeDrawer(),
+              },
+            ),
+          // Ongles médecin
+          if (role == "medecin")
+            DrawerListTile(
+              title: "Consultation",
+              svgSrc: "assets/icons/consultation.svg",
+              press: () => {
+                context.read<MyMenuController>().changePage(2),
+                context.read<MyMenuController>().closeDrawer(),
+              },
+            ),
+          if (role == "medecin")
+            DrawerListTile(
+              title: "Rendez-vous",
+              svgSrc: "assets/icons/rendezvous.svg",
+              press: () => {
+                context.read<MyMenuController>().changePage(8),
+                context.read<MyMenuController>().closeDrawer(),
+              },
+            ),
           DrawerListTile(
             title: "Settings",
             svgSrc: "assets/icons/menu_setting.svg",
@@ -90,17 +117,19 @@ class _SideMenuState extends State<SideMenu> {
                       height: 20,
                     ),
                   ),
-                  title: const Text(
-                    "  Prénom Nom",
-                    style: TextStyle(
+                  title: Text(
+                    "  ${context.watch<MyData>().currentUser?.prenom ?? '-'} ${context.watch<MyData>().currentUser?.nom ?? ''}",
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  subtitle: const Text(
-                    "  Admin",
-                    style: TextStyle(
+                  subtitle: Text(
+                    role,
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
                       fontSize: 12,
@@ -114,15 +143,32 @@ class _SideMenuState extends State<SideMenu> {
                   if (navigatorKey.currentContext != null) {
                     navigatorKey.currentContext!.showLoader();
                   }
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.clear();
 
-                  Navigator.pushReplacementNamed(context, '/login').then((_) {
+                  final authService =
+                      Provider.of<AuthService>(context, listen: false);
+                  await authService.logout();
+
+                  Navigator.pushReplacementNamed(context, '/LoginPage')
+                      .then((_) {
                     if (navigatorKey.currentContext != null) {
                       navigatorKey.currentContext!.hideLoader();
                     }
                   });
                 },
+
+                // onTap: () async {
+                //   if (navigatorKey.currentContext != null) {
+                //     navigatorKey.currentContext!.showLoader();
+                //   }
+                //   final prefs = await SharedPreferences.getInstance();
+                //   await prefs.clear();
+
+                //   Navigator.pushReplacementNamed(context, '/login').then((_) {
+                //     if (navigatorKey.currentContext != null) {
+                //       navigatorKey.currentContext!.hideLoader();
+                //     }
+                //   });
+                // },
                 child: Container(
                   height: 50,
                   width: 40,

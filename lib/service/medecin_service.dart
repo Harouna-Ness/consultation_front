@@ -15,13 +15,14 @@ class MedecinService {
         throw Exception("Erreur lors de la récupération des Médecins");
       }
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
   Future<Medecin> getMedecin(int id) async {
     try {
-      Response response = await apiService.getData('admin/recupererMedecin/$id');
+      Response response =
+          await apiService.getData('admin/recupererMedecin/$id');
       if (response.statusCode == 200) {
         final data = response.data;
         return Medecin.fromMap(data);
@@ -29,10 +30,9 @@ class MedecinService {
         throw Exception('Erreur lors de la récupération des medecin');
       }
     } catch (e) {
-      throw Exception("Erreur lors de la requête GET patient_list: $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
-
 
   // Créer une nouveau Medecin
   Future<void> createMedecin(Medecin medecin) async {
@@ -40,7 +40,7 @@ class MedecinService {
       Map<String, dynamic> data = medecin.toMap();
       await apiService.postData('admin/creerMedecin', data);
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -50,7 +50,7 @@ class MedecinService {
       Map<String, dynamic> data = medecin.toMap();
       await apiService.putData('admin/modifierMedecin', data);
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -59,7 +59,7 @@ class MedecinService {
     try {
       await apiService.deleteData('admin/supprimerMedecin/$medecinId');
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -74,7 +74,7 @@ class MedecinService {
         throw Exception("Erreur lors de la récupération des partenaires.");
       }
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -91,7 +91,7 @@ class MedecinService {
         throw Exception("Erreur lors de la récupération des partenaires.");
       }
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 }

@@ -38,7 +38,11 @@ class _CustomtableState extends State<Customtable> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MyData>(context, listen: false).fetchPatients();
+      Provider.of<MyData>(context, listen: false)
+          .fetchPatients()
+          .catchError((onError) {
+        context.showError(onError.toString());
+      });
     });
   }
 
@@ -121,50 +125,6 @@ class _CustomtableState extends State<Customtable> {
 
     return Consumer<MyData>(builder: (context, myData, child) {
       List<Patient> filteredPatients = _filterPatients(myData.patients);
-      //
-      // List<Patient> filteredPatients = myData.patients.where((patient) {
-      //   bool matchesSearch = patient.prenom
-      //               .toLowerCase()
-      //               .contains(searchText.toLowerCase()) ||
-      //           patient.nom.toLowerCase().contains(searchText.toLowerCase()) ||
-      //           patient.proffession!
-      //               .toLowerCase()
-      //               .contains(searchText.toLowerCase()) ||
-      //           patient.direction!.nom
-      //               .toLowerCase()
-      //               .contains(searchText.toLowerCase()) ||
-      //           patient.sitedetravail!.nom
-      //               .toLowerCase()
-      //               .contains(searchText.toLowerCase()) ??
-      //       false;
-      //   bool matchesFilter = true;
-      //   if (selectedFilter != null) {
-      //     switch (selectedFilter) {
-      //       case "Direction":
-      //         matchesFilter = patient.direction?.nom != null &&
-      //             patient.direction!.nom
-      //                 .toLowerCase()
-      //                 .contains(searchText.toLowerCase());
-      //         break;
-      //       case "Site de Travail":
-      //         matchesFilter = patient.sitedetravail?.nom != null &&
-      //             patient.sitedetravail!.nom
-      //                 .toLowerCase()
-      //                 .contains(searchText.toLowerCase());
-      //         break;
-      //       case "profession":
-      //         matchesFilter = patient.proffession != null &&
-      //             patient.proffession!
-      //                 .toLowerCase()
-      //                 .contains(searchText.toLowerCase());
-      //         break;
-      //     }
-      //   }
-      //   return matchesSearch && matchesFilter;
-      // }).toList();
-
-      //
-
       return Column(
         children: [
           // En-tête
@@ -197,11 +157,6 @@ class _CustomtableState extends State<Customtable> {
                     child: Center(
                       child: TextField(
                         controller: searchController,
-                        // onChanged: (value) {
-                        //   setState(() {
-                        //     searchText = value;
-                        //   });
-                        // },
                         onChanged: (value) => _onSearchChanged(value, myData),
                         decoration: InputDecoration(
                           icon: SizedBox(
@@ -522,12 +477,16 @@ DataRow customDataRow(
                         .archiverPatient(patient.id!)
                         .then((value) {
                       contexte.read<MyData>().getNombrePatient();
+                      contexte
+                          .read<MyData>()
+                          .goToPage(contexte.read<MyData>().currentPage);
                       contexte.hideLoader();
-                    }).catchError((onError) {
-                      contexte.showError(onError.toString());
-                    }).whenComplete(() {
                       contexte.showSuccess(
                           "Le patient a été supprimé avec succès.");
+                    }).catchError((onError) {
+                      contexte.hideLoader();
+                      contexte.showError(onError.toString());
+                    }).whenComplete(() {
                       contexte.read<MyMenuController>().changePage(1);
                     });
                     print("Élément supprimé !");

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medstory/components/champs_texte.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/models/app_exception.dart';
 import 'package:medstory/models/medecin.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/role.dart';
@@ -127,7 +128,11 @@ class DoctorStateForm extends State<DoctorForm> {
           context.showSuccess("Ajoutée avec succès.");
         }).catchError((onError) {
           context.hideLoader();
-          context.showError(onError.toString());
+          if (onError is AppException) {
+            context.showError(onError.message);
+          } else {
+            context.showError(onError.toString());
+          }
         });
       } else {
         context.showSnackError("Les mots de passe ne correspondent pas");

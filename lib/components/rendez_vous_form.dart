@@ -34,7 +34,6 @@ class _RendezVousFormState extends State<RendezVousForm> {
   bool? isForFamilyMember = false;
   bool? isChild = false;
   DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
 
   final TextEditingController motifController = TextEditingController();
 
@@ -228,13 +227,15 @@ class _RendezVousFormState extends State<RendezVousForm> {
                   child: TimeSlotSelector(
                     medecinId: selectedMedecin!.id!,
                     selectedDate: _selectedDate!,
-                    heureDebut: heuresIntervention['heureDebut']!,
-                    heureFin: heuresIntervention['heureFin']!,
-                    intervalMinutes: 10,
+                    heureDebut: "07:45",
+                    heureFin: "17:00",
+                    intervalMinutes: 30,
+                    // heureDebut: heuresIntervention['heureDebut']!,
+                    // heureFin: heuresIntervention['heureFin']!,
+                    // intervalMinutes: 10,
                     onTimeSelected: (TimeOfDay slot) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         setState(() {
-                          _selectedTime = slot;
                           heureRdv = formatTimeOfDay24(slot);
                           // heureRdv =
                           //     "${slot.hour.toString().padLeft(2, '0')}:${slot.minute.toString().padLeft(2, '0')}";
@@ -399,7 +400,6 @@ class _RendezVousFormState extends State<RendezVousForm> {
         (selectedTime.hour >= heureDebut.hour &&
             selectedTime.hour <= heureFin.hour)) {
       setState(() {
-        _selectedTime = selectedTime;
         heureRdv =
             '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
       });
@@ -441,7 +441,6 @@ class _RendezVousFormState extends State<RendezVousForm> {
     if (selectedDate != null) {
       setState(() {
         _selectedDate = selectedDate;
-        _selectedTime = null;
       });
     }
   }

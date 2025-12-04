@@ -86,9 +86,9 @@ class _DoctorTableState extends State<DoctorTable> {
           ],
           rows: widget.medecinList.map((medecin) {
             return DataRow(cells: [
-              DataCell(SizedBox(width: 100, child: Text(medecin.prenom))),
-              DataCell(SizedBox(width: 100, child: Text(medecin.nom))),
-              DataCell(Text(medecin.matricule)),
+              DataCell(SizedBox(width: 150, child: Text(medecin.prenom))),
+              DataCell(SizedBox(width: 150, child: Text(medecin.nom))),
+              DataCell(SizedBox(width: 100, child: Text(medecin.matricule))),
               DataCell(SizedBox(width: 100, child: Text(medecin.telephone))),
               DataCell(Text(medecin.specialite)),
               DataCell(Row(
@@ -191,13 +191,16 @@ class _DoctorTableState extends State<DoctorTable> {
                       Column(
                         children: [
                           Container(
-                            color: const Color.fromARGB(255, 101, 83, 116),
+                            color: Colors.grey[200],
                             height: 200,
                             width: 200,
-                            child: Image.network(
-                              "${DioClient.baseUrl}profile-images/${med.profileImage!}",
-                              fit: BoxFit.cover,
-                            ),
+                            child: med.profileImage == null
+                                ? SvgPicture.asset(
+                                    "assets/icons/person_icon.svg")
+                                : Image.network(
+                                    "${DioClient.baseUrl}profile-images/${med.profileImage!}",
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                           const SizedBox(
                             height: 12,

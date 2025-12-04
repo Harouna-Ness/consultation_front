@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:medstory/components/Bar_chart_widget.dart';
 import 'package:medstory/components/box.dart';
 import 'package:medstory/components/consultation_stat_motif_graph.dart';
+import 'package:medstory/components/consultation_stat_patho_graph.dart';
 import 'package:medstory/components/consultation_stat_type_graph.dart';
 import 'package:medstory/components/customGrid.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/resposive.dart';
+import 'package:medstory/models/app_exception.dart';
 import 'package:medstory/models/consultation.dart';
 import 'package:medstory/service/consultation_service.dart';
 import 'package:medstory/service/dio_client.dart';
@@ -25,6 +27,7 @@ class _TableauDeBordState extends State<TableauDeBord> {
   List<Consultation> consultations = [];
   DateTimeRange? selectedRange;
   DateTimeRange? selectedMotifRange;
+  DateTimeRange? selectedPathologieRange;
   Map<String, List<int>> motifData = {};
   Map<String, int> motifTotals = {};
 
@@ -54,20 +57,27 @@ class _TableauDeBordState extends State<TableauDeBord> {
   Map<String, Map<String, int>> motifStats = {};
   bool motifIsLoading = true;
 
+  // Stats_consultation par motif
+  Map<String, Map<String, int>> pathoStats = {};
+  bool pathoIsLoading = true;
+
   @override
   void initState() {
     super.initState();
-    _loadDataNbrPatient();
-    _loadDataMoyenneAge();
-    _loadDataAgeEleveBas();
-    _loadData();
-    _loadDataSite();
-    fetchPatientStatistics();
-    _loadDataProfession();
-    _loadDataTypeDeContrat();
-    // _fetchConsultations();
-    fetchStats();
-    fetchMotifStats();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadDataNbrPatient();
+      _loadDataMoyenneAge();
+      _loadDataAgeEleveBas();
+      _loadData();
+      _loadDataSite();
+      fetchPatientStatistics();
+      _loadDataProfession();
+      _loadDataTypeDeContrat();
+      // _fetchConsultations();
+      fetchStats();
+      fetchMotifStats();
+      fetchPathoStats();
+    });
   }
 
   Future<void> _loadData() async {
@@ -161,7 +171,7 @@ class _TableauDeBordState extends State<TableauDeBord> {
       });
       print(patientStatistics);
     } else {
-      throw Exception('Failed to load statistics');
+      throw AppException('Impossible charger les statistiques !');
     }
   }
 
@@ -177,9 +187,11 @@ class _TableauDeBordState extends State<TableauDeBord> {
       });
     } catch (e) {
       print("Erreur: $e");
+
       setState(() {
         isLoading = false;
       });
+      throw AppException(e.toString());
     }
   }
 
@@ -198,6 +210,26 @@ class _TableauDeBordState extends State<TableauDeBord> {
       setState(() {
         motifIsLoading = false;
       });
+      throw AppException(e.toString());
+    }
+  }
+
+  Future<void> fetchPathoStats({String? star, String? end}) async {
+    try {
+      var data = await _consultationService.fetchConsultationStatsByPatho(
+        startDate: star,
+        endDate: end,
+      );
+      setState(() {
+        pathoStats = data;
+        pathoIsLoading = false;
+      });
+    } catch (e) {
+      print("Erreur: $e");
+      setState(() {
+        pathoIsLoading = false;
+      });
+      throw AppException(e.toString());
     }
   }
 
@@ -306,6 +338,40 @@ class _TableauDeBordState extends State<TableauDeBord> {
                 "${selectedMotifRange!.start.year.toString()}-${selectedMotifRange!.start.month.toString().padLeft(2, '0')}-${selectedMotifRange!.start.day.toString().padLeft(2, '0')}",
             end:
                 "${selectedMotifRange!.end.year.toString()}-${selectedMotifRange!.end.month.toString().padLeft(2, '0')}-${selectedMotifRange!.end.day.toString().padLeft(2, '0')}");
+      });
+    }
+  }
+
+  Future<void> _selectPatholodieDateRange() async {
+    DateTimeRange? pickedRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: DateTimeRange(
+        start: DateTime.now().subtract(
+          const Duration(days: 30),
+        ),
+        end: DateTime.now(),
+      ),
+      builder: (context, child) {
+        return Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: child,
+          ),
+        );
+      },
+    );
+
+    if (pickedRange != null) {
+      setState(() {
+        selectedPathologieRange = pickedRange;
+        fetchPathoStats(
+            star:
+                "${selectedPathologieRange!.start.year.toString()}-${selectedPathologieRange!.start.month.toString().padLeft(2, '0')}-${selectedPathologieRange!.start.day.toString().padLeft(2, '0')}",
+            end:
+                "${selectedPathologieRange!.end.year.toString()}-${selectedPathologieRange!.end.month.toString().padLeft(2, '0')}-${selectedPathologieRange!.end.day.toString().padLeft(2, '0')}");
       });
     }
   }
@@ -778,6 +844,100 @@ class _TableauDeBordState extends State<TableauDeBord> {
                             .primaries[typeIndex + 1 % Colors.primaries.length];
 
                         //Pour connaitre nbr de chaque motif sur la periode.
+                        var data = entry.value;
+                        double total = 0;
+                        data.forEach((key, val) {
+                          total += val;
+                        });
+
+                        return Container(
+                          padding: const EdgeInsets.all(8.0),
+                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 5,
+                                    backgroundColor: color,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "${entry.key}: ${total.toString()}",
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: defaultPadding,
+          ),
+          // Graphe linear pour diagnosticRetenu / pathologie
+          Box(
+            child: SizedBox(
+              height: 400,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "Consultation par pathologie",
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          _selectPatholodieDateRange();
+                        },
+                        child: selectedPathologieRange != null
+                            ? Text(
+                                "${selectedPathologieRange!.start.day.toString().padLeft(2, '0')}/${selectedPathologieRange!.start.month.toString().padLeft(2, '0')}/${selectedPathologieRange!.start.year.toString()} - ${selectedPathologieRange!.end.day.toString().padLeft(2, '0')}/${selectedPathologieRange!.end.month.toString().padLeft(2, '0')}/${selectedPathologieRange!.end.year.toString()}")
+                            : const Text("Selectionner une periode"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: defaultPadding,
+                  ),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ConsultationStatPathoGraph(stats: pathoStats),
+                  ),
+                  const Divider(),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: pathoStats.entries.map((entry) {
+                        int typeIndex =
+                            pathoStats.keys.toList().indexOf(entry.key);
+                        Color color = Colors.primaries[
+                            (typeIndex + 1) % Colors.primaries.length];
+
+                        //Pour connaitre nbr de chaque patho sur la periode.
                         var data = entry.value;
                         double total = 0;
                         data.forEach((key, val) {

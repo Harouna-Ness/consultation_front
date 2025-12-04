@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:medstory/models/app_exception.dart';
 import 'package:medstory/models/rendez_vous.dart';
 import 'package:medstory/service/dio_client.dart';
 
@@ -18,7 +19,7 @@ class RendezVousService {
         throw Exception("Erreur lors de la récupération des Rdv");
       }
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -33,7 +34,7 @@ class RendezVousService {
         throw Exception("Erreur lors de la récupération des Rdv");
       }
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -48,7 +49,7 @@ class RendezVousService {
         throw Exception("Erreur lors de la récupération des Rdv");
       }
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -65,11 +66,8 @@ class RendezVousService {
       await apiService.postData(
           'admin/planifier-rendez-vous?medecinId=${rendezVous.medecin.id}&patientId=${rendezVous.patient.id}&date=$date&heure=${rendezVous.heure}',
           data);
-    } on DioException catch (e) {
-      print(e.response!);
     } catch (e) {
-      // throw Exception("Erreur : $e");
-      print("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -79,7 +77,8 @@ class RendezVousService {
       await apiService.putData('admin/modifier-statut-rdv/$rdvId', data);
     } catch (e) {
       // throw Exception("Erreur : $e");
-      print("créneau non disponible !");
+      // print("créneau non disponible !");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -88,7 +87,7 @@ class RendezVousService {
       Map<String, dynamic> data = rendezVous.toMap();
       await apiService.putData('admin/modifierRendezVous', data);
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -96,7 +95,7 @@ class RendezVousService {
     try {
       await apiService.deleteData('rendezVous/$rendezVousId');
     } catch (e) {
-      throw Exception("Erreur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -123,8 +122,45 @@ class RendezVousService {
       } else {
         throw Exception('Erreur lors de la mise à jour du rendez-vous');
       }
-    } catch (e) {
-      throw Exception("Erreur lors de la requête PUT: $e");
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw _handleError(e.response!); // Gestion des erreurs par code statut
+      }
+
+      throw AppException("Erreur réseau !");
+    }
+  }
+
+  AppException _handleError(Response response) {
+    int statusCode = response.statusCode ?? 0;
+
+    switch (statusCode) {
+      case 400:
+        throw AppException(
+            'Requête invalide : ${response.data['message'] ?? 'Erreur inconnue'}');
+      case 401:
+        throw AppException(
+            'Non autorisé : ${response.data['description'] ?? 'Authentification requise'}');
+      case 403:
+        {
+          if (response.data != null) {
+            throw AppException(
+                'Accès refusé : ${response.data['description'] ?? "Vous n’avez pas les droits nécessaires"}');
+          }
+          throw AppException('Accès refusé : ${response.statusCode}');
+        }
+      case 404:
+        throw AppException(
+            'Ressource non trouvée : ${response.data['message'] ?? 'URL incorrecte ou ressource absente'}');
+      case 409:
+        throw AppException(
+            'Doublon : ${response.data['message'] ?? 'Ressource déjà utilisé'}');
+      case 500:
+        throw AppException(
+            'Erreur interne du serveur : ${response.data['detail'] ?? 'Veuillez réessayer plus tard'}');
+      default:
+        throw AppException(
+            'Erreur inattendue ($statusCode) : ${response.data['message'] ?? response.statusMessage}');
     }
   }
 }

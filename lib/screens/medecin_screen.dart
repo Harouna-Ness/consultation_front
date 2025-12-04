@@ -72,148 +72,216 @@ class _MedecinScreenState extends State<MedecinScreen> {
                   horizontal: 50,
                   vertical: 16,
                 ),
-                child: Box(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Liste des Médecins",
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                      color: Colors.black87,
-                                      fontSize: 18,
-                                    ),
-                          ),
-                          const Spacer(),
-                          ElevatedButton(
-                            onPressed: () async {
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          height: 50,
+                          width: 170,
+                          child: InkWell(
+                            onTap: () {
                               setState(() {
                                 showForm = true;
                               });
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: .1,
+                                    spreadRadius: .1,
+                                    offset: Offset(0, 1),
+                                    blurStyle: BlurStyle.outer,
+                                    color: Colors.grey,
+                                  ),
+                                ],
                               ),
-                            ),
-                            child: const Text(
-                              "Ajouter un docteur",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
+                              child: Padding(
+                                padding: const EdgeInsets.all(defaultPadding),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                      "assets/icons/personAdd.svg",
+                                      height: 20,
+                                    ),
+                                    const SizedBox(
+                                      width: defaultPadding,
+                                    ),
+                                    Text(
+                                      "Ajouter",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: defaultPadding,
+                    ),
+                    Box(
+                      child: Column(
+                        children: [
                           Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                width: 200,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 0.5,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: TextField(
-                                    controller: searchController,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        searchText = value;
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      icon: SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: SvgPicture.asset(
-                                          "assets/icons/search_icon.svg", // Icône SVG pour le bouton
+                              Text(
+                                "Liste des Médecins",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                      color: Colors.black87,
+                                      fontSize: 18,
+                                    ),
+                              ),
+                              const Spacer(),
+                              // ElevatedButton(
+                              //   onPressed: () async {
+                              //     setState(() {
+                              //       showForm = true;
+                              //     });
+                              //   },
+                              //   style: ElevatedButton.styleFrom(
+                              //     backgroundColor: primaryColor,
+                              //     shape: RoundedRectangleBorder(
+                              //       borderRadius: BorderRadius.circular(5),
+                              //     ),
+                              //   ),
+                              //   child: const Text(
+                              //     "Ajouter un docteur",
+                              //     style: TextStyle(
+                              //       color: Colors.white,
+                              //       fontSize: 18,
+                              //       fontWeight: FontWeight.w500,
+                              //     ),
+                              //   ),
+                              // ),
+                              // const SizedBox(
+                              //   width: 10,
+                              // ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    width: 200,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.grey,
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: TextField(
+                                        controller: searchController,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            searchText = value;
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          icon: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: SvgPicture.asset(
+                                              "assets/icons/search_icon.svg", // Icône SVG pour le bouton
+                                            ),
+                                          ),
+                                          hintText:
+                                              "Prénom, nom, spécialité...",
+                                          contentPadding: const EdgeInsets.only(
+                                            bottom: 10,
+                                          ),
+                                          border: InputBorder.none,
                                         ),
                                       ),
-                                      hintText: "Prénom, nom, spécialité...",
-                                      contentPadding: const EdgeInsets.only(
-                                        bottom: 10,
-                                      ),
-                                      border: InputBorder.none,
                                     ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                height: 35,
-                                width: 35,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 0.5,
+                                  const SizedBox(
+                                    width: 10,
                                   ),
-                                ),
-                                child: Center(
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: selectedFilter,
-                                      icon: SvgPicture.asset(
-                                        "assets/icons/filter_alt.svg",
-                                        height: 25,
-                                        width: 25,
+                                  Container(
+                                    height: 35,
+                                    width: 35,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.grey,
+                                        width: 0.5,
                                       ),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          selectedFilter = newValue!;
-                                        });
-                                      },
-                                      selectedItemBuilder:
-                                          (BuildContext context) {
-                                        return filters
-                                            .map<Widget>((String value) {
-                                          return Container(); // On cache complètement le texte
-                                        }).toList();
-                                      },
-                                      menuWidth: 200,
-                                      items: filters
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(value),
-                                        );
-                                      }).toList(),
+                                    ),
+                                    child: Center(
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          value: selectedFilter,
+                                          icon: SvgPicture.asset(
+                                            "assets/icons/filter_alt.svg",
+                                            height: 25,
+                                            width: 25,
+                                          ),
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              selectedFilter = newValue!;
+                                            });
+                                          },
+                                          selectedItemBuilder:
+                                              (BuildContext context) {
+                                            return filters
+                                                .map<Widget>((String value) {
+                                              return Container(); // On cache complètement le texte
+                                            }).toList();
+                                          },
+                                          menuWidth: 200,
+                                          items: filters
+                                              .map<DropdownMenuItem<String>>(
+                                                  (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          (_medecins.isEmpty)
+                              ? const EmptyContent()
+                              : SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: DoctorTable(
+                                    medecinList: filteredMedecins,
+                                  ),
+                                ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      (_medecins.isEmpty)
-                          ? const EmptyContent()
-                          : SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: DoctorTable(
-                                medecinList: filteredMedecins,
-                              ),
-                            ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

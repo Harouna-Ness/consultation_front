@@ -256,9 +256,12 @@ class _RdvReprogState extends State<RdvReprog> {
                     child: TimeSlotSelector(
                       medecinId: widget.rdv.medecin.id!,
                       selectedDate: _selectedDate!,
-                      heureDebut: heuresIntervention!['heureDebut']!,
-                      heureFin: heuresIntervention!['heureFin']!,
-                      intervalMinutes: 10,
+                      heureDebut: "07:45",
+                      heureFin: "17:00",
+                      intervalMinutes: 30,
+                      // heureDebut: heuresIntervention!['heureDebut']!,
+                      // heureFin: heuresIntervention!['heureFin']!,
+                      // intervalMinutes: 10,
                       onTimeSelected: (TimeOfDay slot) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           setState(() {
@@ -281,27 +284,22 @@ class _RdvReprogState extends State<RdvReprog> {
                         onPressed: () async {
                           context.showLoader();
                           final rendezVousService = RendezVousService();
-
-                          try {
-                            rendezVousService
-                                .modifierDateRdv(
-                              rdv: widget.rdv,
-                              date: _selectedDate ?? widget.rdv.date,
-                              heure: heureRdv!,
-                            )
-                                .then((onValue) {
-                              context.read<MyData>().fetchRendezVous();
-                              context.hideLoader();
-                              Navigator.of(context).pop();
-                              context.showSuccess(
-                                  "Le rendez-vous a été reprogrammé avec succès !");
-                            });
-                          } catch (e) {
-                            print(e);
+                          rendezVousService
+                              .modifierDateRdv(
+                            rdv: widget.rdv,
+                            date: _selectedDate ?? widget.rdv.date,
+                            heure: heureRdv!,
+                          )
+                              .then((onValue) {
+                            context.read<MyData>().fetchRendezVous();
                             context.hideLoader();
-                            throw throw Exception(
-                                'Erreur lors de la mise à jour du rendez-vous: $e');
-                          }
+                            Navigator.of(context).pop();
+                            context.showSuccess(
+                                "Le rendez-vous a été reprogrammé avec succès !");
+                          }).catchError((onError) {
+                            context.hideLoader();
+                            context.showError(onError.toString());
+                          });
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,

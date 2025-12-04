@@ -6,9 +6,11 @@ import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/controllers/resposive.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/screens/archives.dart';
+import 'package:medstory/screens/consultation.dart';
 import 'package:medstory/screens/medecin_screen.dart';
 import 'package:medstory/screens/pathologie.dart';
 import 'package:medstory/screens/patients.dart';
+import 'package:medstory/screens/rdv_med_portail.dart';
 import 'package:medstory/screens/rendez_vous.dart';
 import 'package:medstory/screens/setting_screen.dart';
 import 'package:medstory/screens/tableau_de_bord.dart';
@@ -23,6 +25,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int currentPages = 0;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +54,7 @@ class _MainScreenState extends State<MainScreen> {
     return (size.width <= 272)
         ? const ErreurTaille()
         : Scaffold(
+            // backgroundColor: const Color.fromARGB(255, 125, 221, 232),
             backgroundColor: const Color.fromARGB(255, 245, 254, 255),
             key: context.read<MyMenuController>().scaffoldKey,
             drawer: const SideMenu(),
@@ -109,10 +113,15 @@ class _MainScreenState extends State<MainScreen> {
                             const Expanded(
                               child: Archives(),
                             ),
-                          // if (currentPages == 7)
-                          //   const Expanded(
-                          //     child: DossierPatient(),
-                          //   ),
+                          // Ongles du medecin
+                          if (currentPages == 8)
+                            const Expanded(
+                              child: RdvMedPortail(),
+                            ),
+                          if (currentPages == 2)
+                            const Expanded(
+                              child: ConsultationScreen(),
+                            ),
                         ],
                       ),
                     ),

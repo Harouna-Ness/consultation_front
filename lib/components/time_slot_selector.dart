@@ -76,18 +76,6 @@ class _TimeSlotSelectorState extends State<TimeSlotSelector> {
           'date': dateStr,
         },
       );
-
-      // if (response.statusCode == 200) {
-      //   List<dynamic> timesData = response.data;
-      //   bookedSlots = timesData.map((timeStr) {
-      //     List<String> parts = timeStr.toString().split(":");
-      //     print(parts);
-      //     return TimeOfDay(
-      //       hour: int.parse(parts[0]),
-      //       minute: int.parse(parts[1]),
-      //     );
-      //   }).toList();
-      // }
       if (response.statusCode == 200) {
         List<dynamic> timesData = response.data;
         bookedSlots = timesData.map((timeData) {
@@ -107,7 +95,7 @@ class _TimeSlotSelectorState extends State<TimeSlotSelector> {
       print("Erreur lors de la récupération des créneaux réservés: $e");
     }
 
-    // Générer tous les créneaux de 10 minutes entre workingStart et workingEnd
+    // Générer tous les créneaux entre workingStart et workingEnd
     availableSlots = generateAvailableTimeSlots(
       start: workingStart,
       end: workingEnd,
@@ -115,9 +103,9 @@ class _TimeSlotSelectorState extends State<TimeSlotSelector> {
     );
 
     // Filtrer les créneaux déjà réservés
-    availableSlots = availableSlots.where((slot) {
-      return !bookedSlots.any((booked) => _timeOfDayEquals(slot, booked));
-    }).toList();
+    // availableSlots = availableSlots.where((slot) {
+    //   return !bookedSlots.any((booked) => _timeOfDayEquals(slot, booked));
+    // }).toList();
 
     setState(() {
       isLoading = false;
@@ -163,26 +151,57 @@ class _TimeSlotSelectorState extends State<TimeSlotSelector> {
         final String label = formatTimeOfDay24(slot);
         final bool isSelected =
             _selectedSlot != null && _timeOfDayEquals(_selectedSlot!, slot);
+        final bool isBooked =
+            bookedSlots.any((booked) => _timeOfDayEquals(slot, booked));
+
         return ChoiceChip(
           label: Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
+              color: isSelected
+                  ? Colors.white
+                  : isBooked
+                      ? Colors.grey
+                      : Colors.black,
             ),
           ),
           selected: isSelected,
           selectedColor: primaryColor,
           checkmarkColor: Colors.white,
-          onSelected: (bool selected) {
-            // Planifier l'appel à setState après le build courant pour éviter l'erreur
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              setState(() {
-                _selectedSlot = selected ? slot : null;
-              });
-              widget.onTimeSelected(slot);
-            });
-          },
+          onSelected: isBooked
+              ? null // Si réservé, on ne peut pas sélectionner
+              : (bool selected) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      _selectedSlot = selected ? slot : null;
+                    });
+                    widget.onTimeSelected(slot);
+                  });
+                },
+          backgroundColor:
+              isBooked ? Colors.grey[300] : null, // Couleur de fond si réservé
         );
+
+        // return ChoiceChip(
+        //   label: Text(
+        //     label,
+        //     style: TextStyle(
+        //       color: isSelected ? Colors.white : Colors.black,
+        //     ),
+        //   ),
+        //   selected: isSelected,
+        //   selectedColor: primaryColor,
+        //   checkmarkColor: Colors.white,
+        //   onSelected: (bool selected) {
+        //     // Planifier l'appel à setState après le build courant pour éviter l'erreur
+        //     WidgetsBinding.instance.addPostFrameCallback((_) {
+        //       setState(() {
+        //         _selectedSlot = selected ? slot : null;
+        //       });
+        //       widget.onTimeSelected(slot);
+        //     });
+        //   },
+        // );
       }).toList(),
     );
   }

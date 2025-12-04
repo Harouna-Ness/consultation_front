@@ -32,8 +32,7 @@ class _RdvMedPortailState extends State<RdvMedPortail> {
   List<RendezVous> _rendezVous = [];
   @override
   Widget build(BuildContext context) {
-    // _rendezVous = context.watch<MyData>().rendezVousMedecin;// TODO: Decommenter cette ligne.
-    _rendezVous = context.watch<MyData>().rendezVous;
+    _rendezVous = context.watch<MyData>().rendezVousMedecin;
 
     List<RendezVous> filteredRendezVous = _rendezVous.where((rendezVous) {
       bool matchesSearch =
@@ -93,149 +92,219 @@ class _RdvMedPortailState extends State<RdvMedPortail> {
                   horizontal: 50,
                   vertical: 16,
                 ),
-                child: Box(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Mes Rendez-vous",
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                      color: Colors.black87,
-                                      fontSize: 18,
-                                    ),
-                          ),
-                          const Spacer(),
-                          ElevatedButton(
-                            onPressed: () async {
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          height: 50,
+                          width: 170,
+                          child: InkWell(
+                            onTap: () {
                               setState(() {
                                 showForm = true;
                               });
-                              //TODO: logique de création de rendez-vous.
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: .1,
+                                    spreadRadius: .1,
+                                    offset: Offset(0, 1),
+                                    blurStyle: BlurStyle.outer,
+                                    color: Colors.grey,
+                                  ),
+                                ],
                               ),
-                            ),
-                            child: const Text(
-                              "Planifier un rendez-vous",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
+                              child: Padding(
+                                padding: const EdgeInsets.all(defaultPadding),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.more_time_rounded,
+                                      color: Colors.white70,
+                                      weight: 1,
+                                      grade: .1,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(
+                                      width: defaultPadding,
+                                    ),
+                                    Text(
+                                      "Planifier",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: defaultPadding,
+                    ),
+                    Box(
+                      child: Column(
+                        children: [
                           Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                width: 200,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 0.5,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: TextField(
-                                    controller: searchController,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        searchText = value;
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      icon: SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: SvgPicture.asset(
-                                          "assets/icons/search_icon.svg", // Icône SVG pour le bouton
+                              Text(
+                                "Mes Rendez-vous",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                      color: Colors.black87,
+                                      fontSize: 18,
+                                    ),
+                              ),
+                              const Spacer(),
+                              // ElevatedButton(
+                              //   onPressed: () async {
+                              //     setState(() {
+                              //       showForm = true;
+                              //     });
+                              //     //TODO: logique de création de rendez-vous.
+                              //   },
+                              //   style: ElevatedButton.styleFrom(
+                              //     backgroundColor: primaryColor,
+                              //     shape: RoundedRectangleBorder(
+                              //       borderRadius: BorderRadius.circular(5),
+                              //     ),
+                              //   ),
+                              //   child: const Text(
+                              //     "Planifier un rendez-vous",
+                              //     style: TextStyle(
+                              //       color: Colors.white,
+                              //       fontSize: 18,
+                              //       fontWeight: FontWeight.w500,
+                              //     ),
+                              //   ),
+                              // ),
+                              // const SizedBox(
+                              //   width: 10,
+                              // ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    width: 200,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.grey,
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: TextField(
+                                        controller: searchController,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            searchText = value;
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          icon: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: SvgPicture.asset(
+                                              "assets/icons/search_icon.svg", // Icône SVG pour le bouton
+                                            ),
+                                          ),
+                                          hintText: "Motif, statut, date...",
+                                          contentPadding: const EdgeInsets.only(
+                                            bottom: 10,
+                                          ),
+                                          border: InputBorder.none,
                                         ),
                                       ),
-                                      hintText: "Motif, statut, date...",
-                                      contentPadding: const EdgeInsets.only(
-                                        bottom: 10,
-                                      ),
-                                      border: InputBorder.none,
                                     ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                height: 35,
-                                width: 35,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 0.5,
+                                  const SizedBox(
+                                    width: 10,
                                   ),
-                                ),
-                                child: Center(
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: selectedFilter,
-                                      icon: SvgPicture.asset(
-                                        "assets/icons/filter_alt.svg",
-                                        height: 25,
-                                        width: 25,
+                                  Container(
+                                    height: 35,
+                                    width: 35,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.grey,
+                                        width: 0.5,
                                       ),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          selectedFilter = newValue!;
-                                        });
-                                      },
-                                      selectedItemBuilder:
-                                          (BuildContext context) {
-                                        return filters
-                                            .map<Widget>((String value) {
-                                          return Container(); // On cache complètement le texte
-                                        }).toList();
-                                      },
-                                      menuWidth: 200,
-                                      items: filters
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(value),
-                                        );
-                                      }).toList(),
+                                    ),
+                                    child: Center(
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          value: selectedFilter,
+                                          icon: SvgPicture.asset(
+                                            "assets/icons/filter_alt.svg",
+                                            height: 25,
+                                            width: 25,
+                                          ),
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              selectedFilter = newValue!;
+                                            });
+                                          },
+                                          selectedItemBuilder:
+                                              (BuildContext context) {
+                                            return filters
+                                                .map<Widget>((String value) {
+                                              return Container(); // On cache complètement le texte
+                                            }).toList();
+                                          },
+                                          menuWidth: 200,
+                                          items: filters
+                                              .map<DropdownMenuItem<String>>(
+                                                  (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          (_rendezVous.isEmpty)
+                              ? const EmptyContent()
+                              : SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: RdvTabMedPortail(
+                                    rendezVousList: filteredRendezVous,
+                                  ),
+                                ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      (_rendezVous.isEmpty)
-                          ? const EmptyContent()
-                          : SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: RdvTabMedPortail(
-                                rendezVousList: filteredRendezVous,
-                              ),
-                            ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             )

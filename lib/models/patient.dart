@@ -8,6 +8,7 @@ import 'package:medstory/models/utilisateur.dart';
 class Patient extends Utilisateur {
   final DateTime? dateDeNaissance;
   final String? proffession;
+  final String? typeDeContrat;
   final Sitedetravail? sitedetravail;
   final Direction? direction;
   final StatutPatient? statut;
@@ -29,6 +30,7 @@ class Patient extends Utilisateur {
     required this.direction,
     required this.dossierMedical,
     required this.statut,
+    this.typeDeContrat = 'Inconnu',
     required super.profileImage,
   });
 
@@ -60,6 +62,7 @@ class Patient extends Utilisateur {
           ? DateTime.fromMillisecondsSinceEpoch(map['dateDeNaissance'])
           : null,
       proffession: map['proffession'],
+      typeDeContrat: map['typeDeContrat'] ?? 'Inconnu',
       sitedetravail: map['siteDeTravail'] != null
           ? Sitedetravail.fromMap(map['siteDeTravail'])
           : null,
@@ -83,6 +86,7 @@ class Patient extends Utilisateur {
       'telephone': telephone,
       'motDePasse': motDePasse,
       'sexe': sexe,
+      'typeDeContrat': typeDeContrat,
       'profileImage': profileImage,
       'dateDeNaissance': dateDeNaissance!.toIso8601String(),
       'proffession': proffession,

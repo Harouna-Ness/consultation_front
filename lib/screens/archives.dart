@@ -64,12 +64,12 @@ class _ArchivesState extends State<Archives> {
                                             .read<MyData>()
                                             .getNombrePatient();
                                         context.hideLoader();
-                                        setState(() {});
-                                      }).catchError((onError) {
-                                        context.showError(onError.toString());
-                                      }).whenComplete(() {
                                         context.showSuccess(
                                             "Le patient a été Restauré avec succès.");
+                                        setState(() {});
+                                      }).catchError((onError) {
+                                        context.hideLoader();
+                                        context.showError(onError.toString());
                                       });
                                       print("Élément restauré !");
                                     },

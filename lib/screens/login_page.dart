@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medstory/constantes.dart';
 import 'package:medstory/controllers/controller.dart';
 import 'package:medstory/main.dart';
+import 'package:medstory/models/auth_service.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/utilisateur.dart';
 import 'package:medstory/service/dio_client.dart';
@@ -23,10 +24,11 @@ class _LoginPageState extends State<LoginPage> {
 
   final ApiService apiService = ApiService(DioClient.dio);
 
-  Future<void> login(String username, String password) async {
-    if (navigatorKey.currentContext != null) {
-      navigatorKey.currentContext!.showLoader();
-    }
+  Future<void> login(
+      String username, String password, BuildContext contexte) async {
+    DioClient.dio.interceptors.clear();
+
+    contexte.showLoader();
     try {
       final response = await apiService.postData("auth/login", {
         'email': username,
@@ -35,64 +37,38 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final token = response.data['token'];
+        final authService = Provider.of<AuthService>(context, listen: false);
+
         // S'assurer de n'avoir l'intercepteur qu'une seule fois
         DioClient.dio.interceptors.clear();
         DioClient.dio.interceptors.add(DioClient.authInterceptor(token));
 
-        final userResponse = await apiService.getData('/users/me');
+        // final userResponse = await apiService.getData('/users/me');
 
-        if (userResponse.statusCode == 200) {
-          final userData = userResponse.data;
-          final utilisateur = Utilisateur.fromMap(userData);
+        // if (userResponse.statusCode == 200) {
+        //   final userData = userResponse.data;
+        //   final utilisateur = Utilisateur.fromMap(userData);
 
-          if (utilisateur.role.libelle == 'medecin') {
-            await context.read<MyData>().getCurrentMedecin(utilisateur.id!);
-            await context
-                .read<MyData>()
-                .fetchRendezVousmedecin(utilisateur.id!);
-          }
+        //   if (utilisateur.role.libelle == 'medecin') {
+        //     await context.read<MyData>().getCurrentMedecin(utilisateur.id!);
+        //     await context
+        //         .read<MyData>()
+        //         .fetchRendezVousmedecin(utilisateur.id!);
+        //   }
+        // } else {
+        //   throw Exception(
+        //       "Impossible de récupérer les informations utilisateur");
+        // }
 
-          // Redirection en fonction du rôle
-          if (utilisateur.role.libelle == 'admin') {
-            Navigator.pushReplacementNamed(context, '/admin').then((_) {
-              context.read<MyMenuController>().changePage(0);
-              // context.read<MyMenuController>().changePage(1);
-            });
-          } else if (utilisateur.role.libelle == 'medecin') {
-            Navigator.pushReplacementNamed(context, '/medecin').then((_) {
-              context.read<MyMenuController>().changePage(2);
-            });
-          } else if (utilisateur.role.libelle == 'patient') {
-            Navigator.pushReplacementNamed(context, '/patient');
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Rôle utilisateur non reconnu')),
-            );
-          }
-        } else {
-          throw Exception(
-              "Impossible de récupérer les informations utilisateur");
-        }
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token);
-      } else if (response.statusCode == 401) {
-        if (Navigator.canPop(context)) {
-          Navigator.of(context).pop();
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response.data['description'])),
-        );
+        authService.login(token);
       }
     } catch (e) {
-      if (Navigator.canPop(context)) {
-        Navigator.of(context).pop();
-      }
+      contexte.hideLoader();
 
-      print("le print du catch: ${e.toString()}");
+      print("le print du catch: ${e}");
       // Gérer l'erreur de connexion
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+      ScaffoldMessenger.of(contexte).showSnackBar(
+        SnackBar(content: Text("$e")),
       );
     }
   }
@@ -157,20 +133,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 obscureText: isNotVisible,
               ),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.end,
-              //   children: [
-              //     TextButton(
-              //       onPressed: () {},
-              //       child: const Text(
-              //         "Mot de passe oublié ?",
-              //         style: TextStyle(
-              //           color: Colors.black54,
-              //         ),
-              //       ),
-              //     )
-              //   ],
-              // ),
               const SizedBox(height: 24),
               Row(
                 children: [
@@ -178,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: ElevatedButton(
                       onPressed: () {
                         login(_emailController.text.trim(),
-                            _passwordController.text.trim());
+                            _passwordController.text.trim(), context);
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -206,3 +168,200 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+
+
+
+
+
+
+
+// class _LoginPageState extends State<LoginPage> {
+//   final TextEditingController _emailController = TextEditingController();
+//   final TextEditingController _passwordController = TextEditingController();
+
+//   final ApiService apiService = ApiService(DioClient.dio);
+
+//   Future<void> login(String username, String password) async {
+//     if (navigatorKey.currentContext != null) {
+//       navigatorKey.currentContext!.showLoader();
+//     }
+//     try {
+//       final response = await apiService.postData("auth/login", {
+//         'email': username,
+//         'password': password,
+//       });
+
+//       if (response.statusCode == 200) {
+//         final token = response.data['token'];
+//         // S'assurer de n'avoir l'intercepteur qu'une seule fois
+//         DioClient.dio.interceptors.clear();
+//         DioClient.dio.interceptors.add(DioClient.authInterceptor(token));
+
+//         final userResponse = await apiService.getData('/users/me');
+
+//         if (userResponse.statusCode == 200) {
+//           final userData = userResponse.data;
+//           final utilisateur = Utilisateur.fromMap(userData);
+
+//           if (utilisateur.role.libelle == 'medecin') {
+//             await context.read<MyData>().getCurrentMedecin(utilisateur.id!);
+//             await context
+//                 .read<MyData>()
+//                 .fetchRendezVousmedecin(utilisateur.id!);
+//           }
+
+//           // Redirection en fonction du rôle
+//           if (utilisateur.role.libelle == 'admin') {
+//             Navigator.pushReplacementNamed(context, '/admin').then((_) {
+//               context.read<MyMenuController>().changePage(0);
+//               // context.read<MyMenuController>().changePage(1);
+//             });
+//           } else if (utilisateur.role.libelle == 'medecin') {
+//             Navigator.pushReplacementNamed(context, '/medecin').then((_) {
+//               context.read<MyMenuController>().changePage(2);
+//             });
+//           } else if (utilisateur.role.libelle == 'patient') {
+//             Navigator.pushReplacementNamed(context, '/patient');
+//           } else {
+//             ScaffoldMessenger.of(context).showSnackBar(
+//               const SnackBar(content: Text('Rôle utilisateur non reconnu')),
+//             );
+//           }
+//         } else {
+//           throw Exception(
+//               "Impossible de récupérer les informations utilisateur");
+//         }
+
+//         final prefs = await SharedPreferences.getInstance();
+//         await prefs.setString('auth_token', token);
+//       } else if (response.statusCode == 401) {
+//         if (Navigator.canPop(context)) {
+//           Navigator.of(context).pop();
+//         }
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text(response.data['description'])),
+//         );
+//       }
+//     } catch (e) {
+//       if (Navigator.canPop(context)) {
+//         Navigator.of(context).pop();
+//       }
+
+//       print("le print du catch: ${e.toString()}");
+//       // Gérer l'erreur de connexion
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text(e.toString())),
+//       );
+//     }
+//   }
+
+//   bool isNotVisible = true;
+
+//   void showPassWord() {
+//     setState(() {
+//       isNotVisible = !isNotVisible;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     bool isWideScreen = MediaQuery.of(context).size.width > 600;
+
+//     return Scaffold(
+//       body: Center(
+//         child: Container(
+//           width: isWideScreen ? 400 : double.infinity,
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               SvgPicture.asset(
+//                 "assets/icons/logo.svg",
+//                 height: 120,
+//               ),
+//               const SizedBox(
+//                 height: 10,
+//               ),
+//               SvgPicture.asset(
+//                 "assets/icons/MedStory.svg",
+//                 height: 40,
+//               ),
+//               const SizedBox(height: 40),
+//               TextField(
+//                 controller: _emailController,
+//                 decoration: const InputDecoration(
+//                   prefixIcon: Icon(Icons.email_outlined),
+//                   labelText: 'Email',
+//                   border: OutlineInputBorder(),
+//                 ),
+//                 keyboardType: TextInputType.emailAddress,
+//               ),
+//               const SizedBox(height: 16),
+//               TextField(
+//                 controller: _passwordController,
+//                 decoration: InputDecoration(
+//                   prefixIcon: const Icon(Icons.lock_outline),
+//                   suffixIcon: isNotVisible
+//                       ? IconButton(
+//                           onPressed: showPassWord,
+//                           icon: const Icon(Icons.visibility_outlined),
+//                         )
+//                       : IconButton(
+//                           onPressed: showPassWord,
+//                           icon: const Icon(Icons.visibility_off_outlined),
+//                         ),
+//                   labelText: 'Mot de passe',
+//                   border: const OutlineInputBorder(),
+//                 ),
+//                 obscureText: isNotVisible,
+//               ),
+//               // Row(
+//               //   mainAxisAlignment: MainAxisAlignment.end,
+//               //   children: [
+//               //     TextButton(
+//               //       onPressed: () {},
+//               //       child: const Text(
+//               //         "Mot de passe oublié ?",
+//               //         style: TextStyle(
+//               //           color: Colors.black54,
+//               //         ),
+//               //       ),
+//               //     )
+//               //   ],
+//               // ),
+//               const SizedBox(height: 24),
+//               Row(
+//                 children: [
+//                   Expanded(
+//                     child: ElevatedButton(
+//                       onPressed: () {
+//                         login(_emailController.text.trim(),
+//                             _passwordController.text.trim());
+//                       },
+//                       style: ElevatedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(vertical: 12),
+//                         backgroundColor: primaryColor,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(5),
+//                         ),
+//                       ),
+//                       child: const Text(
+//                         'Se connecter',
+//                         style: TextStyle(
+//                           color: Colors.white,
+//                           fontSize: 18,
+//                           fontWeight: FontWeight.w500,
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

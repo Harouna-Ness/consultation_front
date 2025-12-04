@@ -119,6 +119,11 @@ class MyData extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCurrentUser(Utilisateur user) {
+    _currentUser = user;
+    notifyListeners();
+  }
+
   Future<void> getCurrentPatient(int id) async {
     _currentPatient = await patientService.getPatient(id);
     notifyListeners();
@@ -169,7 +174,8 @@ class MyData extends ChangeNotifier {
       _currentPage = page;
       notifyListeners();
     } catch (e) {
-      print("Erreur lors du chargement des patients: $e");
+      print("Erreur lors du chargement des patients dans MyData: $e");
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();

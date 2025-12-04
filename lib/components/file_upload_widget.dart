@@ -57,16 +57,19 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       );
       if (response.statusCode == 200) {
         print("Fichier envoyé avec succès: ${response.data}");
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Fichier envoyé avec succès")),
         );
       } else {
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text("Erreur lors de l'envoi: ${response.statusCode}")),
         );
       }
     } catch (e) {
+      Navigator.of(context).pop();
       print("Erreur lors de l'envoi du fichier: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erreur lors de l'envoi: $e")),

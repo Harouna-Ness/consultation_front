@@ -4,7 +4,9 @@ import 'dart:html' as html;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:medstory/components/file_upload_widget.dart';
+import 'package:medstory/models/auth_service.dart';
 import 'package:medstory/models/consultation.dart';
 import 'package:medstory/service/pdf_service.dart';
 
@@ -33,8 +35,8 @@ class _DossierPatientState extends State<DossierPatient> {
   bool showUploadWidget = false;
 
   Future<void> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    final authToken = prefs.getString("auth_token");
+    FlutterSecureStorage storage = const FlutterSecureStorage();
+    final authToken = await storage.read(key: 'token');
     if (authToken != null) {
       token = authToken;
       print("token ::: $getToken");
@@ -941,23 +943,26 @@ class _DossierPatientState extends State<DossierPatient> {
                                   element.endsWith('.jpg') ||
                                   element.endsWith('.jpeg') ||
                                   element.endsWith('.gif');
-                              return ListTile(
-                                leading: isImage
-                                    ? Image.network(
-                                        headers: {
-                                          'Authorization': 'Bearer $token'
-                                        },
-                                        "${DioClient.baseUrl}admin/dossier-medical/${widget.patient.dossierMedical!.id!}/download/$element",
-                                        width: 50,
-                                        height: 50,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : const Icon(Icons.picture_as_pdf,
-                                        size: 50, color: Colors.red),
-                                title: Text(element),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.download),
-                                  onPressed: () => _downloadFile(element),
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: ListTile(
+                                  leading: isImage
+                                      ? Image.network(
+                                          headers: {
+                                            'Authorization': 'Bearer $token'
+                                          },
+                                          "${DioClient.baseUrl}admin/dossier-medical/${widget.patient.dossierMedical!.id!}/download/$element",
+                                          width: 50,
+                                          height: 50,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const Icon(Icons.picture_as_pdf,
+                                          size: 50, color: Colors.red),
+                                  title: Text(element),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.download),
+                                    onPressed: () => _downloadFile(element),
+                                  ),
                                 ),
                               );
                             }).toList(),

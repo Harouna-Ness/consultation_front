@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:medstory/models/consultation.dart';
 import 'package:medstory/service/dio_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +21,50 @@ class ConsultationService {
   Future<List<Consultation>> getAllConsultation() async {
     try {
       Response response = await apiService.getData('medecin/consultation');
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((e) => Consultation.fromMap(e)).toList();
+      } else {
+        throw Exception("Erreur lors de la récupération des consultations");
+      }
+    } catch (e) {
+      throw Exception("Erreur : $e");
+    }
+  }
+
+  Future<Map<String, dynamic>> getAllConsultations({
+    int page = 0,
+    int size = 21,
+    required int medecinId,
+  }) async {
+    try {
+      Response response = await apiService
+          .getData('medecin/consultations/$medecinId?page=$page&size=$size');
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = response.data;
+        List<dynamic> content = data['content'];
+        int totalPages = data['totalPages'];
+        int totalElements = data['totalElements'];
+
+        List<Consultation> consultations =
+            content.map((e) => Consultation.fromMap(e)).toList();
+        return {
+          'consultations': consultations,
+          'totalPages': totalPages,
+          'totalElements': totalElements,
+        };
+      } else {
+        throw Exception('Erreur lors de la récupération des consultations');
+      }
+    } catch (e) {
+      rethrow; // Relanche au niveau sup.
+    }
+  }
+
+  Future<List<Consultation>> getAllConsultationByMed(int medecinId) async {
+    try {
+      Response response =
+          await apiService.getData('medecin/medecin/$medecinId');
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         return data.map((e) => Consultation.fromMap(e)).toList();
@@ -127,7 +170,7 @@ class ConsultationService {
   }) async {
     try {
       final response = await DioClient.dio.get(
-        'statistics/repartition-consultation-motif', // Endpoint adapté pour la répartition par motif
+        'statistics/repartition-consultation-motif',
         queryParameters: {
           'startDate': startDate,
           'endDate': endDate,
@@ -137,6 +180,32 @@ class ConsultationService {
         Map<String, Map<String, int>> data = {};
         (response.data as Map<String, dynamic>).forEach((motif, dateMap) {
           data[motif] = Map<String, int>.from(dateMap);
+        });
+        return data;
+      } else {
+        throw Exception('Erreur lors de la récupération des statistiques');
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la requête GET: $e");
+    }
+  }
+
+  Future<Map<String, Map<String, int>>> fetchConsultationStatsByPatho({
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final response = await DioClient.dio.get(
+        'statistics/repartition-consultation-diagnostic',
+        queryParameters: {
+          'startDate': startDate,
+          'endDate': endDate,
+        },
+      );
+      if (response.statusCode == 200) {
+        Map<String, Map<String, int>> data = {};
+        (response.data as Map<String, dynamic>).forEach((pathologie, dateMap) {
+          data[pathologie] = Map<String, int>.from(dateMap);
         });
         return data;
       } else {

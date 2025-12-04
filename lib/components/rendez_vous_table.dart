@@ -23,8 +23,6 @@ class RendezVousTable extends StatefulWidget {
 
 class _RendezVousTableState extends State<RendezVousTable> {
   final rendezVousService = RendezVousService();
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
   String? heureRdv;
   @override
   Widget build(BuildContext context) {
@@ -89,7 +87,7 @@ class _RendezVousTableState extends State<RendezVousTable> {
                                   "Le rendez-vous a été confirmé avec succès.");
                             }).catchError((onError) {
                               context.hideLoader();
-                              context.showError("Oups !");
+                              context.showError(onError.toString());
                             });
                           },
                         ),
@@ -101,25 +99,10 @@ class _RendezVousTableState extends State<RendezVousTable> {
                             color: Colors.orange,
                           ),
                           onPressed: () async {
-                            // TODO: Implementer la logique de reprogrammation ici.
                             customRdvModal(
                               context,
                               rendezVous,
                             );
-                            // // Action pour annuler le rendez-vous
-                            // context.showLoader();
-
-                            // await rendezVousService.changeRendezVousStatut(
-                            //     rendezVous.id,
-                            //     {"id": 2, "libelle": "annulé"}).then((value) {
-                            //   context.read<MyData>().fetchRendezVous();
-                            //   context.hideLoader();
-                            //   context.showSuccess(
-                            //       "Le rendez-vous a été annulé avec succès.");
-                            // }).catchError((onError) {
-                            //   context.hideLoader();
-                            //   context.showError("Oups !");
-                            // });
                           },
                         ),
                   IconButton(

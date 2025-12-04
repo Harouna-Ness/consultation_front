@@ -39,8 +39,7 @@ class PatientService {
           await apiService.getData('admin/voirPatients?page=$page&size=$size');
       if (response.statusCode == 200) {
         Map<String, dynamic> data = response.data;
-        List<dynamic> content = data[
-            'content']; // Firestore retourne généralement les données sous "content"
+        List<dynamic> content = data['content'];
         int totalPages = data['totalPages'];
         int totalElements = data['totalElements'];
 
@@ -55,7 +54,7 @@ class PatientService {
         throw Exception('Erreur lors de la récupération des patients');
       }
     } catch (e) {
-      throw Exception("Erreur lors de la requête GET patient_list: $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -97,7 +96,7 @@ class PatientService {
         throw Exception('Erreur lors de la récupération des patients');
       }
     } catch (e) {
-      throw Exception("Erreur lors de la requête GET patient_list: $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -112,7 +111,7 @@ class PatientService {
         throw Exception('Erreur lors de la récupération des patients');
       }
     } catch (e) {
-      throw Exception("Erreur lors de la requête GET patient_list: $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -128,7 +127,7 @@ class PatientService {
             'Erreur lors de la récupération de patients-age-moyenne');
       }
     } catch (e) {
-      throw Exception("Erreur lors de la requête GET patients-age-moyenne: $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -147,7 +146,7 @@ class PatientService {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('patient_count', _cachedPatientCount!);
     } catch (e) {
-      throw Exception("Erreur lors de l'ajout de l'utilisateur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -160,7 +159,7 @@ class PatientService {
       // Si nécessaire, actualiser le cache local
       _cachedPatientCount ??= await getPatientCount();
     } catch (e) {
-      throw Exception("Erreur lors de la modification du patient : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -179,7 +178,7 @@ class PatientService {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('patient_count', _cachedPatientCount!);
     } catch (e) {
-      throw Exception("Erreur lors de la suppression de l'utilisateur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -198,7 +197,7 @@ class PatientService {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('patient_count', _cachedPatientCount!);
     } catch (e) {
-      throw Exception("Erreur lors de la suppression de l'utilisateur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -217,7 +216,7 @@ class PatientService {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('patient_count', _cachedPatientCount!);
     } catch (e) {
-      throw Exception("Erreur lors de la suppression de l'utilisateur : $e");
+      rethrow; // Relanche au niveau sup.
     }
   }
 
@@ -240,7 +239,7 @@ class PatientService {
         return Map<String, int>.from(response.data);
       }
     } catch (e) {
-      print('Erreur : $e');
+      rethrow; // Relanche au niveau sup.
     }
     return {};
   }
@@ -252,7 +251,7 @@ class PatientService {
         return Map<String, int>.from(response.data);
       }
     } catch (e) {
-      print('Erreur : $e');
+      rethrow; // Relanche au niveau sup.
     }
     return {};
   }
@@ -267,7 +266,7 @@ class PatientService {
         );
       }
     } catch (e) {
-      print('Erreur : $e');
+      rethrow; // Relanche au niveau sup.
       // throw Exception('Erreur lors de la récupération des statistiques');
     }
     return {};
@@ -283,7 +282,7 @@ class PatientService {
         );
       }
     } catch (e) {
-      print('Erreur : $e');
+      rethrow; // Relanche au niveau sup.
       // throw Exception('Erreur lors de la récupération des statistiques');
     }
     return {};

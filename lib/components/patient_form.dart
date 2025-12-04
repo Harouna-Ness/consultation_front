@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:medstory/components/champs_texte.dart';
 import 'package:medstory/constantes.dart';
+import 'package:medstory/models/app_exception.dart';
 import 'package:medstory/models/direction.dart';
 import 'package:medstory/models/my_data.dart';
 import 'package:medstory/models/patient.dart';
@@ -122,7 +123,12 @@ class _PatientFormState extends State<PatientForm> {
           context.showSuccess("Ajoutée avec succès.");
         }).catchError((onError) {
           context.hideLoader();
-          context.showError(onError.toString());
+          if (onError is AppException) {
+            AppException error = onError;
+            context.showError(error.message);
+          } else {
+            context.showError(onError.toString());
+          }
         });
       } else {
         context.showSnackError("Les mots de passe ne correspondent pas");
